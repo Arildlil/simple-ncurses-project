@@ -7,14 +7,17 @@ WARNINGS = -pedantic -Wall -Wextra
 DEBUG = -g
 
 TESTS = tests.c
-OBJS = app.c
+APP = app.c
+OBJS = curses.c utils.c
 
 INCS = -I/usr/include/cmocka
 LIB_PATH = -L/usr/lib/
-LIBS = -lcmocka
+LIBS = -lcmocka -lncurses
 
 FLAGS = $(WARNINGS) $(DEBUG)
 LDLIBS = $(LIB_PATH) $(LIBS)
+
+.PHONY: all clean install debug run test
 
 all: app
 
@@ -23,15 +26,19 @@ all: app
 #	@echo "Compiling" $< "..."
 #	$(CC) $(CFLAGS) -c $<
 
-tests: $(TESTS)
+tests: $(TESTS) $(OBJS) 
 	@echo "Building target" $@ "..."
-	$(CC) $(FLAGS) $(TESTS) $(LDLIBS) -o $@ 
+	$(CC) $(FLAGS) $(TESTS) $(OBJS) $(LDLIBS) -o $@ 
 
-app: $(OBJS)
+debug: $(APP) $(OBJS)
+	@echo "Building target" $@ "in DEBUG mode..." 
+	$(CC) $(FLAGS) -DDEBUG $(APP) $(OBJS) $(LDLIBS) -o app
+
+app: $(APP) $(OBJS)
 	@echo "Building target" $@ "..." 
-	$(CC) $(FLAGS) $(OBJS) $(LDLIBS) -o $@
+	$(CC) $(FLAGS) $(APP) $(OBJS) $(LDLIBS) -o $@
 
-rtests: tests
+test: tests
 	./tests
 
 run: app
