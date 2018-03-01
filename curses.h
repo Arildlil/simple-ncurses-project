@@ -3,6 +3,12 @@
 
 #include "utils.h"
 
+typedef struct Surface {
+    int x;
+    int y;
+    char *content;
+} Surface;
+
 /*
  * Can be used to check if the 'ncurses' module
  * has been initialized yet.
@@ -25,5 +31,10 @@ boolean Curses_init(void);
  * @return: Should always return TRUE.
  */
 boolean Curses_exit(void);
+
+/*
+ * Redraws the screen.
+ */
+void Curses_redraw(Surface surfaces[], int num_elements);
 
 #endif

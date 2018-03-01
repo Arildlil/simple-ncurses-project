@@ -1,12 +1,19 @@
-#include <unistd.h>
-
 #include "utils.h"
 #include "curses.h"
 
+#include <curses.h>
+#include <unistd.h>
+
+
+
+
+#define DEFAULT_DELAY 1000
 
 /* ----- | Static globals | ----- */
 
 static boolean inited = FALSE;
+
+static int delay = DEFAULT_DELAY;
 
 
 
@@ -28,9 +35,9 @@ boolean Curses_init(void) {
         dnprintf("Initializing ncurses...\n");
         
         inited = TRUE;
-        //initscr();          /* Initialize the window */
-        //noecho();           /* Don't echo any keypresses */
-        //curs_set(FALSE);    /* Don't display a cursor */
+        initscr();          /* Initialize the window */
+        noecho();           /* Don't echo any keypresses */
+        curs_set(FALSE);    /* Don't display a cursor */
     }
     return inited;
 }
@@ -41,4 +48,18 @@ boolean Curses_init(void) {
 boolean Curses_exit(void) {
     endwin();
     return TRUE;
+}
+
+/*
+ * Redraws the screen.
+ */
+void Curses_redraw(Surface surfaces[], int num_elements) {
+    int x = 0, y = 0;
+    int i;
+    clear();
+    for (i = 0; i < num_elements; i++) {
+        Surface* cur = &surfaces[i];
+        mvprintw(cur->x, cur->y, cur->content);
+    }
+    refresh();
 }
