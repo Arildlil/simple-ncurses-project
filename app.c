@@ -11,11 +11,43 @@
 
 
 
+/* ----- | Prototypes | ------ */
+
+static void cleanup(int sig);
+
+
+
+/* ----- | Functions | ----- */
+
+/*
+ * Initialization code.
+ */
+static int init() {
+    signal(SIGINT, cleanup);
+    signal(SIGTERM, cleanup);
+    signal(SIGKILL, cleanup);
+    Curses_init();
+    return OK;
+}
+
+/*
+ * Clean up before exiting.
+ * 
+ * @arg sig: Signal that caused this to be called. 
+ *   0 on normal termination.
+ */
+static void cleanup(int sig) {
+    Curses_exit();
+    sleep(1);
+    dnprintf("Cleaning up and exiting...\n");
+    exit(0);
+}
+
 
 
 int main(int argc, char *argv[]) {
     dnprintf("Main!\n");
-    Curses_init();
+    init();
 
     #define NUM_OBJECTS 2
     Surface objects[NUM_OBJECTS];
@@ -35,6 +67,7 @@ int main(int argc, char *argv[]) {
     }
     Curses_exit();
     printf("max_x: %d, max_y: %d\n", max_x, max_y);
-    return EXIT_SUCCESS;
+    
+    cleanup(OK);
 }
 
