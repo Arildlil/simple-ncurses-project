@@ -43,7 +43,12 @@ boolean Curses_init(void) {
         inited = TRUE;
         initscr();          /* Initialize the window */
         noecho();           /* Don't echo any keypresses */
+        cbreak();           /* Take input chars one at a time, no '\n' wait */
         curs_set(FALSE);    /* Don't display a cursor */
+        keypad(stdscr, TRUE);   /* Enable keyboard mapping */
+        if (has_colors()) {
+            start_color();  /* GIFF NICE COLORS! */
+        }
         max_y = 0, max_x = 0;
         getmaxyx(stdscr, max_y, max_x);
     }
@@ -68,6 +73,9 @@ void Curses_redraw(Surface surfaces[], int num_elements) {
     clear();
     for (i = 0; i < num_elements; i++) {
         Surface* cur = &surfaces[i];
+        if (cur->state == DEAD) {
+            continue;
+        } 
         mvprintw(cur->y, cur->x, cur->content);
     }
     refresh();

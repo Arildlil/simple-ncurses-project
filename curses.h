@@ -3,18 +3,23 @@
 
 #include "utils.h"
 
-typedef struct Surface_options {
+typedef enum {
+    DEAD, ALIVE
+} Surface_State;
+
+typedef struct Surface_Options {
     /* If the object should bounce on edges. */
     boolean bounce;
     /* If the object is removed when leaving the screen. */
     boolean screen_only;
-} Surface_options;
+} Surface_Options;
 
 typedef struct Surface {
     int x;
     int y;
     char *content;
-    Surface_options options;
+    Surface_Options options;
+    Surface_State state;
 } Surface;
 
 int max_x;
@@ -31,7 +36,7 @@ int max_y;
  *  behave.
  */
 void Surface_init(Surface *surface, int x, int y, char *content, 
-    Surface_options* options);
+    Surface_Options* options);
 
 /*
  * Moves the 'Surface' by the specified arguments.
@@ -41,6 +46,13 @@ void Surface_init(Surface *surface, int x, int y, char *content,
  * @arg y: The initial y coordinate.
  */
 void Surface_move(Surface *surface, int x, int y);
+
+/*
+ * Cleans up the Surface and marks it as unused.
+ * 
+ * @arg Surface: The Surface to clean up.
+ */
+void Surface_remove(Surface *surface);
 
 /*
  * Can be used to check if the 'ncurses' module
