@@ -56,6 +56,15 @@ static void test_Surface_remove(void **state) {
     assert_int_equal(surface.state, DEAD);
 }
 
+static void test_Surface_bounce(void **state) {
+    Surface surface;
+    Surface_Options options = {.bounce = TRUE, .screen_only = FALSE};
+    Surface_init(&surface, max_x/2, max_y, "o", &options);
+    Surface_bounce(&surface, max_x/2-1, max_y-1);
+    assert_int_equal(surface.x, max_x+1);
+    assert_int_equal(surface.y, max_y+1);
+}
+
 
 
 /* ----- | Other | ------ */
@@ -72,6 +81,7 @@ int main(void) {
         cmocka_unit_test(test_Surface_init),
         cmocka_unit_test(test_Surface_move),
         cmocka_unit_test(test_Surface_remove),
+        cmocka_unit_test(test_Surface_bounce),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

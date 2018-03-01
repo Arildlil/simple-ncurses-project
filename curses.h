@@ -48,6 +48,11 @@ void Surface_init(Surface *surface, int x, int y, char *content,
 void Surface_move(Surface *surface, int x, int y);
 
 /*
+ * 
+ */
+void Surface_bounce(Surface *surface, int old_x, int old_y);
+
+/*
  * Cleans up the Surface and marks it as unused.
  * 
  * @arg Surface: The Surface to clean up.

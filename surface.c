@@ -40,6 +40,9 @@ void Surface_init(Surface *surface, int x, int y, char *content,
  * Move the Surface object.
  */
 void Surface_move(Surface *surface, int x, int y) {
+    int old_x = surface->x;
+    int old_y = surface->y;
+    
     surface->x += x;
     surface->y += y;
 
@@ -58,6 +61,10 @@ void Surface_move(Surface *surface, int x, int y) {
             return;
         }
     }
+}
+
+void Surface_bounce(Surface *surface, int old_x, int old_y) {
+    
 }
 
 /*
