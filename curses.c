@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "utils.h"
 #include "curses.h"
 
@@ -31,4 +33,12 @@ boolean Curses_init(void) {
         //curs_set(FALSE);    /* Don't display a cursor */
     }
     return inited;
+}
+
+/*
+ * Restore normal terminal behavior.
+ */
+boolean Curses_exit(void) {
+    endwin();
+    return TRUE;
 }

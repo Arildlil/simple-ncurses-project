@@ -19,4 +19,11 @@ boolean Curses_is_inited(void);
  */
 boolean Curses_init(void);
 
+/*
+ * Restore normal terminal behavior.
+ * 
+ * @return: Should always return TRUE.
+ */
+boolean Curses_exit(void);
+
 #endif

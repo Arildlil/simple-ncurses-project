@@ -11,6 +11,7 @@ static void test_Curses_init(void **state) {
     assert_int_equal(Curses_is_inited(), FALSE);
     assert_int_equal(Curses_init(), TRUE);
     assert_int_equal(Curses_is_inited(), TRUE);
+    assert_int_equal(Curses_exit(), TRUE);
 }
 
 
