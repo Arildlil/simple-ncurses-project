@@ -2,13 +2,19 @@
 
 
 
+/* ----- | Type Definitions | ----- */
+
+
 
 static const Surface_options default_options = {
     .bounce = FALSE,
+    .screen_only = TRUE,
 };
 
 
-
+/*
+ * Initialize the Surface object.
+ */
 void Surface_init(Surface *surface, int x, int y, char *content, 
     Surface_options* options) {
     
@@ -16,18 +22,21 @@ void Surface_init(Surface *surface, int x, int y, char *content,
     surface->y = y;
     surface->content = content;
 
-    if (options) {
-        surface->bounce = options->bounce;
-    } else {
-        surface->bounce = default_options.bounce;
+    if (options == NULL) {
+        options = &default_options;
     }
+    surface->options.bounce = options->bounce;
+    surface->options.screen_only = options->screen_only;
 }
 
+/*
+ * Move the Surface object.
+ */
 void Surface_move(Surface *surface, int x, int y) {
     surface->x += x;
     surface->y += y;
 
-    if (surface->bounce == TRUE) {
+    if (surface->options.bounce == TRUE) {
         if (surface->x > max_x-1) {
             surface->x = max_x-1;
         }

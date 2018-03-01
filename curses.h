@@ -3,16 +3,19 @@
 
 #include "utils.h"
 
+typedef struct Surface_options {
+    /* If the object should bounce on edges. */
+    boolean bounce;
+    /* If the object is removed when leaving the screen. */
+    boolean screen_only;
+} Surface_options;
+
 typedef struct Surface {
     int x;
     int y;
     char *content;
-    boolean bounce;
+    Surface_options options;
 } Surface;
-
-typedef struct Surface_options {
-    boolean bounce;
-} Surface_options;
 
 int max_x;
 int max_y;

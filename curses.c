@@ -64,6 +64,7 @@ boolean Curses_exit(void) {
 void Curses_redraw(Surface surfaces[], int num_elements) {
     int x = 0, y = 0;
     int i;
+    getmaxyx(stdscr, max_y, max_x);
     clear();
     for (i = 0; i < num_elements; i++) {
         Surface* cur = &surfaces[i];
