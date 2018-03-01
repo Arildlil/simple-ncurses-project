@@ -7,7 +7,37 @@ typedef struct Surface {
     int x;
     int y;
     char *content;
+    boolean bounce;
 } Surface;
+
+typedef struct Surface_options {
+    boolean bounce;
+} Surface_options;
+
+int max_x;
+int max_y;
+
+/*
+ * Construction for the 'Surface' type.
+ * 
+ * @arg Surface: The Surface to initialize.
+ * @arg x: The initial x coordinate.
+ * @arg y: The initial y coordinate.
+ * @arg content: The graphical representation of the object.
+ * @arg options (Optional): Options for how the Surface will 
+ *  behave.
+ */
+void Surface_init(Surface *surface, int x, int y, char *content, 
+    Surface_options* options);
+
+/*
+ * Moves the 'Surface' by the specified arguments.
+ * 
+ * @arg Surface: The Surface to initialize.
+ * @arg x: The initial x coordinate.
+ * @arg y: The initial y coordinate.
+ */
+void Surface_move(Surface *surface, int x, int y);
 
 /*
  * Can be used to check if the 'ncurses' module

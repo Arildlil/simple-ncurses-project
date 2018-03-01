@@ -9,6 +9,12 @@
 
 #define DEFAULT_DELAY 1000
 
+/* ----- | Definitions | ------ */
+
+
+
+
+
 /* ----- | Static globals | ----- */
 
 static boolean inited = FALSE;
@@ -38,6 +44,8 @@ boolean Curses_init(void) {
         initscr();          /* Initialize the window */
         noecho();           /* Don't echo any keypresses */
         curs_set(FALSE);    /* Don't display a cursor */
+        max_y = 0, max_x = 0;
+        getmaxyx(stdscr, max_y, max_x);
     }
     return inited;
 }
@@ -59,7 +67,7 @@ void Curses_redraw(Surface surfaces[], int num_elements) {
     clear();
     for (i = 0; i < num_elements; i++) {
         Surface* cur = &surfaces[i];
-        mvprintw(cur->x, cur->y, cur->content);
+        mvprintw(cur->y, cur->x, cur->content);
     }
     refresh();
 }
