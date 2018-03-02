@@ -25,21 +25,21 @@ static void test_Image_1D(void **state) {
 
     Image image1D;
     Image_init_1D(&image1D, 1, "");
-    assert_int_equal(image1D.getHeight(&image1D), 1);
-    assert_int_equal(image1D.getWidth(&image1D), 1);
+    assert_int_equal(image1D.get_height(&image1D), 1);
+    assert_int_equal(image1D.get_width(&image1D), 1);
     assert_int_equal(image1D.getPixels(&image1D)[0][0], '\0');
 
     Image image1D_2;
     char *testString = "test";
     size_t lenTestString = strlen(testString);
     Image_init_1D(&image1D_2, lenTestString, testString);
-    assert_int_equal(image1D_2.getHeight(&image1D_2), 1);
-    assert_int_equal(image1D_2.getWidth(&image1D_2), lenTestString);
+    assert_int_equal(image1D_2.get_height(&image1D_2), 1);
+    assert_int_equal(image1D_2.get_width(&image1D_2), lenTestString);
     assert_memory_equal(image1D_2.getPixels(&image1D_2)[0], testString, lenTestString);
 
     image1D_2.free(&image1D_2);
-    assert_int_equal(image1D_2.getWidth(&image1D_2), 0);
-    assert_int_equal(image1D_2.getHeight(&image1D_2), 0);
+    assert_int_equal(image1D_2.get_width(&image1D_2), 0);
+    assert_int_equal(image1D_2.get_height(&image1D_2), 0);
     // assert_int_equal(image1D_2.getPixels(), NULL);
 }
 
@@ -49,16 +49,16 @@ static void test_Image_2D(void **state) {
     Image image2D;
     char **image1 = {""};
     Image_init_2D(&image2D, 1, 1, image1);
-    assert_int_equal(image2D.getHeight(&image2D), 1);
-    assert_int_equal(image2D.getWidth(&image2D), 1);
+    assert_int_equal(image2D.get_height(&image2D), 1);
+    assert_int_equal(image2D.get_width(&image2D), 1);
     assert_int_equal(image2D.getPixels(&image2D)[0][0], '\0');
 
     Image image2D_2;
     char **testString = {"test"};
     size_t lenTestString = strlen(testString[0]);
     Image_init_2D(&image2D_2, lenTestString, 1, testString);
-    assert_int_equal(image2D_2.getHeight(&image2D_2), 1);
-    assert_int_equal(image2D_2.getWidth(&image2D_2), lenTestString);
+    assert_int_equal(image2D_2.get_height(&image2D_2), 1);
+    assert_int_equal(image2D_2.get_width(&image2D_2), lenTestString);
     assert_memory_equal(image2D_2.getPixels(&image2D_2)[0], testString, lenTestString);
 
     Image image2D_3;
@@ -68,13 +68,13 @@ static void test_Image_2D(void **state) {
     assert_memory_equal(image2D_3.getPixels(&image2D_3)[0], "AAA", 3);
     assert_memory_equal(image2D_3.getPixels(&image2D_3)[1], "BBB", 3);
     assert_memory_equal(image2D_3.getPixels(&image2D_3)[2], "CCC", 3);
-    assert_int_equal(image2D_3.getHeight(&image2D_3), lenTestString3);
-    assert_int_equal(image2D_3.getWidth(&image2D_3), lenTestString3);
+    assert_int_equal(image2D_3.get_height(&image2D_3), lenTestString3);
+    assert_int_equal(image2D_3.get_width(&image2D_3), lenTestString3);
     assert_memory_equal(image2D_3.getPixels(&image2D_3)[0], testString3, lenTestString3);
 
     image2D_2.free(&image2D_2);
-    assert_int_equal(image2D_2.getWidth(&image2D_2), 0);
-    assert_int_equal(image2D_2.getHeight(&image2D_2), 0);
+    assert_int_equal(image2D_2.get_width(&image2D_2), 0);
+    assert_int_equal(image2D_2.get_height(&image2D_2), 0);
     assert_null(image2D_2.getPixels(&image2D_2));
 }
 

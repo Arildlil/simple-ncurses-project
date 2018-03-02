@@ -18,42 +18,45 @@ typedef struct Surface_Options {
 typedef struct Surface {
     int x;
     int y;
-    char *content;
+    Image *image;
     Surface_Options options;
     Surface_State state;
+
+    void (*free)(struct Surface* surface);
+    void (*move)(struct Surface* surface, int x, int y);
+    int (*get_x)(struct Surface* surface);
+    int (*get_y)(struct Surface* surface);
+    Image *(*get_image)(struct Surface* surface);
 } Surface;
 
 int max_x;
 int max_y;
 
 /*
- * Construction for the 'Surface' type.
+ * Constructor for the 'Surface' type, where a single char is provided.
  * 
  * @arg Surface: The Surface to initialize.
+ * @arg character: The graphical representation of the object.
  * @arg x: The initial x coordinate.
  * @arg y: The initial y coordinate.
- * @arg content: The graphical representation of the object.
  * @arg options (Optional): Options for how the Surface will 
  *  behave.
  */
-void Surface_init(Surface *surface, int x, int y, char *content, 
+void Surface_init_char(Surface *surface, char character, int x, int y,
     Surface_Options* options);
 
 /*
- * Moves the 'Surface' by the specified arguments.
+ * Constructor for the 'Surface' type, where an Image is provided.
  * 
  * @arg Surface: The Surface to initialize.
+ * @arg Image: The graphical representation of the object.
  * @arg x: The initial x coordinate.
  * @arg y: The initial y coordinate.
+ * @arg options (Optional): Options for how the Surface will 
+ *  behave.
  */
-void Surface_move(Surface *surface, int x, int y);
-
-/*
- * Cleans up the Surface and marks it as unused.
- * 
- * @arg Surface: The Surface to clean up.
- */
-void Surface_remove(Surface *surface);
+void Surface_init_image(Surface *surface, Image *image, int x, int y, 
+    Surface_Options* options);
 
 /*
  * Can be used to check if the 'ncurses' module

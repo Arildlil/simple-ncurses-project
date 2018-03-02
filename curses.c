@@ -1,4 +1,6 @@
 #include "utils.h"
+#include "image.h"
+#include "rect.h"
 #include "curses.h"
 
 #include <curses.h>
@@ -76,7 +78,7 @@ void Curses_redraw(Surface surfaces[], int num_elements) {
         if (cur->state == DEAD) {
             continue;
         } 
-        mvprintw(cur->y, cur->x, cur->content);
+        //mvprintw(cur->y, cur->x, cur->content);
     }
     refresh();
 }

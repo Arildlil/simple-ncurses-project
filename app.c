@@ -34,16 +34,17 @@ int main(int argc, char *argv[]) {
 
     #define NUM_OBJECTS 2
     Surface objects[NUM_OBJECTS];
-    Surface_init(&objects[0], 0, 0, "o", NULL);
+    Surface_init_char(&objects[0], 'o', 0, 0, NULL);
     Surface_Options options = {.bounce = TRUE, .screen_only=TRUE};
-    Surface_init(&objects[1], 25, 0, "*", &options);
+    Surface_init_char(&objects[1], '*', 25, 0, &options);
 
     int counter = 0;
     while (1) {
         Curses_redraw(objects, NUM_OBJECTS);
         usleep(update_rate_us);
-        Surface_move(&objects[0], 1, 1);
-        Surface_move(&objects[1], 1, 1);
+        //objects[0].move(&objects[0], 1, 1);
+        //objects[0].move(&objects[0], 1, 1);
+        //Surface_move(&objects[1], 1, 1);
         /*counter++;
         if (counter > 50)
             break;*/
