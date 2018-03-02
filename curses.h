@@ -1,6 +1,7 @@
 #ifndef CURSES_H
 #define CURSES_H
 
+#include "image.h"
 #include "utils.h"
 
 typedef enum {
@@ -46,11 +47,6 @@ void Surface_init(Surface *surface, int x, int y, char *content,
  * @arg y: The initial y coordinate.
  */
 void Surface_move(Surface *surface, int x, int y);
-
-/*
- * 
- */
-void Surface_bounce(Surface *surface, int old_x, int old_y);
 
 /*
  * Cleans up the Surface and marks it as unused.

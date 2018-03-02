@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "image.h"
 #include "curses.h"
 
 
@@ -15,6 +16,7 @@ static const Surface_Options default_options = {
 };
 
 /* ----- | Function Prototypes | ----- */
+
 static boolean is_outside_screen(Surface *surface);
 
 
@@ -61,10 +63,6 @@ void Surface_move(Surface *surface, int x, int y) {
             return;
         }
     }
-}
-
-void Surface_bounce(Surface *surface, int old_x, int old_y) {
-    
 }
 
 /*

@@ -67,7 +67,7 @@ boolean Curses_exit(void) {
  * Redraws the screen.
  */
 void Curses_redraw(Surface surfaces[], int num_elements) {
-    int x = 0, y = 0;
+    // int x = 0, y = 0;
     int i;
     getmaxyx(stdscr, max_y, max_x);
     clear();

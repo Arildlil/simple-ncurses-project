@@ -18,6 +18,11 @@ static void cleanup(int sig);
 
 
 
+/* ----- | Static Variables | ------ */
+static long update_rate_us = 30000;
+
+
+
 /* ----- | Functions | ----- */
 
 
@@ -36,7 +41,7 @@ int main(int argc, char *argv[]) {
     int counter = 0;
     while (1) {
         Curses_redraw(objects, NUM_OBJECTS);
-        usleep(30000);
+        usleep(update_rate_us);
         Surface_move(&objects[0], 1, 1);
         Surface_move(&objects[1], 1, 1);
         /*counter++;

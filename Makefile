@@ -8,7 +8,7 @@ DEBUG = -g
 
 TESTS = tests.c
 APP = app.c
-OBJS = curses.c utils.c surface.c
+OBJS = curses.c utils.c surface.c rect.c image.c
 
 INCS = -I/usr/include/cmocka
 LIB_PATH = -L/usr/lib/
