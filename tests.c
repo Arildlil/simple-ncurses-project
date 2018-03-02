@@ -27,7 +27,7 @@ static void test_Image_1D(void **state) {
     Image_init_1D(&image1D, 1, "");
     assert_int_equal(image1D.get_height(&image1D), 1);
     assert_int_equal(image1D.get_width(&image1D), 1);
-    assert_int_equal(image1D.getPixels(&image1D)[0][0], '\0');
+    assert_int_equal(image1D.get_pixels(&image1D)[0][0], '\0');
 
     Image image1D_2;
     char *testString = "test";
@@ -35,12 +35,12 @@ static void test_Image_1D(void **state) {
     Image_init_1D(&image1D_2, lenTestString, testString);
     assert_int_equal(image1D_2.get_height(&image1D_2), 1);
     assert_int_equal(image1D_2.get_width(&image1D_2), lenTestString);
-    assert_memory_equal(image1D_2.getPixels(&image1D_2)[0], testString, lenTestString);
+    assert_memory_equal(image1D_2.get_pixels(&image1D_2)[0], testString, lenTestString);
 
     image1D_2.free(&image1D_2);
     assert_int_equal(image1D_2.get_width(&image1D_2), 0);
     assert_int_equal(image1D_2.get_height(&image1D_2), 0);
-    // assert_int_equal(image1D_2.getPixels(), NULL);
+    // assert_int_equal(image1D_2.get_pixels(), NULL);
 }
 
 static void test_Image_2D(void **state) {
@@ -51,7 +51,7 @@ static void test_Image_2D(void **state) {
     Image_init_2D(&image2D, 1, 1, image1);
     assert_int_equal(image2D.get_height(&image2D), 1);
     assert_int_equal(image2D.get_width(&image2D), 1);
-    assert_int_equal(image2D.getPixels(&image2D)[0][0], '\0');
+    assert_int_equal(image2D.get_pixels(&image2D)[0][0], '\0');
 
     Image image2D_2;
     char **testString = {"test"};
@@ -59,90 +59,72 @@ static void test_Image_2D(void **state) {
     Image_init_2D(&image2D_2, lenTestString, 1, testString);
     assert_int_equal(image2D_2.get_height(&image2D_2), 1);
     assert_int_equal(image2D_2.get_width(&image2D_2), lenTestString);
-    assert_memory_equal(image2D_2.getPixels(&image2D_2)[0], testString, lenTestString);
+    assert_memory_equal(image2D_2.get_pixels(&image2D_2)[0], testString, lenTestString);
 
     Image image2D_3;
     char **testString3 = {"AAA", "BBB", "CCC"};
     size_t lenTestString3 = strlen(testString3[0]);
     Image_init_2D(&image2D_3, lenTestString3, lenTestString3, testString3);
-    assert_memory_equal(image2D_3.getPixels(&image2D_3)[0], "AAA", 3);
-    assert_memory_equal(image2D_3.getPixels(&image2D_3)[1], "BBB", 3);
-    assert_memory_equal(image2D_3.getPixels(&image2D_3)[2], "CCC", 3);
+    assert_memory_equal(image2D_3.get_pixels(&image2D_3)[0], "AAA", 3);
+    assert_memory_equal(image2D_3.get_pixels(&image2D_3)[1], "BBB", 3);
+    assert_memory_equal(image2D_3.get_pixels(&image2D_3)[2], "CCC", 3);
     assert_int_equal(image2D_3.get_height(&image2D_3), lenTestString3);
     assert_int_equal(image2D_3.get_width(&image2D_3), lenTestString3);
-    assert_memory_equal(image2D_3.getPixels(&image2D_3)[0], testString3, lenTestString3);
+    assert_memory_equal(image2D_3.get_pixels(&image2D_3)[0], testString3, lenTestString3);
 
     image2D_2.free(&image2D_2);
     assert_int_equal(image2D_2.get_width(&image2D_2), 0);
     assert_int_equal(image2D_2.get_height(&image2D_2), 0);
-    assert_null(image2D_2.getPixels(&image2D_2));
+    assert_null(image2D_2.get_pixels(&image2D_2));
 }
 
-static void test_Surface_init(void **state) {
+static void test_Surface_1D(void **state) {
     (void)state; /* Remove unused complaint. */
 
-    /*
-    Surface surface1;
-    char image1[1][1] = {""};
-    Surface_init(&surface1, 0, 0, 0, 0, image1, NULL);
-    assert_int_equal(surface1.rect.x, 0);
-    assert_int_equal(surface1.rect.y, 0);
-    // assert_int_equal(surface1.content[0][0], "");
-    assert_int_equal(surface1.options.bounce, FALSE);
+    /* Checks that it doesn't crash. */
+    Surface_init_char(NULL, '*', 5, 3, NULL);
 
-    Surface surface2;
-    char image2[1][1] = {"Hello"};
-    Surface_Options options = {.bounce = TRUE};
-    Surface_init(&surface2, 10, 10, 5, 1, image2, &options);
-    assert_int_equal(surface2.rect.x, 10);
-    assert_int_equal(surface2.rect.y, 10);
-    assert_int_equal(surface2.content, "Hello");
-    assert_int_equal(surface2.options.bounce, TRUE);*/
+    /* Normal tests. */
+    Surface surface1D;
+    Surface_init_char(&surface1D, '*', 5, 3, NULL);
+
+    assert_int_equal(surface1D.get_x(&surface1D), 5);
+    assert_int_equal(surface1D.get_y(&surface1D), 3);
+    assert_non_null(surface1D.get_image(&surface1D));
+    surface1D.movement(&surface1D, 2, 3);
+    assert_int_equal(surface1D.get_x(&surface1D), 7);
+    assert_int_equal(surface1D.get_y(&surface1D), 6);
+    assert_int_equal(surface1D.get_state(&surface1D), ALIVE);
+    surface1D.free(&surface1D);
+    assert_int_equal(surface1D.get_state(&surface1D), DEAD);
+    assert_null(surface1D.get_image(&surface1D));
 }
 
-static void test_Surface_move(void **state) {
+static void test_Surface_2D(void **state) {
     (void)state; /* Remove unused complaint. */
 
-    /*
-    Surface surfaces[2]; 
-    char image1[1][1] = {"o"};
-    Surface_init(&surfaces[0], 5, 2, 1, 1, image1, NULL);
-    Surface_move(&surfaces[0], 5, 5);
-    assert_int_equal(surfaces[0].rect.x, 10);
-    assert_int_equal(surfaces[0].rect.y, 7);
-    
-    Surface_Options options = {.bounce = TRUE};
-    char image2[1][1] = {"o"};
-    Surface_init(&surfaces[1], 30, 30, 1, 1, image2, &options);
-    Surface_move(&surfaces[1], max_x+1, max_y+1);
-    assert_int_equal(surfaces[1].rect.x, max_x-1);
-    assert_int_equal(surfaces[1].rect.y, max_y-1);*/
+    Surface surface2D;
+    Image image2D;
+    Image_init_2D(&image2D, 5, 5, (char*[]){"AA AA", "BBBBBB"});
+    Surface_init_image(&surface2D, &image2D, 9, 2, 
+        &(Surface_Options){.screen_only = TRUE});
+
+    assert_int_equal(surface2D.get_x(&surface2D), 9);
+    assert_int_equal(surface2D.get_y(&surface2D), 2);
+    assert_non_null(surface2D.get_image(&surface2D));
+    surface2D.movement(&surface2D, 2, 3);
+    assert_int_equal(surface2D.get_x(&surface2D), 11);
+    assert_int_equal(surface2D.get_y(&surface2D), 5);
+    assert_int_equal(surface2D.get_state(&surface2D), ALIVE);
+
+    Image *storedImage = surface2D.get_image(&surface2D);
+    assert_non_null(storedImage);
+    assert_memory_equal(storedImage->get_pixels(storedImage)[0], (char*)("AA AA"), 5);
+
+    surface2D.free(&surface2D);
+    assert_int_equal(surface2D.get_state(&surface2D), DEAD);
+    assert_null(surface2D.get_image(&surface2D));
 }
-
-static void test_Surface_remove(void **state) {
-    (void)state; /* Remove unused complaint. */
-
-    /*
-    Surface surface;
-    Surface_Options options = {.bounce = TRUE, .screen_only = FALSE};
-    Surface_init(&surface, 10, 5, "o", &options);
-    Surface_remove(&surface);
-    assert_int_equal(surface.rect.x, 0);
-    assert_int_equal(surface.rect.y, 0);
-    assert_int_equal(surface.content, NULL);
-    assert_int_equal(surface.state, DEAD);*/
-}
-
-/*
-static void test_Surface_bounce(void **state) {
-    
-    Surface surface;
-    Surface_Options options = {.bounce = TRUE, .screen_only = FALSE};
-    Surface_init(&surface, max_x/2, max_y, "o", &options);
-    Surface_bounce(&surface, max_x/2-1, max_y-1);
-    assert_int_equal(surface.x, max_x+1);
-    assert_int_equal(surface.y, max_y+1);
-}*/
 
 static void test_Rect_init(void **state) {
     (void)state; /* Remove unused complaint. */
@@ -189,9 +171,8 @@ int main(void) {
 
         cmocka_unit_test(null_test_success),
         cmocka_unit_test(test_Curses_init),
-        cmocka_unit_test(test_Surface_init),
-        cmocka_unit_test(test_Surface_move),
-        cmocka_unit_test(test_Surface_remove),
+        cmocka_unit_test(test_Surface_1D),
+        cmocka_unit_test(test_Surface_2D),
 
         cmocka_unit_test(test_Rect_init),
         cmocka_unit_test(test_Rect_move),

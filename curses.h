@@ -23,10 +23,11 @@ typedef struct Surface {
     Surface_State state;
 
     void (*free)(struct Surface* surface);
-    void (*move)(struct Surface* surface, int x, int y);
+    void (*movement)(struct Surface* surface, int x, int y);
     int (*get_x)(struct Surface* surface);
     int (*get_y)(struct Surface* surface);
     Image *(*get_image)(struct Surface* surface);
+    Surface_State (*get_state)(struct Surface* surface);
 } Surface;
 
 int max_x;

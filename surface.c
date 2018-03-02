@@ -18,10 +18,11 @@ static const Surface_Options default_options = {
 /* ----- | Function Prototypes | ----- */
 
 static void Surface_free(Surface *surface);
-static void Surface_move(Surface *surface, int x, int y);
+static void Surface_movement(Surface *surface, int x, int y);
 static int Surface_get_x(Surface *surface);
 static int Surface_get_y(Surface *surface);
 static Image *Surface_get_image(Surface *surface);
+static Surface_State Surface_get_state(Surface* surface);
 
 static boolean is_outside_screen(Surface *surface);
 
@@ -46,7 +47,6 @@ void Surface_init_image(Surface *surface, Image *image, int x, int y,
     Surface_Options* options) {
     
     if (surface == NULL) {
-        surface->state = DEAD;
         return;
     }
     
@@ -63,10 +63,11 @@ void Surface_init_image(Surface *surface, Image *image, int x, int y,
     surface->options.screen_only = options->screen_only;
 
     surface->free = Surface_free;
-    surface->move = Surface_move;
+    surface->movement = Surface_movement;
     surface->get_x = Surface_get_x;
     surface->get_y = Surface_get_y;
     surface->get_image = Surface_get_image;
+    surface->get_state = Surface_get_state;
 }
 
 static int Surface_get_x(Surface *surface) {
@@ -79,6 +80,10 @@ static int Surface_get_y(Surface *surface) {
 
 static Image *Surface_get_image(Surface *surface) {
     return surface->image;
+}
+
+static Surface_State Surface_get_state(Surface* surface) {
+    return surface->state;
 }
 
 /*
@@ -95,7 +100,7 @@ static void Surface_free(Surface *surface) {
 /*
  * Move the Surface object.
  */
-static void Surface_move(Surface *surface, int x, int y) {
+static void Surface_movement(Surface *surface, int x, int y) {
     int old_x = surface->x;
     int old_y = surface->y;
     
