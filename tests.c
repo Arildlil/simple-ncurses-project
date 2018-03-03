@@ -23,10 +23,11 @@ static void test_Curses_init(void **state) {
 static void test_Image_1D(void **state) {
     (void)state; /* Remove unused complaint. */
 
+    size_t lenEmptyString = strlen("");
     Image image1D;
-    Image_init_1D(&image1D, 1, "");
+    Image_init_1D(&image1D, 0, "");
     assert_int_equal(image1D.get_height(&image1D), 1);
-    assert_int_equal(image1D.get_width(&image1D), 1);
+    assert_int_equal(image1D.get_width(&image1D), lenEmptyString);
     assert_int_equal(image1D.get_pixels(&image1D)[0][0], '\0');
 
     Image image1D_2;
@@ -48,9 +49,9 @@ static void test_Image_2D(void **state) {
 
     Image image2D;
     char **image1 = {""};
-    Image_init_2D(&image2D, 1, 1, image1);
+    Image_init_2D(&image2D, 0, 1, image1);
     assert_int_equal(image2D.get_height(&image2D), 1);
-    assert_int_equal(image2D.get_width(&image2D), 1);
+    assert_int_equal(image2D.get_width(&image2D), 0);
     assert_int_equal(image2D.get_pixels(&image2D)[0][0], '\0');
 
     Image image2D_2;
@@ -105,7 +106,7 @@ static void test_Surface_2D(void **state) {
 
     Surface surface2D;
     Image image2D;
-    Image_init_2D(&image2D, 5, 5, (char*[]){"AA AA", "BBBBBB"});
+    Image_init_2D(&image2D, 5, 2, (char*[]){"AA AA", "BBBBBB"});
     Surface_init_image(&surface2D, &image2D, 9, 2, 
         &(Surface_Options){.screen_only = TRUE});
 
@@ -169,7 +170,6 @@ int main(void) {
         cmocka_unit_test(test_Image_1D),
         cmocka_unit_test(test_Image_1D),
 
-        cmocka_unit_test(null_test_success),
         cmocka_unit_test(test_Curses_init),
         cmocka_unit_test(test_Surface_1D),
         cmocka_unit_test(test_Surface_2D),

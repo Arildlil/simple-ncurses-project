@@ -52,8 +52,8 @@ void Surface_init_image(Surface *surface, Image *image, int x, int y,
     
     surface->x = x;
     surface->y = y;
-    surface->image = calloc(x*y, sizeof(char));
-    memcpy(&surface->image, image, x*y);
+    surface->image = calloc(1, sizeof(Image));
+    memcpy(surface->image, image, sizeof(image));
     surface->state = ALIVE;
 
     if (options == NULL) {
@@ -92,7 +92,8 @@ static Surface_State Surface_get_state(Surface* surface) {
 static void Surface_free(Surface *surface) {
     surface->x = 0;
     surface->y = 0;
-    free(surface->image);
+    if (surface->image) free(surface->image);
+    surface->image = NULL;
     memcpy(&surface->options, &default_options, sizeof(default_options));
     surface->state = DEAD;
 }

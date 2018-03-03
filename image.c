@@ -39,7 +39,7 @@ void Image_init_2D(Image *image, int width, int height, char **content) {
 
     int i, j;
     for (i = 0; i < height; i++) {
-        image->pixels[i] = calloc(width, sizeof(char));
+        image->pixels[i] = calloc(width+1, sizeof(char));
 
         for (j = 0; j < width && content[i][j] != '\0'; j++) {
             image->pixels[i][j] = content[i][j];

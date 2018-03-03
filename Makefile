@@ -17,7 +17,7 @@ LIBS = -lcmocka -lncurses
 FLAGS = $(WARNINGS) $(DEBUG)
 LDLIBS = $(LIB_PATH) $(LIBS)
 
-.PHONY: all clean install debug run test
+.PHONY: all clean install debug run test vtest
 
 all: app
 
@@ -39,7 +39,12 @@ app: $(APP) $(OBJS)
 	$(CC) $(FLAGS) $(APP) $(OBJS) $(LDLIBS) -o $@
 
 test: tests
+	@echo "Running test suite with all tests..."
 	./tests
+
+vtest: tests
+	@echo "(Valgrind) Running test suite with all test..."
+	valgrind ./tests -v --leak-check=full
 
 run: app
 	./app
