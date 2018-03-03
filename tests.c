@@ -29,6 +29,7 @@ static void test_Image_1D(void **state) {
     assert_int_equal(image1D.get_height(&image1D), 1);
     assert_int_equal(image1D.get_width(&image1D), lenEmptyString);
     assert_int_equal(image1D.get_pixels(&image1D)[0][0], '\0');
+    image1D.free(&image1D);
 
     Image image1D_2;
     char *testString = "test";
@@ -37,11 +38,10 @@ static void test_Image_1D(void **state) {
     assert_int_equal(image1D_2.get_height(&image1D_2), 1);
     assert_int_equal(image1D_2.get_width(&image1D_2), lenTestString);
     assert_memory_equal(image1D_2.get_pixels(&image1D_2)[0], testString, lenTestString);
-
     image1D_2.free(&image1D_2);
     assert_int_equal(image1D_2.get_width(&image1D_2), 0);
     assert_int_equal(image1D_2.get_height(&image1D_2), 0);
-    // assert_int_equal(image1D_2.get_pixels(), NULL);
+    assert_null(image1D_2.get_pixels(&image1D_2));
 }
 
 static void test_Image_2D(void **state) {
@@ -53,17 +53,22 @@ static void test_Image_2D(void **state) {
     assert_int_equal(image2D.get_height(&image2D), 1);
     assert_int_equal(image2D.get_width(&image2D), 0);
     assert_int_equal(image2D.get_pixels(&image2D)[0][0], '\0');
+    image2D.free(&image2D);
 
     Image image2D_2;
-    char **testString = {"test"};
-    size_t lenTestString = strlen(testString[0]);
+    char *testString[] = {"test"};
+    size_t lenTestString = strlen("test");
     Image_init_2D(&image2D_2, lenTestString, 1, testString);
     assert_int_equal(image2D_2.get_height(&image2D_2), 1);
     assert_int_equal(image2D_2.get_width(&image2D_2), lenTestString);
-    assert_memory_equal(image2D_2.get_pixels(&image2D_2)[0], testString, lenTestString);
+    assert_string_equal(image2D_2.get_pixels(&image2D_2)[0], testString[0]);
+    image2D_2.free(&image2D_2);
+    assert_int_equal(image2D_2.get_width(&image2D_2), 0);
+    assert_int_equal(image2D_2.get_height(&image2D_2), 0);
+    assert_null(image2D_2.get_pixels(&image2D_2));
 
     Image image2D_3;
-    char **testString3 = {"AAA", "BBB", "CCC"};
+    char *testString3[] = {"AAA", "BBB", "CCC"};
     size_t lenTestString3 = strlen(testString3[0]);
     Image_init_2D(&image2D_3, lenTestString3, lenTestString3, testString3);
     assert_memory_equal(image2D_3.get_pixels(&image2D_3)[0], "AAA", 3);
@@ -71,12 +76,10 @@ static void test_Image_2D(void **state) {
     assert_memory_equal(image2D_3.get_pixels(&image2D_3)[2], "CCC", 3);
     assert_int_equal(image2D_3.get_height(&image2D_3), lenTestString3);
     assert_int_equal(image2D_3.get_width(&image2D_3), lenTestString3);
-    assert_memory_equal(image2D_3.get_pixels(&image2D_3)[0], testString3, lenTestString3);
-
-    image2D_2.free(&image2D_2);
-    assert_int_equal(image2D_2.get_width(&image2D_2), 0);
-    assert_int_equal(image2D_2.get_height(&image2D_2), 0);
-    assert_null(image2D_2.get_pixels(&image2D_2));
+    assert_string_equal(image2D_3.get_pixels(&image2D_3)[0], testString3[0]);
+    image2D_3.free(&image2D_3);
+    image2D_3.free(&image2D_3);
+    image2D_3.free(&image2D_3);
 }
 
 static void test_Surface_1D(void **state) {
@@ -120,7 +123,10 @@ static void test_Surface_2D(void **state) {
 
     Image *storedImage = surface2D.get_image(&surface2D);
     assert_non_null(storedImage);
-    assert_memory_equal(storedImage->get_pixels(storedImage)[0], (char*)("AA AA"), 5);
+    char **pixels = storedImage->get_pixels(&storedImage);
+    assert_non_null(pixels);
+    assert_non_null(pixels[0]);
+    assert_string_equal(storedImage->get_pixels(storedImage)[0], "AA AA");
 
     surface2D.free(&surface2D);
     assert_int_equal(surface2D.get_state(&surface2D), DEAD);
@@ -138,11 +144,11 @@ static void test_Rect_init(void **state) {
     assert_int_equal(rect.height, 1);
 
     Rect rect2;
-    Rect_init(&rect, 5, 7, -1, -1);
-    assert_int_equal(rect.x, 5);
-    assert_int_equal(rect.y, 7);
-    assert_int_equal(rect.width, 0);
-    assert_int_equal(rect.height, 0);
+    Rect_init(&rect2, 5, 7, -1, -1);
+    assert_int_equal(rect2.x, 5);
+    assert_int_equal(rect2.y, 7);
+    assert_int_equal(rect2.width, 0);
+    assert_int_equal(rect2.height, 0);
 }
 
 static void test_Rect_move(void **state) {
@@ -160,15 +166,13 @@ static void test_Rect_move(void **state) {
 
 /* ----- | Other | ------ */
 
-static void null_test_success(void **state) {
-    (void) state; /* Unused */
-}
+
 
 int main(void) {
 
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_Image_1D),
-        cmocka_unit_test(test_Image_1D),
+        cmocka_unit_test(test_Image_2D),
 
         cmocka_unit_test(test_Curses_init),
         cmocka_unit_test(test_Surface_1D),

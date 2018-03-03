@@ -37,13 +37,11 @@ void Image_init_2D(Image *image, int width, int height, char **content) {
     image->height = height;
     image->pixels = calloc(height, sizeof(char*));
 
-    int i, j;
+    int i;
     for (i = 0; i < height; i++) {
         image->pixels[i] = calloc(width+1, sizeof(char));
 
-        for (j = 0; j < width && content[i][j] != '\0'; j++) {
-            image->pixels[i][j] = content[i][j];
-        }
+        strncpy(image->pixels[i], content[i], width);
     }
 
     image->free = Image_free;
@@ -58,7 +56,9 @@ void Image_init_2D(Image *image, int width, int height, char **content) {
 static void Image_free(Image *image) {
     int i;
     for (i = 0; i < image->height; i++) {
-        free(image->pixels[i]);
+        if (image->pixels[i] != NULL) {
+            free(image->pixels[i]);
+        }
         image->pixels[i] = NULL;
     }
     free(image->pixels);
