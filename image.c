@@ -17,7 +17,7 @@ static char **Image_get_pixels(Image*);
 /*
  * Constructor for 1D images.
  */
-void Image_init_1D(Image *image, int width, char *content) {
+void Image_init_1D(Image *image, int width, const char *content) {
     char *contentWrapper[1] = {content};
     Image_init_2D(image, width, 1, contentWrapper);
 }
@@ -25,7 +25,7 @@ void Image_init_1D(Image *image, int width, char *content) {
 /*
  * Constructor for 2D images.
  */
-void Image_init_2D(Image *image, int width, int height, char **content) {
+void Image_init_2D(Image *image, int width, int height, const char **content) {
     if (image == NULL) {
         return;
     }
@@ -40,8 +40,10 @@ void Image_init_2D(Image *image, int width, int height, char **content) {
     int i;
     for (i = 0; i < height; i++) {
         image->pixels[i] = calloc(width+1, sizeof(char));
+        //image->pixels[i] = malloc((width+1)*sizeof(char));
 
         strncpy(image->pixels[i], content[i], width);
+        image->pixels[i][width] = '\0';
     }
 
     image->free = Image_free;

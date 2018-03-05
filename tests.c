@@ -32,7 +32,7 @@ static void test_Image_1D(void **state) {
     image1D.free(&image1D);
 
     Image image1D_2;
-    char *testString = "test";
+    const char *testString = "test";
     size_t lenTestString = strlen(testString);
     Image_init_1D(&image1D_2, lenTestString, testString);
     assert_int_equal(image1D_2.get_height(&image1D_2), 1);
@@ -48,7 +48,7 @@ static void test_Image_2D(void **state) {
     (void)state; /* Remove unused complaint. */
 
     Image image2D;
-    char **image1 = {""};
+    const char **image1 = {""};
     Image_init_2D(&image2D, 0, 1, image1);
     assert_int_equal(image2D.get_height(&image2D), 1);
     assert_int_equal(image2D.get_width(&image2D), 0);
@@ -56,7 +56,7 @@ static void test_Image_2D(void **state) {
     image2D.free(&image2D);
 
     Image image2D_2;
-    char *testString[] = {"test"};
+    const char *testString[] = {"test"};
     size_t lenTestString = strlen("test");
     Image_init_2D(&image2D_2, lenTestString, 1, testString);
     assert_int_equal(image2D_2.get_height(&image2D_2), 1);
@@ -68,7 +68,7 @@ static void test_Image_2D(void **state) {
     assert_null(image2D_2.get_pixels(&image2D_2));
 
     Image image2D_3;
-    char *testString3[] = {"AAA", "BBB", "CCC"};
+    const char *testString3[] = {"AAA", "BBB", "CCC"};
     size_t lenTestString3 = strlen(testString3[0]);
     Image_init_2D(&image2D_3, lenTestString3, lenTestString3, testString3);
     assert_memory_equal(image2D_3.get_pixels(&image2D_3)[0], "AAA", 3);
@@ -125,7 +125,6 @@ static void test_Surface_2D(void **state) {
     assert_non_null(storedImage);
     char **pixels = storedImage->get_pixels(&storedImage);
     assert_non_null(pixels);
-    assert_non_null(pixels[0]);
     assert_string_equal(storedImage->get_pixels(storedImage)[0], "AA AA");
 
     surface2D.free(&surface2D);
@@ -163,6 +162,22 @@ static void test_Rect_move(void **state) {
     assert_int_equal(rect.height, 1);
 }
 
+static void test_Image_units(void **state) {
+    (void)state;
+
+    const char *archer_array[] = {
+        "|\\", 
+        "|/"
+    };
+    Image archer;
+    Image_init_2D(&archer, 2, 2, archer_array);
+    assert_int_equal(archer.get_height(&archer), 2);
+    assert_int_equal(archer.get_width(&archer), 2);
+    char **pixels_archer = archer.get_pixels(&archer);
+    assert_string_equal(pixels_archer[0], "|\\");
+    assert_string_equal(pixels_archer[1], "|/");
+}
+
 
 /* ----- | Other | ------ */
 
@@ -180,6 +195,8 @@ int main(void) {
 
         cmocka_unit_test(test_Rect_init),
         cmocka_unit_test(test_Rect_move),
+
+        cmocka_unit_test(test_Image_units),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

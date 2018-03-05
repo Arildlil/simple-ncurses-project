@@ -19,7 +19,7 @@ typedef struct Image {
  * @arg width: The width of the image.
  * @arg content: The string representation of the image.
  */
-void Image_init_1D(Image *image, int width, char *content);
+void Image_init_1D(Image *image, int width, const char *content);
 
 /*
  * Constructor for 2D images.
@@ -29,6 +29,6 @@ void Image_init_1D(Image *image, int width, char *content);
  * @arg height: The height of the image.
  * @arg content: The 2D string representation of the image.
  */
-void Image_init_2D(Image *image, int width, int height, char **content);
+void Image_init_2D(Image *image, int width, int height, const char **content);
 
 #endif
