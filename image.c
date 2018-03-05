@@ -17,17 +17,17 @@ static char **Image_get_pixels(Image*);
 /*
  * Constructor for 1D images.
  */
-void Image_init_1D(Image *image, int width, const char *content) {
+Image* Image_init_1D(Image *image, int width, const char *content) {
     const char *contentWrapper[1] = {content};
-    Image_init_2D(image, width, 1, (const char**)contentWrapper);
+    return Image_init_2D(image, width, 1, (const char**)contentWrapper);
 }
 
 /*
  * Constructor for 2D images.
  */
-void Image_init_2D(Image *image, int width, int height, const char **content) {
+Image* Image_init_2D(Image *image, int width, int height, const char **content) {
     if (image == NULL) {
-        return;
+        return NULL;
     }
 
     if (width < 0) width = 0;
@@ -49,6 +49,8 @@ void Image_init_2D(Image *image, int width, int height, const char **content) {
     image->get_height = Image_get_height;
     image->get_width = Image_get_width;
     image->get_pixels = Image_get_pixels;    
+
+    return image;
 }
 
 /*

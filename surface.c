@@ -35,23 +35,23 @@ static boolean is_outside_screen(Surface *surface);
 /*
  * Initialize the Surface object with a char.
  */
-void Surface_init_char(Surface *surface, char character, int x, int y,
+Surface* Surface_init_char(Surface *surface, char character, int x, int y,
     Surface_Options* options) {
 
     char char_as_string[2] = {character, '\0'};
     Image image;
     Image_init_1D(&image, 1, char_as_string);
-    Surface_init_image(surface, &image, x, y, options);
+    return Surface_init_image(surface, &image, x, y, options);
 }
 
 /*
  * Initialize the Surface object with an image.
  */
-void Surface_init_image(Surface *surface, Image *image, int x, int y,
+Surface* Surface_init_image(Surface *surface, Image *image, int x, int y,
     Surface_Options* options) {
     
     if (surface == NULL) {
-        return;
+        return NULL;
     }
     
     surface->x = x;
@@ -76,6 +76,8 @@ void Surface_init_image(Surface *surface, Image *image, int x, int y,
     surface->get_width = Surface_get_width;
     surface->get_height = Surface_get_height;
     surface->get_pixels = Surface_get_pixels;
+
+    return surface;
 }
 
 static int Surface_get_x(Surface *surface) {

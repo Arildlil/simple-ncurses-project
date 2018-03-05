@@ -48,8 +48,9 @@ int max_y;
  * @arg y: The initial y coordinate.
  * @arg options (Optional): Options for how the Surface will 
  *  behave.
+ * @return: The first argument is also returned.
  */
-void Surface_init_char(Surface *surface, char character, int x, int y,
+Surface* Surface_init_char(Surface *surface, char character, int x, int y,
     Surface_Options* options);
 
 /*
@@ -61,8 +62,9 @@ void Surface_init_char(Surface *surface, char character, int x, int y,
  * @arg y: The initial y coordinate.
  * @arg options (Optional): Options for how the Surface will 
  *  behave.
+ * @return: The first argument is also returned.
  */
-void Surface_init_image(Surface *surface, Image *image, int x, int y, 
+Surface* Surface_init_image(Surface *surface, Image *image, int x, int y, 
     Surface_Options* options);
 
 /*

@@ -2,6 +2,7 @@
 #include "curses.h"
 #include "utils.h"
 #include "unit_images.h"
+#include "units.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,15 +20,11 @@ static int init();
 static void render(Surface objects[], int num_objects);
 static void cleanup(int sig);
 
-
-
 /* ----- | Static Variables | ------ */
+
 static long update_rate_us = 45000;
 
-
-
 /* ----- | Functions | ----- */
-
 
 
 

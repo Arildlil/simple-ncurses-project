@@ -7,7 +7,7 @@
 /*
  * Constructor for the Rect type.
  */
-void Rect_init(Rect *rect, int x, int y, int width, int height) {
+Rect* Rect_init(Rect *rect, int x, int y, int width, int height) {
     assert(rect != NULL);
 
     if (width < 0) width = 0;
@@ -17,15 +17,19 @@ void Rect_init(Rect *rect, int x, int y, int width, int height) {
     rect->y = y;
     rect->width = width;
     rect->height = height;
+
+    return rect;
 }
 
 /*
  * Move the coordinates of the Rect.
  */
-void Rect_move(Rect *rect, int x, int y) {
+Rect* Rect_move(Rect *rect, int x, int y) {
     assert(rect != NULL);
 
     rect->x += x;
     rect->y += y;
+
+    return rect;
 }
 

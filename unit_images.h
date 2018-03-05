@@ -16,5 +16,11 @@ const char *UNIT_IMAGE_SWORDMAN[] = {
     "-+-"
 };
 
+const char *UNIT_IMAGE_SPEARMAN[] = {
+    " ^ ",
+    " | ",
+    " | "
+};
+
 
 #endif

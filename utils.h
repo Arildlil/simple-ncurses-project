@@ -20,4 +20,7 @@ typedef int boolean;
     #define dprintf(format, expr) 
 #endif
 
+/* Source: http://www.c-faq.com/style/strcmp.html. */
+#define StrRel(s1, op, s2) (strcmp(s1, s2) op 0)
+
 #endif
