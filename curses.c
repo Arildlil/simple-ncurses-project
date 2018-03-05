@@ -5,6 +5,7 @@
 
 #include <curses.h>
 #include <unistd.h>
+#include <assert.h>
 
 
 
@@ -20,8 +21,6 @@
 /* ----- | Static globals | ----- */
 
 static boolean inited = FALSE;
-
-static int delay = DEFAULT_DELAY;
 
 
 
@@ -69,8 +68,7 @@ boolean Curses_exit(void) {
  * Redraws the screen.
  */
 void Curses_redraw(Surface surfaces[], int num_elements) {
-    // int x = 0, y = 0;
-    int i;
+    int i, j, k;
     getmaxyx(stdscr, max_y, max_x);
     clear();
     for (i = 0; i < num_elements; i++) {
@@ -78,7 +76,19 @@ void Curses_redraw(Surface surfaces[], int num_elements) {
         if (cur->state == DEAD) {
             continue;
         } 
-        //mvprintw(cur->y, cur->x, cur->content);
+        char **pixels = cur->get_pixels(cur);
+        assert(pixels != NULL);
+        dprintf("Object <%d> (x,y)\n", i);
+
+        for (j = 0; j < cur->get_height(cur); j++) {
+            for (k = 0; k < cur->get_width(cur); k++) {
+                char cur_pixel = pixels[j][k];
+                dprintf("\t(%d,", cur->x+k);
+                dprintf("%d) ", cur->y+j);
+                mvaddch(cur->y+j, cur->x+k,cur_pixel);
+            }
+            dnprintf("\n");
+        }
     }
     refresh();
 }

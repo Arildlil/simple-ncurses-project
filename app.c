@@ -1,6 +1,7 @@
 #include "test_headers.h"
 #include "curses.h"
 #include "utils.h"
+#include "unit_images.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,11 +33,25 @@ int main(int argc, char *argv[]) {
     dnprintf("Main!\n");
     init();
 
-    #define NUM_OBJECTS 2
+    (void)argc;
+    (void)argv;
+
+    #define NUM_ARCHERS 2
+    #define NUM_SWORDMEN 2
+    Image archers[NUM_ARCHERS];
+    Image swordmen[NUM_SWORDMEN];
+    int i, j;
+    for (i = 0, j = 0; i < NUM_ARCHERS, j < NUM_SWORDMEN; i++, j++) {
+        Image_init_2D(&archers[i], UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_IMAGE_ARCHER);
+        Image_init_2D(&swordmen[j], UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_IMAGE_SWORDMAN);
+    }
+    Image *unit_images[] = {&archers[0], &archers[1], &swordmen[0], &swordmen[1]};
+
+    #define NUM_OBJECTS (NUM_ARCHERS + NUM_SWORDMEN)
     Surface objects[NUM_OBJECTS];
-    Surface_init_char(&objects[0], 'o', 0, 0, NULL);
-    Surface_Options options = {.bounce = TRUE, .screen_only=TRUE};
-    Surface_init_char(&objects[1], '*', 25, 0, &options);
+    for (i = 0; i < NUM_OBJECTS; i++) {
+        Surface_init_image(&objects[i], unit_images[i], 0, 10+5*i, NULL);
+    }
 
     int counter = 0;
     while (1) {
@@ -45,9 +60,9 @@ int main(int argc, char *argv[]) {
         //objects[0].move(&objects[0], 1, 1);
         //objects[0].move(&objects[0], 1, 1);
         //Surface_move(&objects[1], 1, 1);
-        /*counter++;
+        counter++;
         if (counter > 50)
-            break;*/
+            break;
     }
     printf("max_x: %d, max_y: %d\n", max_x, max_y);
     
@@ -72,7 +87,8 @@ static int init() {
  *   0 on normal termination.
  */
 static void cleanup(int sig) {
+    (void)sig;
     Curses_exit();
-    dnprintf("Cleaning up and exiting...\n");
+    dprintf("Cleaning up and exiting with sig %d...\n", sig);
     exit(0);
 }

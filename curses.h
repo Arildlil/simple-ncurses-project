@@ -22,12 +22,18 @@ typedef struct Surface {
     Surface_Options options;
     Surface_State state;
 
+    /* Surface methods. */
     void (*free)(struct Surface* surface);
     void (*movement)(struct Surface* surface, int x, int y);
     int (*get_x)(struct Surface* surface);
     int (*get_y)(struct Surface* surface);
     Image *(*get_image)(struct Surface* surface);
     Surface_State (*get_state)(struct Surface* surface);
+
+    /* Surface->image methods. */
+    int (*get_width)(struct Surface* image);
+    int (*get_height)(struct Surface* image);
+    char **(*get_pixels)(struct Surface* image);
 } Surface;
 
 int max_x;
