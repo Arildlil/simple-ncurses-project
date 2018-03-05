@@ -18,8 +18,8 @@ static char **Image_get_pixels(Image*);
  * Constructor for 1D images.
  */
 void Image_init_1D(Image *image, int width, const char *content) {
-    char *contentWrapper[1] = {content};
-    Image_init_2D(image, width, 1, contentWrapper);
+    const char *contentWrapper[1] = {content};
+    Image_init_2D(image, width, 1, (const char**)contentWrapper);
 }
 
 /*
@@ -77,6 +77,6 @@ static int Image_get_width(Image *image) {
     return image->width;
 }
 
-static char** Image_get_pixels(Image *image) {
+static char **Image_get_pixels(Image *image) {
     return image->pixels;
 }

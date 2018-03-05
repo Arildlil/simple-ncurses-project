@@ -5,8 +5,8 @@
 #define UNIT_IMAGE_HEIGHT 3
 
 const char *UNIT_IMAGE_ARCHER[] = {
-    "|\\",
-    "| |", 
+    "|\\ ",
+    "+->", 
     "|/ "
 };
 

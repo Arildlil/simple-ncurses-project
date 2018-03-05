@@ -24,6 +24,10 @@ static int Surface_get_y(Surface *surface);
 static Image *Surface_get_image(Surface *surface);
 static Surface_State Surface_get_state(Surface* surface);
 
+static int Surface_get_width(Surface *surface);
+static int Surface_get_height(Surface *surface);
+static char **Surface_get_pixels(Surface *surface);
+
 static boolean is_outside_screen(Surface *surface);
 
 
@@ -68,6 +72,10 @@ void Surface_init_image(Surface *surface, Image *image, int x, int y,
     surface->get_y = Surface_get_y;
     surface->get_image = Surface_get_image;
     surface->get_state = Surface_get_state;
+
+    surface->get_width = Surface_get_width;
+    surface->get_height = Surface_get_height;
+    surface->get_pixels = Surface_get_pixels;
 }
 
 static int Surface_get_x(Surface *surface) {
@@ -105,9 +113,6 @@ static void Surface_free(Surface *surface) {
  * Move the Surface object.
  */
 static void Surface_movement(Surface *surface, int x, int y) {
-    int old_x = surface->x;
-    int old_y = surface->y;
-    
     surface->x += x;
     surface->y += y;
 
@@ -129,6 +134,23 @@ static void Surface_movement(Surface *surface, int x, int y) {
         }
     }*/
 }
+
+/* Image related */
+
+static int Surface_get_width(Surface *surface) {
+    return surface->image->get_width(surface->image);
+}
+
+static int Surface_get_height(Surface *surface) {
+    return surface->image->get_height(surface->image);
+}
+
+static char **Surface_get_pixels(Surface *surface) {
+    return surface->image->get_pixels(surface->image);
+}
+
+
+/* Other */
 
 /*
  * Checks if the Surface is outside the screen.

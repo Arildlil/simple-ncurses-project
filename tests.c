@@ -124,7 +124,7 @@ static void test_Surface_2D(void **state) {
 
     Image *storedImage = surface2D.get_image(&surface2D);
     assert_non_null(storedImage);
-    char **pixels = storedImage->get_pixels(&storedImage);
+    char **pixels = storedImage->get_pixels(storedImage);
     assert_non_null(pixels);
     assert_string_equal(storedImage->get_pixels(storedImage)[0], "AA AA");
 
