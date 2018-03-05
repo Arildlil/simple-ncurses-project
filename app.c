@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <assert.h>
 
 #include <ncurses.h>
 
@@ -15,12 +16,13 @@
 /* ----- | Prototypes | ------ */
 
 static int init();
+static void render(Surface objects[], int num_objects);
 static void cleanup(int sig);
 
 
 
 /* ----- | Static Variables | ------ */
-static long update_rate_us = 30000;
+static long update_rate_us = 45000;
 
 
 
@@ -55,11 +57,10 @@ int main(int argc, char *argv[]) {
 
     int counter = 0;
     while (1) {
-        Curses_redraw(objects, NUM_OBJECTS);
-        usleep(update_rate_us);
-        //objects[0].move(&objects[0], 1, 1);
-        //objects[0].move(&objects[0], 1, 1);
-        //Surface_move(&objects[1], 1, 1);
+        render(objects, NUM_OBJECTS);
+        for (i = 0; i < NUM_OBJECTS; i++) {
+            objects[i].movement(&objects[i], 1, 0);
+        }
         counter++;
         if (counter > 50)
             break;
@@ -67,6 +68,17 @@ int main(int argc, char *argv[]) {
     printf("max_x: %d, max_y: %d\n", max_x, max_y);
     
     cleanup(OK);
+}
+
+/* 
+ * Render the specified objects.
+ */
+static void render(Surface objects[], int num_objects) {
+    assert(objects != NULL);
+    assert(num_objects >= 0);
+
+    Curses_redraw(objects, num_objects);
+    usleep(update_rate_us);
 }
 
 /*
