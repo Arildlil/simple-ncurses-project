@@ -3,6 +3,7 @@
 #include "image.h"
 #include "rect.h"
 #include "curses.h"
+#include "unit_images.h"
 
 #include <string.h>
 #include <curses.h>
@@ -165,17 +166,23 @@ static void test_Rect_move(void **state) {
 static void test_Image_units(void **state) {
     (void)state;
 
-    const char *archer_array[] = {
-        "|\\", 
-        "|/"
-    };
     Image archer;
-    Image_init_2D(&archer, 2, 2, archer_array);
-    assert_int_equal(archer.get_height(&archer), 2);
-    assert_int_equal(archer.get_width(&archer), 2);
+    Image_init_2D(&archer, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_IMAGE_ARCHER);
+    assert_int_equal(archer.get_height(&archer), UNIT_IMAGE_HEIGHT);
+    assert_int_equal(archer.get_width(&archer), UNIT_IMAGE_WIDTH);
     char **pixels_archer = archer.get_pixels(&archer);
-    assert_string_equal(pixels_archer[0], "|\\");
-    assert_string_equal(pixels_archer[1], "|/");
+    assert_string_equal(pixels_archer[0], UNIT_IMAGE_ARCHER[0]);
+    assert_string_equal(pixels_archer[1], UNIT_IMAGE_ARCHER[1]);
+    assert_string_equal(pixels_archer[2], UNIT_IMAGE_ARCHER[2]);
+
+    Image swordman;
+    Image_init_2D(&swordman, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_IMAGE_SWORDMAN);
+    assert_int_equal(swordman.get_height(&swordman), UNIT_IMAGE_HEIGHT);
+    assert_int_equal(swordman.get_width(&swordman), UNIT_IMAGE_WIDTH);
+    char **pixels_swordman = swordman.get_pixels(&swordman);
+    assert_string_equal(pixels_swordman[0], UNIT_IMAGE_SWORDMAN[0]);
+    assert_string_equal(pixels_swordman[1], UNIT_IMAGE_SWORDMAN[1]);
+    assert_string_equal(pixels_swordman[2], UNIT_IMAGE_SWORDMAN[2]);
 }
 
 

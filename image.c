@@ -40,7 +40,6 @@ void Image_init_2D(Image *image, int width, int height, const char **content) {
     int i;
     for (i = 0; i < height; i++) {
         image->pixels[i] = calloc(width+1, sizeof(char));
-        //image->pixels[i] = malloc((width+1)*sizeof(char));
 
         strncpy(image->pixels[i], content[i], width);
         image->pixels[i][width] = '\0';
