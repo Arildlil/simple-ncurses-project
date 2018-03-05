@@ -187,6 +187,16 @@ static void test_Image_units(void **state) {
     assert_string_equal(pixels_swordman[2], UNIT_STRING_SWORDMAN[2]);
 }
 
+static void test_unit_images(void **state) {
+    (void)state;
+
+    Image *archer = &UNIT_IMAGE_ARCHER;
+    assert_int_equal(archer->get_height(archer), UNIT_IMAGE_HEIGHT);
+    assert_int_equal(archer->get_width(archer), UNIT_IMAGE_WIDTH);
+    assert_non_null(archer->get_pixels(archer));
+    //assert_memory_equal(archer->get_pixels(archer), UNIT_STRING_ARCHER, sizeof(UNIT_IMAGE_ARCHER));
+}
+
 static void test_Units_constructors(void **state) {
     (void)state;
 /*
@@ -200,6 +210,7 @@ static void test_Units_constructors(void **state) {
 
 
 int main(void) {
+    UnitImages_init();
 
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_Image_1D),
@@ -213,6 +224,7 @@ int main(void) {
         cmocka_unit_test(test_Rect_move),
 
         cmocka_unit_test(test_Image_units),
+        cmocka_unit_test(test_unit_images),
 
         cmocka_unit_test(test_Units_constructors),
     };
