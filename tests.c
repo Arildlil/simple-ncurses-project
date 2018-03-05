@@ -4,6 +4,8 @@
 #include "rect.h"
 #include "curses.h"
 #include "unit_images.h"
+#include "units.h"
+#include "gameobject.h"
 
 #include <string.h>
 #include <curses.h>
@@ -167,22 +169,29 @@ static void test_Image_units(void **state) {
     (void)state;
 
     Image archer;
-    Image_init_2D(&archer, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_IMAGE_ARCHER);
+    Image_init_2D(&archer, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_STRING_ARCHER);
     assert_int_equal(archer.get_height(&archer), UNIT_IMAGE_HEIGHT);
     assert_int_equal(archer.get_width(&archer), UNIT_IMAGE_WIDTH);
     char **pixels_archer = archer.get_pixels(&archer);
-    assert_string_equal(pixels_archer[0], UNIT_IMAGE_ARCHER[0]);
-    assert_string_equal(pixels_archer[1], UNIT_IMAGE_ARCHER[1]);
-    assert_string_equal(pixels_archer[2], UNIT_IMAGE_ARCHER[2]);
+    assert_string_equal(pixels_archer[0], UNIT_STRING_ARCHER[0]);
+    assert_string_equal(pixels_archer[1], UNIT_STRING_ARCHER[1]);
+    assert_string_equal(pixels_archer[2], UNIT_STRING_ARCHER[2]);
 
     Image swordman;
-    Image_init_2D(&swordman, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_IMAGE_SWORDMAN);
+    Image_init_2D(&swordman, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_STRING_SWORDMAN);
     assert_int_equal(swordman.get_height(&swordman), UNIT_IMAGE_HEIGHT);
     assert_int_equal(swordman.get_width(&swordman), UNIT_IMAGE_WIDTH);
     char **pixels_swordman = swordman.get_pixels(&swordman);
-    assert_string_equal(pixels_swordman[0], UNIT_IMAGE_SWORDMAN[0]);
-    assert_string_equal(pixels_swordman[1], UNIT_IMAGE_SWORDMAN[1]);
-    assert_string_equal(pixels_swordman[2], UNIT_IMAGE_SWORDMAN[2]);
+    assert_string_equal(pixels_swordman[0], UNIT_STRING_SWORDMAN[0]);
+    assert_string_equal(pixels_swordman[1], UNIT_STRING_SWORDMAN[1]);
+    assert_string_equal(pixels_swordman[2], UNIT_STRING_SWORDMAN[2]);
+}
+
+static void test_Units_constructors(void **state) {
+    (void)state;
+/*
+    GameObject objects[3];
+    GameObject_init(&objects[0], SURFACE_ARCHER, 0, 0);*/
 }
 
 
@@ -204,6 +213,8 @@ int main(void) {
         cmocka_unit_test(test_Rect_move),
 
         cmocka_unit_test(test_Image_units),
+
+        cmocka_unit_test(test_Units_constructors),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

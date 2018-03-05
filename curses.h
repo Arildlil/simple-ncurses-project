@@ -3,6 +3,7 @@
 
 #include "image.h"
 #include "utils.h"
+#include "rect.h"
 
 typedef enum {
     DEAD, ALIVE
@@ -18,6 +19,7 @@ typedef struct Surface_Options {
 typedef struct Surface {
     int x;
     int y;
+    Rect rect; // To be handled!
     Image *image;
     Surface_Options options;
     Surface_State state;

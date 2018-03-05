@@ -35,18 +35,12 @@ int main(int argc, char *argv[]) {
     (void)argc;
     (void)argv;
 
-    #define NUM_ARCHERS 2
-    #define NUM_SWORDMEN 2
-    Image archers[NUM_ARCHERS];
-    Image swordmen[NUM_SWORDMEN];
-    int i, j;
-    for (i = 0, j = 0; i < NUM_ARCHERS, j < NUM_SWORDMEN; i++, j++) {
-        Image_init_2D(&archers[i], UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_IMAGE_ARCHER);
-        Image_init_2D(&swordmen[j], UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_IMAGE_SWORDMAN);
-    }
-    Image *unit_images[] = {&archers[0], &archers[1], &swordmen[0], &swordmen[1]};
+    int i;
+    Image *unit_images[] = {
+        &UNIT_IMAGE_ARCHER, &UNIT_IMAGE_ARCHER, &UNIT_IMAGE_SWORDMAN, &UNIT_IMAGE_SPEARMAN
+    };
 
-    #define NUM_OBJECTS (NUM_ARCHERS + NUM_SWORDMEN)
+    #define NUM_OBJECTS 4
     Surface objects[NUM_OBJECTS];
     for (i = 0; i < NUM_OBJECTS; i++) {
         Surface_init_image(&objects[i], unit_images[i], 0, 10+5*i, NULL);
@@ -82,6 +76,8 @@ static void render(Surface objects[], int num_objects) {
  * Initialization code.
  */
 static int init() {
+    UnitImages_init();
+
     signal(SIGINT, cleanup);
     signal(SIGTERM, cleanup);
     signal(SIGKILL, cleanup);

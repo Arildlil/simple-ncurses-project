@@ -4,23 +4,23 @@
 #define UNIT_IMAGE_WIDTH 3
 #define UNIT_IMAGE_HEIGHT 3
 
-const char *UNIT_IMAGE_ARCHER[] = {
-    "|\\ ",
-    "+->", 
-    "|/ "
-};
+#include "image.h"
 
-const char *UNIT_IMAGE_SWORDMAN[] = {
-    " | ", 
-    " | ",
-    "-+-"
-};
+extern const char *UNIT_STRING_ARCHER[];
+extern const char *UNIT_STRING_SWORDMAN[];
+extern const char *UNIT_STRING_SPEARMAN[];
 
-const char *UNIT_IMAGE_SPEARMAN[] = {
-    " ^ ",
-    " | ",
-    " | "
-};
+extern Image UNIT_IMAGE_ARCHER;
+extern Image UNIT_IMAGE_SWORDMAN;
+extern Image UNIT_IMAGE_SPEARMAN;
+
+
+
+/*
+ * Used to set the values above.
+ */ 
+void UnitImages_init();
+
 
 
 #endif

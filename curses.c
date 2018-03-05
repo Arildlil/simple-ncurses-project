@@ -73,13 +73,15 @@ void Curses_redraw(Surface surfaces[], int num_elements) {
     clear();
     for (i = 0; i < num_elements; i++) {
         Surface* cur = &surfaces[i];
+        assert(cur != NULL);
         if (cur->state == DEAD) {
             continue;
-        } 
+        }
+        
         char **pixels = cur->get_pixels(cur);
         assert(pixels != NULL);
         dprintf("Object <%d> (x,y)\n", i);
-
+ 
         for (j = 0; j < cur->get_height(cur); j++) {
             for (k = 0; k < cur->get_width(cur); k++) {
                 char cur_pixel = pixels[j][k];
