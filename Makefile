@@ -17,7 +17,7 @@ LIBS = -lcmocka -lncurses
 FLAGS = $(WARNINGS) $(DEBUG)
 LDLIBS = $(LIB_PATH) $(LIBS)
 
-.PHONY: all clean install debug run test vtest
+.PHONY: all clean install debug run lrun test vtest
 
 all: app
 
@@ -48,6 +48,9 @@ vtest: tests
 
 run: app
 	./app
+
+lrun: app
+	make run > output.log; cat output.log
 
 # Clean up!
 clean:
