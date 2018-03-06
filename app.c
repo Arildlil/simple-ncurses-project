@@ -3,6 +3,8 @@
 #include "utils.h"
 #include "unit_images.h"
 #include "units.h"
+#include "gameobject.h"
+#include "units.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,7 +19,8 @@
 /* ----- | Prototypes | ------ */
 
 static int init();
-static void render(Surface objects[], int num_objects);
+static void render_objects(GameObject objects[], int num_objects);
+static void render(Surface *surfaces[], int num_objects);
 static void cleanup(int sig);
 
 /* ----- | Static Variables | ------ */
@@ -35,22 +38,25 @@ int main(int argc, char *argv[]) {
     (void)argc;
     (void)argv;
 
-    int i;
-    Image *unit_images[] = {
-        &UNIT_IMAGE_ARCHER, &UNIT_IMAGE_ARCHER, &UNIT_IMAGE_SWORDMAN, &UNIT_IMAGE_SPEARMAN
+    char *units_to_spawn[] = {
+        "archer",
+        "archer",
+        "swordman",
+        "spearman"
     };
 
     #define NUM_OBJECTS 4
-    Surface objects[NUM_OBJECTS];
+    GameObject objects[NUM_OBJECTS];
+    int i;
     for (i = 0; i < NUM_OBJECTS; i++) {
-        Surface_init_image(&objects[i], unit_images[i], 0, 10+5*i, NULL);
+        Units_init_name(&objects[i], 0, 10+5*i, units_to_spawn[i]);
     }
 
     int counter = 0;
     while (1) {
-        render(objects, NUM_OBJECTS);
+        render_objects(objects, NUM_OBJECTS);
         for (i = 0; i < NUM_OBJECTS; i++) {
-            objects[i].movement(&objects[i], 1, 0);
+            objects[i].m->movement(&objects[i], 1, 0);
         }
         counter++;
         if (counter > 50)
@@ -61,14 +67,26 @@ int main(int argc, char *argv[]) {
     cleanup(OK);
 }
 
-/* 
- * Render the specified objects.
- */
-static void render(Surface objects[], int num_objects) {
+static void render_objects(GameObject objects[], int num_objects) {
     assert(objects != NULL);
     assert(num_objects >= 0);
 
-    Curses_redraw(objects, num_objects);
+    Surface *surfaces[num_objects];
+    int i;
+    for (i = 0; i < num_objects; i++) {
+        surfaces[i] = objects[i].m->get_surface(&objects[i]);
+    }
+    render(surfaces, num_objects);
+}
+
+/* 
+ * Render the specified objects.
+ */
+static void render(Surface *surfaces[], int num_objects) {
+    assert(surfaces != NULL);
+    assert(num_objects >= 0);
+
+    Curses_redraw(surfaces, num_objects);
     usleep(update_rate_us);
 }
 

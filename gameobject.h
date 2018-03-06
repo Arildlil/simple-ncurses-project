@@ -12,6 +12,7 @@ typedef struct GameObject {
     Surface surface;
     boolean active;
     
+    /* Common methods for all GameObjects */
     GameObject_Methods *m;
 } GameObject;
 
@@ -27,6 +28,7 @@ struct GameObject_Methods {
     void (*set_x)(struct GameObject *object, int x);
     void (*set_y)(struct GameObject *object, int y);
     void (*set_xy)(struct GameObject *object, int x, int y);
+    Surface *(*get_surface)(struct GameObject *object);
 
     /* Image */
     Image *(*get_image)(struct GameObject *object);

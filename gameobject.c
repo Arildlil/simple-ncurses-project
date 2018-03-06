@@ -17,6 +17,7 @@ static int GameObject_get_y(struct GameObject *object);
 static void GameObject_set_x(struct GameObject *object, int x);
 static void GameObject_set_y(struct GameObject *object, int y);
 static void GameObject_set_xy(struct GameObject *object, int x, int y);
+static Surface *GameObject_get_surface(struct GameObject *object);
 
 /* Image */
 static Image *GameObject_get_image(struct GameObject *object);
@@ -38,6 +39,7 @@ static GameObject_Methods methods = {
     .set_x = GameObject_set_x,
     .set_y = GameObject_set_y,
     .set_xy = GameObject_set_xy,
+    .get_surface = GameObject_get_surface,
 
     .get_image = GameObject_get_image,
     .get_width = GameObject_get_width,
@@ -113,6 +115,10 @@ static void GameObject_set_xy(struct GameObject *object, int x, int y) {
     object->y = y;
     Surface *surface = &object->surface;
     surface->set_xy(surface, x, y);
+}
+
+static Surface *GameObject_get_surface(struct GameObject *object) {
+    return &object->surface;
 }
 
 /* Image */

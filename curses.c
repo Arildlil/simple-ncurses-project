@@ -67,12 +67,12 @@ boolean Curses_exit(void) {
 /*
  * Redraws the screen.
  */
-void Curses_redraw(Surface surfaces[], int num_elements) {
+void Curses_redraw(Surface *surfaces[], int num_elements) {
     int i, j, k;
     getmaxyx(stdscr, max_y, max_x);
     clear();
     for (i = 0; i < num_elements; i++) {
-        Surface* cur = &surfaces[i];
+        Surface* cur = surfaces[i];
         assert(cur != NULL);
         if (cur->state == DEAD) {
             continue;
