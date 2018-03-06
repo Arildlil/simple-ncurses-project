@@ -5,6 +5,8 @@
 #define UNIT_IMAGE_HEIGHT 3
 
 #include "image.h"
+#include "utils.h"
+#include "curses.h"
 
 extern const char *UNIT_STRING_ARCHER[];
 extern const char *UNIT_STRING_SWORDMAN[];

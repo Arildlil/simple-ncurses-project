@@ -1,6 +1,8 @@
 #include "unit_images.h"
-#include "image.h"
 
+
+
+static boolean inited = FALSE;
 
 const char *UNIT_STRING_ARCHER[] = {
     "|\\ ",
@@ -25,6 +27,11 @@ Image UNIT_IMAGE_SWORDMAN;
 Image UNIT_IMAGE_SPEARMAN;
 
 void UnitImages_init() {
+    if (inited != FALSE) {
+        return;
+    }
+    inited = TRUE;
+
     Image_init_2D(&UNIT_IMAGE_ARCHER, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_STRING_ARCHER);
     Image_init_2D(&UNIT_IMAGE_SWORDMAN, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_STRING_SWORDMAN);
     Image_init_2D(&UNIT_IMAGE_SPEARMAN, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_STRING_SPEARMAN);
