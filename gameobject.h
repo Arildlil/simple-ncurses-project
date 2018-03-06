@@ -3,12 +3,19 @@
 
 #include "curses.h"
 
+/* Necessary forward declaration */
+typedef struct GameObject_Methods GameObject_Methods;
+
 typedef struct GameObject {
     int x;
     int y;
     Surface surface;
     boolean active;
+    
+    GameObject_Methods *m;
+} GameObject;
 
+struct GameObject_Methods {
     /* Utils */
     void (*free)(struct GameObject *object);
     boolean (*is_active)(struct GameObject *object);
@@ -26,7 +33,7 @@ typedef struct GameObject {
     int (*get_width)(struct GameObject *object);
     int (*get_height)(struct GameObject *object);
     char **(*get_pixels)(struct GameObject *object);
-} GameObject;
+};
 
 /*
  * Constructor for GameObjects.
@@ -34,9 +41,11 @@ typedef struct GameObject {
  * @arg object: The object to initialize.
  * @arg x: The x-coordinate to spawn at.
  * @arg y: The y-coordinate to spawn at.
- * @arg image: The image to use.
+ * @arg image: The image to use. If this is NULL, the GameObject will NOT be rendered!
+ * @arg options (Optional): The surface options to use. Uses default options if NULL.
  * @return: The object argument.
  */
-GameObject* GameObject_init(GameObject *object, int x, int y, const Image *image);
+GameObject* GameObject_init(GameObject *object, int x, int y, const Image *image,
+    Surface_Options *options);
 
 #endif

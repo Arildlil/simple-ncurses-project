@@ -227,31 +227,33 @@ static void test_Gameobject(void **state) {
     (void)state;
 
     GameObject object;
-    GameObject_init(&object, 3, 5, &UNIT_IMAGE_ARCHER);
-    assert_int_equal(object.is_active(&object), TRUE);
+    GameObject_init(&object, 3, 5, &UNIT_IMAGE_ARCHER, NULL);
+    assert_int_equal(object.m->is_active(&object), TRUE);
 
-    assert_int_equal(object.get_x(&object), 3);
-    assert_int_equal(object.get_y(&object), 5);
-    object.movement(&object, 2, 3);
-    assert_int_equal(object.get_x(&object), 5);
-    assert_int_equal(object.get_y(&object), 8);
-    object.set_x(&object, 2);
-    object.set_y(&object, 1);
-    assert_int_equal(object.get_x(&object), 2);
-    assert_int_equal(object.get_y(&object), 1);
-    object.set_xy(&object, 3, 4);
-    assert_int_equal(object.get_x(&object), 3);
-    assert_int_equal(object.get_y(&object), 4);
+    assert_int_equal(object.m->get_x(&object), 3);
+    assert_int_equal(object.m->get_y(&object), 5);
+    object.m->movement(&object, 2, 3);
+    assert_int_equal(object.m->get_x(&object), 5);
+    assert_int_equal(object.m->get_y(&object), 8);
+    object.m->set_x(&object, 2);
+    object.m->set_y(&object, 1);
+    assert_int_equal(object.m->get_x(&object), 2);
+    assert_int_equal(object.m->get_y(&object), 1);
+    object.m->set_xy(&object, 3, 4);
+    assert_int_equal(object.m->get_x(&object), 3);
+    assert_int_equal(object.m->get_y(&object), 4);
 
-    assert_memory_equal(object.get_image(&object), &UNIT_IMAGE_ARCHER, sizeof(Image));
-    assert_int_equal(object.get_width(&object), UNIT_IMAGE_ARCHER.get_width(&UNIT_IMAGE_ARCHER));
-    assert_int_equal(object.get_height(&object), UNIT_IMAGE_ARCHER.get_height(&UNIT_IMAGE_ARCHER));
-    int image_width = object.get_width(&object);
-    char **pixels = object.get_pixels(&object);
+    assert_memory_equal(object.m->get_image(&object), &UNIT_IMAGE_ARCHER, sizeof(Image));
+    assert_int_equal(object.m->get_width(&object), UNIT_IMAGE_ARCHER.get_width(&UNIT_IMAGE_ARCHER));
+    assert_int_equal(object.m->get_height(&object), UNIT_IMAGE_ARCHER.get_height(&UNIT_IMAGE_ARCHER));
+    int image_width = object.m->get_width(&object);
+    char **pixels = object.m->get_pixels(&object);
     char **pixels_original = UNIT_IMAGE_ARCHER.get_pixels(&UNIT_IMAGE_ARCHER);
     assert_memory_equal(pixels[0], pixels_original[0], sizeof(char) * image_width);
-    object.free(&object);
-    assert_int_equal(object.is_active(&object), FALSE);
+    object.m->free(&object);
+    assert_int_equal(object.m->is_active(&object), FALSE);
+
+    GameObject_init(NULL, 2, 4, &UNIT_IMAGE_ARCHER, NULL);
 }
 
 

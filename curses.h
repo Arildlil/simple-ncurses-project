@@ -29,6 +29,7 @@ typedef struct Surface {
     void (*movement)(struct Surface* surface, int x, int y);
     int (*get_x)(struct Surface* surface);
     int (*get_y)(struct Surface* surface);
+    void (*set_xy)(struct Surface* surface, int x, int y);
     Image *(*get_image)(struct Surface* surface);
     Surface_State (*get_state)(struct Surface* surface);
 

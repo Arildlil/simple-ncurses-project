@@ -21,6 +21,7 @@ static void Surface_free(Surface *surface);
 static void Surface_movement(Surface *surface, int x, int y);
 static int Surface_get_x(Surface *surface);
 static int Surface_get_y(Surface *surface);
+static void Surface_set_xy(Surface *surface, int x, int y);
 static Image *Surface_get_image(Surface *surface);
 static Surface_State Surface_get_state(Surface* surface);
 
@@ -70,6 +71,7 @@ Surface* Surface_init_image(Surface *surface, Image *image, int x, int y,
     surface->movement = Surface_movement;
     surface->get_x = Surface_get_x;
     surface->get_y = Surface_get_y;
+    surface->set_xy = Surface_set_xy;
     surface->get_image = Surface_get_image;
     surface->get_state = Surface_get_state;
 
@@ -86,6 +88,11 @@ static int Surface_get_x(Surface *surface) {
 
 static int Surface_get_y(Surface *surface) {
     return surface->y;
+}
+
+static void Surface_set_xy(Surface *surface, int x, int y) {
+    surface->x = x;
+    surface->y = y;
 }
 
 static Image *Surface_get_image(Surface *surface) {
