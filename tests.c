@@ -4,8 +4,9 @@
 #include "rect.h"
 #include "curses.h"
 #include "unit_images.h"
-#include "units.h"
+#include "unit_surfaces.h"
 #include "gameobject.h"
+#include "units.h"
 
 #include <string.h>
 #include <curses.h>
@@ -197,11 +198,29 @@ static void test_unit_images(void **state) {
     //assert_memory_equal(archer->get_pixels(archer), UNIT_STRING_ARCHER, sizeof(UNIT_IMAGE_ARCHER));
 }
 
+static void test_unit_surfaces(void **state) {
+    (void)state;
+
+    Surface surfs[1];
+    UnitSurface_archer(&surfs[0], 1, 2);
+    
+    Image *image_archer = surfs[0].get_image(&surfs[0]);
+    assert_int_equal(image_archer->get_width(image_archer), UNIT_IMAGE_ARCHER.get_width(&UNIT_IMAGE_ARCHER));
+    assert_int_equal(image_archer->get_height(image_archer), UNIT_IMAGE_ARCHER.get_height(&UNIT_IMAGE_ARCHER));
+    
+    int image_width = image_archer->get_width(image_archer);
+    char **pixels = image_archer->get_pixels(image_archer);
+    char **pixels_original = UNIT_IMAGE_ARCHER.get_pixels(&UNIT_IMAGE_ARCHER);
+    assert_memory_equal(pixels[0], pixels_original[0], sizeof(char) * image_width);
+    assert_memory_equal(pixels[1], pixels_original[1], sizeof(char) * image_width);
+    assert_memory_equal(pixels[2], pixels_original[2], sizeof(char) * image_width);
+}
+
 static void test_Units_constructors(void **state) {
     (void)state;
-/*
-    GameObject objects[3];
-    GameObject_init(&objects[0], SURFACE_ARCHER, 0, 0);*/
+
+    //GameObject objects[3];
+    //GameObject_init(&objects[0], SURFACE_ARCHER, 0, 0);
 }
 
 
@@ -225,7 +244,7 @@ int main(void) {
 
         cmocka_unit_test(test_Image_units),
         cmocka_unit_test(test_unit_images),
-
+        cmocka_unit_test(test_unit_surfaces),
         cmocka_unit_test(test_Units_constructors),
     };
 
