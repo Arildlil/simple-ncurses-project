@@ -19,13 +19,14 @@
 /* ----- | Prototypes | ------ */
 
 static int init();
+static void process_input();
 static void render_objects(GameObject objects[], int num_objects);
 static void render(Surface *surfaces[], int num_objects);
 static void cleanup(int sig);
 
 /* ----- | Static Variables | ------ */
 
-static long update_rate_us = 45000;
+static long update_rate_us = 50000;
 
 /* ----- | Functions | ----- */
 
@@ -58,13 +59,39 @@ int main(int argc, char *argv[]) {
         for (i = 0; i < NUM_OBJECTS; i++) {
             objects[i].m->movement(&objects[i], 1, 0);
         }
+
+        process_input();
+
         counter++;
         if (counter > 50)
             break;
+        usleep(update_rate_us);
     }
     printf("max_x: %d, max_y: %d\n", max_x, max_y);
     
     cleanup(OK);
+}
+
+static void process_input() {
+    char input = getch();
+
+    switch (input) {
+        case ERR: 
+            fprintf(stderr, "Nope!");
+            break;
+        case 'a':
+            fprintf(stderr, "A");
+            break;
+        case 'd':
+            fprintf(stderr, "D");
+            break;
+        case 'w':
+            fprintf(stderr, "W");
+            break;
+        case 's':
+            fprintf(stderr, "S");
+            break;
+    }
 }
 
 static void render_objects(GameObject objects[], int num_objects) {
@@ -87,7 +114,6 @@ static void render(Surface *surfaces[], int num_objects) {
     assert(num_objects >= 0);
 
     Curses_redraw(surfaces, num_objects);
-    usleep(update_rate_us);
 }
 
 /*

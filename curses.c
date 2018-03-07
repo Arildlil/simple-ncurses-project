@@ -45,8 +45,10 @@ boolean Curses_init(void) {
         initscr();          /* Initialize the window */
         noecho();           /* Don't echo any keypresses */
         cbreak();           /* Take input chars one at a time, no '\n' wait */
+        // raw();              /* We don't want to have to press enter */
         curs_set(FALSE);    /* Don't display a cursor */
         keypad(stdscr, TRUE);   /* Enable keyboard mapping */
+        nodelay(stdscr, TRUE);  /* Makes 'getch' no-blocking */
         if (has_colors()) {
             start_color();  /* GIFF NICE COLORS! */
         }
