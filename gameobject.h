@@ -2,6 +2,9 @@
 #define GAMEOBJECT_H
 
 #include "curses.h"
+#include "utils.h"
+#include "gameobject.h"
+#include "player.h"
 
 /* Necessary forward declaration */
 typedef struct GameObject_Methods GameObject_Methods;
@@ -11,7 +14,8 @@ typedef struct GameObject {
     int y;
     Surface surface;
     boolean active;
-    
+    Player *owner;
+
     /* Common methods for all GameObjects */
     GameObject_Methods *m;
 } GameObject;
@@ -20,6 +24,7 @@ struct GameObject_Methods {
     /* Utils */
     void (*free)(struct GameObject *object);
     boolean (*is_active)(struct GameObject *object);
+    Player *(*get_owner)(struct GameObject *object);
 
     /* Movement and coordinates */
     void (*movement)(struct GameObject *object, int x, int y);

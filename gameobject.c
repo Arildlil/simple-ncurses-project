@@ -9,6 +9,7 @@
 /* Utils */
 static void GameObject_free(struct GameObject *object);
 static boolean GameObject_is_active(struct GameObject *object);
+static Player *GameObject_get_owner(struct GameObject *object);
 
 /* Movement and coordinates */
 static void GameObject_movement(struct GameObject *object, int x, int y);
@@ -32,6 +33,7 @@ static char **GameObject_get_pixels(struct GameObject *object);
 static GameObject_Methods methods = {
     .free = GameObject_free,
     .is_active = GameObject_is_active,
+    .get_owner = GameObject_get_owner,
 
     .movement = GameObject_movement,
     .get_x = GameObject_get_x,
@@ -84,6 +86,10 @@ static void GameObject_free(struct GameObject *object) {
 
 static boolean GameObject_is_active(struct GameObject *object) {
     return object->active;
+}
+
+static Player *GameObject_get_owner(struct GameObject *object) {
+    return object->owner;
 }
 
 /* Movement and coordinates */
