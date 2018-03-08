@@ -99,16 +99,50 @@ static void process_input() {
     }
 }
 
+/*
+ * Redraws the GameObjects.
+ */
+void Curses_redraw_objects(GameObject objects[], int num_elements) {
+    int i, j, k;
+    getmaxyx(stdscr, max_y, max_x);
+    clear();
+    for (i = 0; i < num_elements; i++) {
+        GameObject* cur = &objects[i];
+        /*assert(cur != NULL);*/
+        /*
+        if (cur->state == DEAD) {
+            continue;
+        }*/
+        if (cur == NULL) {
+            continue;
+        }
+        
+        char **pixels = cur->m->get_pixels(cur);
+        assert(pixels != NULL);
+        dprintf("Object <%d> (x,y)\n", i);
+ 
+        Player *owner = cur->m->get_owner(cur);
+        Color_Pair colors = owner->m->get_colors(owner);
+        attron(colors);
+        for (j = 0; j < cur->m->get_height(cur); j++) {
+            for (k = 0; k < cur->m->get_width(cur); k++) {
+                char cur_pixel = pixels[j][k];
+                dprintf("\t(%d,", cur->x+k);
+                dprintf("%d) ", cur->y+j);
+                mvaddch(cur->y+j, cur->x+k,cur_pixel);
+            }
+            dnprintf("\n");
+        }
+        attroff(colors);
+    }
+    refresh();
+}
+
 static void render_objects(GameObject objects[], int num_objects) {
     assert(objects != NULL);
     assert(num_objects >= 0);
 
-    Surface *surfaces[num_objects];
-    int i;
-    for (i = 0; i < num_objects; i++) {
-        surfaces[i] = objects[i].m->get_surface(&objects[i]);
-    }
-    render(surfaces, num_objects);
+    Curses_redraw_objects(objects, num_objects);
 }
 
 /* 

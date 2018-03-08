@@ -12,9 +12,9 @@
 
 #define DEFAULT_DELAY 1000
 
-/* ----- | Definitions | ------ */
 
 
+static void define_color_pairs();
 
 
 
@@ -51,11 +51,22 @@ boolean Curses_init(void) {
         nodelay(stdscr, TRUE);  /* Makes 'getch' no-blocking */
         if (has_colors()) {
             start_color();  /* GIFF NICE COLORS! */
+            define_color_pairs();    /* Define color pairs */
         }
         max_y = 0, max_x = 0;
         getmaxyx(stdscr, max_y, max_x);
     }
     return inited;
+}
+
+/*
+ * Initialize color pairs 
+ */
+static void define_color_pairs() {
+    init_pair(COLOR_PAIR_RED, COLOR_BLACK, COLOR_RED);
+    init_pair(COLOR_PAIR_GREEN, COLOR_BLACK, COLOR_GREEN);
+    init_pair(COLOR_PAIR_BLUE, COLOR_BLACK, COLOR_BLUE);
+    init_pair(COLOR_PAIR_YELLOW, COLOR_BLACK, COLOR_YELLOW);
 }
 
 /*

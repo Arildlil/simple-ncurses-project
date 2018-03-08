@@ -6,6 +6,13 @@
 #include "rect.h"
 
 typedef enum {
+    COLOR_PAIR_RED = 1, 
+    COLOR_PAIR_GREEN, 
+    COLOR_PAIR_BLUE, 
+    COLOR_PAIR_YELLOW
+} Color_Pair;
+
+typedef enum {
     DEAD, ALIVE
 } Surface_State;
 
@@ -92,6 +99,11 @@ boolean Curses_init(void);
  * @return: Should always return TRUE.
  */
 boolean Curses_exit(void);
+
+/*
+ * Redraws the GameObjects.
+ */
+//void Curses_redraw_objects(GameObject *objects[], int num_elements);
 
 /*
  * Redraws the screen.
