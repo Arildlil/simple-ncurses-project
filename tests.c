@@ -8,6 +8,7 @@
 #include "gameobject.h"
 #include "units.h"
 #include "player_controls.h"
+#include "player.h"
 
 #include <string.h>
 #include <curses.h>
@@ -258,6 +259,8 @@ static void test_Gameobject(void **state) {
 }
 
 static void test_Player_controls(void **state) {
+    (void)state;
+
     GameObject object;
     Units_init_archer(&object, 5, 6);
     #define NUM_TO_CHECK 8
@@ -269,6 +272,18 @@ static void test_Player_controls(void **state) {
     for (i = 0; i < NUM_TO_CHECK; i++) { 
         assert_int_equal(PlayerControls_handle_input_char(chars_to_check[i], &object), TRUE);
     }
+}
+
+static void test_Player(void **state) {
+    (void)state;
+
+    Player players[2];
+    Player_init(&players[0], COLOR_PAIR_RED, TRUE);
+    Player_init(&players[1], COLOR_PAIR_RED, FALSE);
+
+    assert_in_range(players[0].m->get_player_id(&players[0]), 0, 10);
+    assert_int_equal(players[0].m->get_colors(&players[0]), COLOR_PAIR_RED);
+    assert_int_equal(players[0].m->is_real_player(&players[0]), TRUE);
 }
 
 
@@ -298,6 +313,7 @@ int main(void) {
 
         cmocka_unit_test(test_Gameobject),
         cmocka_unit_test(test_Player_controls),
+        cmocka_unit_test(test_Player),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
