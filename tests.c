@@ -7,6 +7,7 @@
 #include "unit_surfaces.h"
 #include "gameobject.h"
 #include "units.h"
+#include "player_controls.h"
 
 #include <string.h>
 #include <curses.h>
@@ -256,6 +257,20 @@ static void test_Gameobject(void **state) {
     GameObject_init(NULL, 2, 4, &UNIT_IMAGE_ARCHER, NULL);
 }
 
+static void test_Player_controls(void **state) {
+    GameObject object;
+    #define NUM_TO_CHECK 8
+    char chars_to_check[NUM_TO_CHECK] = {'a', 'A', 'w', 'W', 's', 'S', 'd', 'D'};
+    int i;
+
+    assert_int_equal(PlayerControls_handle_input_char('a', NULL), FALSE);
+    
+    for (i = 0; i < NUM_TO_CHECK; i++) { 
+        assert_int_equal(PlayerControls_handle_input_char(chars_to_check[i], &object), TRUE);
+    }
+}
+
+
 
 /* ----- | Other | ------ */
 
@@ -281,6 +296,7 @@ int main(void) {
         cmocka_unit_test(test_Units_constructors),
 
         cmocka_unit_test(test_Gameobject),
+        cmocka_unit_test(test_Player_controls),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

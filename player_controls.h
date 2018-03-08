@@ -8,7 +8,9 @@
  * and decides what to do with it.
  * 
  * @arg input: The input data to use.
+ * @arg hero: The player owned unit to manipulate.
+ * @return: Whether the input was used or not.
  */
-void PlayerControls_handle_input(char input, GameObject *hero);
+boolean PlayerControls_handle_input_char(char input, GameObject *hero);
 
 #endif

@@ -28,7 +28,7 @@ static void cleanup(int sig);
 /* ----- | Static Variables | ------ */
 
 static long update_rate_us = 50000;
-static GameObject hero;
+static GameObject *hero;
 
 /* ----- | Functions | ----- */
 
@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
     }
     /* Initialize a unit for the player to control */
     Units_init_archer(&objects[NUM_OBJECTS-1], 20, 20);
+    hero = &objects[NUM_OBJECTS-1];
 
     int counter = 0;
     while (1) {
@@ -90,7 +91,7 @@ static void process_input() {
         case 'w':
             /* Intentional fall-through */
         case 's':
-            PlayerControls_handle_input(input, &hero);
+            PlayerControls_handle_input_char(input, hero);
             break;
     }
 }
