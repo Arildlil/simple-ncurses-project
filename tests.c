@@ -259,6 +259,7 @@ static void test_Gameobject(void **state) {
 
 static void test_Player_controls(void **state) {
     GameObject object;
+    Units_init_archer(&object, 5, 6);
     #define NUM_TO_CHECK 8
     char chars_to_check[NUM_TO_CHECK] = {'a', 'A', 'w', 'W', 's', 'S', 'd', 'D'};
     int i;

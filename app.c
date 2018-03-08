@@ -6,6 +6,7 @@
 #include "gameobject.h"
 #include "units.h"
 #include "player_controls.h"
+#include "player.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,8 +70,10 @@ int main(int argc, char *argv[]) {
         process_input();
 
         counter++;
+        #ifdef DEBUG
         if (counter > 50)
             break;
+        #endif
         usleep(update_rate_us);
     }
     printf("max_x: %d, max_y: %d\n", max_x, max_y);
