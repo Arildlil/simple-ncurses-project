@@ -5,6 +5,7 @@
 #include "units.h"
 #include "gameobject.h"
 #include "units.h"
+#include "player_controls.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +28,7 @@ static void cleanup(int sig);
 /* ----- | Static Variables | ------ */
 
 static long update_rate_us = 50000;
+static GameObject hero;
 
 /* ----- | Functions | ----- */
 
@@ -46,17 +48,20 @@ int main(int argc, char *argv[]) {
         "spearman"
     };
 
-    #define NUM_OBJECTS 4
+    #define NUM_TROOPS 4
+    #define NUM_OBJECTS (NUM_TROOPS + 1)
     GameObject objects[NUM_OBJECTS];
     int i;
-    for (i = 0; i < NUM_OBJECTS; i++) {
+    for (i = 0; i < NUM_TROOPS; i++) {
         Units_init_name(&objects[i], 0, 10+5*i, units_to_spawn[i]);
     }
+    /* Initialize a unit for the player to control */
+    Units_init_archer(&objects[NUM_OBJECTS-1], 20, 20);
 
     int counter = 0;
     while (1) {
         render_objects(objects, NUM_OBJECTS);
-        for (i = 0; i < NUM_OBJECTS; i++) {
+        for (i = 0; i < NUM_TROOPS; i++) {
             objects[i].m->movement(&objects[i], 1, 0);
         }
 
@@ -77,19 +82,15 @@ static void process_input() {
 
     switch (input) {
         case ERR: 
-            fprintf(stderr, "Nope!");
             break;
         case 'a':
-            fprintf(stderr, "A");
-            break;
+            /* Intentional fall-through */
         case 'd':
-            fprintf(stderr, "D");
-            break;
+            /* Intentional fall-through */
         case 'w':
-            fprintf(stderr, "W");
-            break;
+            /* Intentional fall-through */
         case 's':
-            fprintf(stderr, "S");
+            PlayerControls_handle_input(input, &hero);
             break;
     }
 }
