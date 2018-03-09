@@ -10,11 +10,11 @@
 typedef struct GameObject_Methods GameObject_Methods;
 
 typedef struct GameObject {
+    Player *owner;
     int x;
     int y;
     Surface surface;
     boolean active;
-    Player *owner;
 
     /* Common methods for all GameObjects */
     GameObject_Methods *m;
@@ -52,7 +52,7 @@ struct GameObject_Methods {
  * @arg options (Optional): The surface options to use. Uses default options if NULL.
  * @return: The object argument.
  */
-GameObject* GameObject_init(GameObject *object, int x, int y, const Image *image,
+GameObject* GameObject_init(GameObject *object, Player *owner, int x, int y, const Image *image,
     Surface_Options *options);
 
 #endif

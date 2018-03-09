@@ -42,6 +42,10 @@ int main(int argc, char *argv[]) {
     (void)argc;
     (void)argv;
 
+    Player player, neutrals;
+    Player_init(&player, COLOR_PAIR_RED, TRUE);
+    Player_init(&neutrals, COLOR_PAIR_GREEN, FALSE);
+
     char *units_to_spawn[] = {
         "archer",
         "archer",
@@ -54,10 +58,10 @@ int main(int argc, char *argv[]) {
     GameObject objects[NUM_OBJECTS];
     int i;
     for (i = 0; i < NUM_TROOPS; i++) {
-        Units_init_name(&objects[i], 0, 10+5*i, units_to_spawn[i]);
+        Units_init_name(&objects[i], &neutrals, 0, 10+5*i, units_to_spawn[i]);
     }
     /* Initialize a unit for the player to control */
-    Units_init_archer(&objects[NUM_OBJECTS-1], 20, 20);
+    Units_init_archer(&objects[NUM_OBJECTS-1], &player, 20, 20);
     hero = &objects[NUM_OBJECTS-1];
 
     int counter = 0;

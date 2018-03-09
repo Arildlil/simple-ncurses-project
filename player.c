@@ -20,6 +20,14 @@ static Player_Methods methods = {
 
 static int next_player_id = 0;
 
+Player dummy_player = {
+    .player_id = 0,
+    .colors = COLOR_PAIR_GREEN,
+    .real_player = FALSE,
+
+    .m = &methods
+};
+
 
 
 /* ----- | Functions | ------ */

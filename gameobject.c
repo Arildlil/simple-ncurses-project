@@ -58,13 +58,14 @@ static GameObject_Methods methods = {
 /*
  * Constructor for GameObjects.
  */
-struct GameObject* GameObject_init(struct GameObject *object, int x, int y, const Image *image, 
+struct GameObject* GameObject_init(struct GameObject *object, Player *owner, int x, int y, const Image *image, 
     Surface_Options *options) {
     
     if (object == NULL) {
         return NULL;
     }
 
+    object->owner = owner;
     object->x = x;
     object->y = y;
     object->active = TRUE;
@@ -78,6 +79,7 @@ struct GameObject* GameObject_init(struct GameObject *object, int x, int y, cons
 /* Utils */
 static void GameObject_free(struct GameObject *object) {
     object->active = FALSE;
+    object->owner = NULL;
     object->x = 0;
     object->y = 0;
     Surface *surface = &object->surface;

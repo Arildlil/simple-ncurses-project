@@ -21,6 +21,8 @@ struct Player_Methods {
     boolean (*is_real_player)(struct Player *player);
 };
 
+extern Player dummy_player;
+
 /*
  * Constructor for Players.
  * 

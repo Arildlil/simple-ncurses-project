@@ -229,9 +229,10 @@ static void test_Gameobject(void **state) {
     (void)state;
 
     GameObject object;
-    GameObject_init(&object, 3, 5, &UNIT_IMAGE_ARCHER, NULL);
+    GameObject_init(&object, &dummy_player, 3, 5, &UNIT_IMAGE_ARCHER, NULL);
     assert_int_equal(object.m->is_active(&object), TRUE);
 
+    assert_ptr_equal(object.m->get_owner(&object), &dummy_player);
     assert_int_equal(object.m->get_x(&object), 3);
     assert_int_equal(object.m->get_y(&object), 5);
     object.m->movement(&object, 2, 3);
@@ -255,14 +256,14 @@ static void test_Gameobject(void **state) {
     object.m->free(&object);
     assert_int_equal(object.m->is_active(&object), FALSE);
 
-    GameObject_init(NULL, 2, 4, &UNIT_IMAGE_ARCHER, NULL);
+    GameObject_init(NULL, &dummy_player, 2, 4, &UNIT_IMAGE_ARCHER, NULL);
 }
 
 static void test_Player_controls(void **state) {
     (void)state;
 
     GameObject object;
-    Units_init_archer(&object, 5, 6);
+    Units_init_archer(&object, &dummy_player, 5, 6);
     #define NUM_TO_CHECK 8
     char chars_to_check[NUM_TO_CHECK] = {'a', 'A', 'w', 'W', 's', 'S', 'd', 'D'};
     int i;
