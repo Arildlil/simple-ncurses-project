@@ -127,7 +127,7 @@ void Curses_redraw_objects(GameObject objects[], int num_elements) {
  
         Player *owner = cur->m->get_owner(cur);
         Color_Pair colors = owner->m->get_colors(owner);
-        attron(colors);
+        attron(COLOR_PAIR(colors));
         for (j = 0; j < cur->m->get_height(cur); j++) {
             for (k = 0; k < cur->m->get_width(cur); k++) {
                 char cur_pixel = pixels[j][k];
@@ -137,7 +137,7 @@ void Curses_redraw_objects(GameObject objects[], int num_elements) {
             }
             dnprintf("\n");
         }
-        attroff(colors);
+        attroff(COLOR_PAIR(colors));
     }
     refresh();
 }

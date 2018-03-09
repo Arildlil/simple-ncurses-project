@@ -63,10 +63,12 @@ boolean Curses_init(void) {
  * Initialize color pairs 
  */
 static void define_color_pairs() {
-    init_pair(COLOR_PAIR_RED, COLOR_BLACK, COLOR_RED);
-    init_pair(COLOR_PAIR_GREEN, COLOR_BLACK, COLOR_GREEN);
-    init_pair(COLOR_PAIR_BLUE, COLOR_BLACK, COLOR_BLUE);
-    init_pair(COLOR_PAIR_YELLOW, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(COLOR_PAIR_RED, COLOR_WHITE, COLOR_RED);
+    //init_pair(COLOR_PAIR_RED, COLOR_RED, COLOR_WHITE);
+
+    init_pair(COLOR_PAIR_GREEN, COLOR_WHITE, COLOR_GREEN);
+    init_pair(COLOR_PAIR_BLUE, COLOR_WHITE, COLOR_BLUE);
+    init_pair(COLOR_PAIR_YELLOW, COLOR_WHITE, COLOR_YELLOW);
 }
 
 /*
