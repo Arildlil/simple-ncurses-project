@@ -287,6 +287,29 @@ static void test_Player(void **state) {
     assert_int_equal(players[0].m->is_real_player(&players[0]), TRUE);
 }
 
+static void dummy_on_tick(GameObject_Controller *controller, GameObject *object) {
+    object->m->movement(object, 1, 1);
+}
+static void test_GameObject_Controller(void **state) {
+    (void)state;
+
+    GameObject object;
+    Units_init_archer(&object, &dummy_player, 0, 0);
+    GameObject_Controller controller;
+    GameObject_Controller_init(&controller, NULL);
+    assert_non_null(controller.m);
+    memset(&controller, 0, sizeof(controller));
+
+    GameObject_Controller_Methods methods = {.on_tick = dummy_on_tick};
+    GameObject_Controller_init(&controller, &methods);
+    assert_non_null(controller.m);
+    int old_x = object.m->get_x(&object);
+    int old_y = object.m->get_y(&object);
+    controller.m->on_tick(&controller, &object);
+    assert_int_equal(object.m->get_x(&object), old_x + 1);
+    assert_int_equal(object.m->get_y(&object), old_y + 1);
+}
+
 
 
 /* ----- | Other | ------ */
@@ -315,6 +338,8 @@ int main(void) {
         cmocka_unit_test(test_Gameobject),
         cmocka_unit_test(test_Player_controls),
         cmocka_unit_test(test_Player),
+
+        cmocka_unit_test(test_GameObject_Controller),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

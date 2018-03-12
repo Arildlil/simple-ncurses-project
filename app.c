@@ -28,7 +28,9 @@ static void cleanup(int sig);
 
 /* ----- | Static Variables | ------ */
 
-static long update_rate_us = 50000;
+#define FPS 20
+#define US_PER_SEC 1000000
+#define UPDATE_RATE_US (US_PER_SEC / FPS)
 static GameObject *hero;
 
 /* ----- | Functions | ----- */
@@ -78,7 +80,7 @@ int main(int argc, char *argv[]) {
         if (counter > 50)
             break;
         #endif
-        usleep(update_rate_us);
+        usleep(UPDATE_RATE_US);
     }
     printf("max_x: %d, max_y: %d\n", max_x, max_y);
     

@@ -53,8 +53,6 @@ static GameObject_Methods methods = {
 
 /* ----- | Functions | ----- */
 
-
-
 /*
  * Constructor for GameObjects.
  */
@@ -96,6 +94,8 @@ static Player *GameObject_get_owner(struct GameObject *object) {
 
 /* Movement and coordinates */
 static void GameObject_movement(struct GameObject *object, int x, int y) {
+    int width = object->m->get_width(object);
+    int height = object->m->get_height(object);
     object->x += x;
     object->y += y;
     Surface *surface = &object->surface;
