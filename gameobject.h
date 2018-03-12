@@ -37,6 +37,7 @@ struct GameObject_Methods {
     void (*free)(struct GameObject *object);
     boolean (*is_active)(struct GameObject *object);
     Player *(*get_owner)(struct GameObject *object);
+    void (*set_controller)(struct GameObject *object, struct GameObject_Controller *controller);
 
     /* Movement and coordinates */
     void (*movement)(struct GameObject *object, int x, int y);

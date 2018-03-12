@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <assert.h>
+#include <time.h>
 
 #include <ncurses.h>
 
@@ -28,7 +29,7 @@ static void cleanup(int sig);
 
 /* ----- | Static Variables | ------ */
 
-#define FPS 20
+#define FPS 10
 #define US_PER_SEC 1000000
 #define UPDATE_RATE_US (US_PER_SEC / FPS)
 static GameObject *hero;
@@ -36,6 +37,13 @@ static GameObject *hero;
 /* ----- | Functions | ----- */
 
 
+
+static void default_on_tick(GameObject_Controller *controller, GameObject *object) {
+    int move_x = (rand() % 3) - 1;
+    int move_y = (rand() % 3) - 1;
+    
+    object->m->movement(object, move_x, move_y);
+}
 
 int main(int argc, char *argv[]) {
     dnprintf("Main!\n");
@@ -55,12 +63,18 @@ int main(int argc, char *argv[]) {
         "spearman"
     };
 
+    GameObject_Controller random_controller;
+    GameObject_Controller_Methods random_methods = {.on_tick = default_on_tick};
+    GameObject_Controller_init(&random_controller, &random_methods);
+    //GameObject_Controller_init(&random_controller, NULL);
+
     #define NUM_TROOPS 4
     #define NUM_OBJECTS (NUM_TROOPS + 1)
     GameObject objects[NUM_OBJECTS];
     int i;
     for (i = 0; i < NUM_TROOPS; i++) {
         Units_init_name(&objects[i], &neutrals, 0, 10+5*i, units_to_spawn[i]);
+        objects[i].m->set_controller(&objects[i], &random_controller);
     }
     /* Initialize a unit for the player to control */
     Units_init_archer(&objects[NUM_OBJECTS-1], &player, 20, 20);
@@ -70,7 +84,9 @@ int main(int argc, char *argv[]) {
     while (1) {
         render_objects(objects, NUM_OBJECTS);
         for (i = 0; i < NUM_TROOPS; i++) {
-            objects[i].m->movement(&objects[i], 1, 0);
+            /*objects[i].m->movement(&objects[i], 1, 0);*/
+            
+            random_controller.m->on_tick(&random_controller, &objects[i]);
         }
 
         process_input();
@@ -166,6 +182,7 @@ static void render(Surface *surfaces[], int num_objects) {
  */
 static int init() {
     UnitImages_init();
+    srand(clock());
 
     signal(SIGINT, cleanup);
     signal(SIGTERM, cleanup);
