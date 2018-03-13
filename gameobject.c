@@ -10,6 +10,7 @@
 static void GameObject_free(struct GameObject *object);
 static boolean GameObject_is_active(struct GameObject *object);
 static Player *GameObject_get_owner(struct GameObject *object);
+static GameObject_Controller *GameObject_get_controller(struct GameObject *object);
 static void GameObject_set_controller(struct GameObject *object, struct GameObject_Controller *controller);
 
 /* Orders */
@@ -46,6 +47,7 @@ static GameObject_Methods methods = {
     .free = GameObject_free,
     .is_active = GameObject_is_active,
     .get_owner = GameObject_get_owner,
+    .get_controller = GameObject_get_controller,
     .set_controller = GameObject_set_controller,
 
     .on_tick = GameObject_on_tick,
@@ -122,6 +124,10 @@ static Player *GameObject_get_owner(struct GameObject *object) {
     return object->owner;
 }
 
+static GameObject_Controller *GameObject_get_controller(struct GameObject *object) {
+    return object->controller;
+}
+
 static void GameObject_set_controller(struct GameObject *object,
     struct GameObject_Controller *controller) {
 
@@ -144,10 +150,11 @@ static boolean insert_order(struct GameObject *object, Order *order, boolean que
     if (queued == FALSE) {
         clear_order_queue(object);
     }
-    int index = GameObject_get_order_count(object);
-    if (index >= MAX_ORDERS) {
+    int order_count = object->order_count;
+    if (order_count >= MAX_ORDERS) {
         return FALSE;
     }
+    int index = (object->current_order_index + order_count) % MAX_ORDERS;
     memcpy(&object->order_queue[index], order, sizeof(Order));
     object->order_count++;
     return TRUE;

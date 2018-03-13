@@ -23,6 +23,7 @@
 
 static int init();
 static void process_input();
+static void on_tick(GameObject objects[], int num_elements);
 static void render_objects(GameObject objects[], int num_objects);
 static void render(Surface *surfaces[], int num_objects);
 static void cleanup(int sig);
@@ -32,6 +33,7 @@ static void cleanup(int sig);
 #define FPS 10
 #define US_PER_SEC 1000000
 #define UPDATE_RATE_US (US_PER_SEC / FPS)
+#define MOVE_RANGE 10
 static GameObject *hero;
 
 /* ----- | Functions | ----- */
@@ -41,8 +43,34 @@ static GameObject *hero;
 static void default_on_tick(GameObject_Controller *controller, GameObject *object) {
     int move_x = (rand() % 3) - 1;
     int move_y = (rand() % 3) - 1;
+    move_x *= MOVE_RANGE;
+    move_y *= MOVE_RANGE;
+    int new_x = object->m->get_x(object) + move_x;
+    int new_y = object->m->get_y(object) + move_y;
+
+    if (new_x < 0) {
+        new_x = 0;
+    } else if (new_x > max_x) {
+        new_x = max_x;
+    }
+
+    if (new_y < 0) {
+        new_y = 0;
+    } else if (new_y > max_y) {
+        new_y = max_y;
+    }
     
-    object->m->movement(object, move_x, move_y);
+    boolean result = FALSE;
+    if (object->m->get_order_count(object) == 0) {
+        result = object->m->move_to(object, new_x, new_y, FALSE);
+    }
+    object->m->on_tick(object);
+
+    /*
+    if (result == FALSE) {
+      object->m->movement(object, 1, 0);  
+    }*/
+    //object->m->movement(object, move_x, move_y);
 }
 
 int main(int argc, char *argv[]) {
@@ -82,12 +110,8 @@ int main(int argc, char *argv[]) {
 
     int counter = 0;
     while (1) {
+        on_tick(objects, NUM_TROOPS);
         render_objects(objects, NUM_OBJECTS);
-        for (i = 0; i < NUM_TROOPS; i++) {
-            /*objects[i].m->movement(&objects[i], 1, 0);*/
-            
-            random_controller.m->on_tick(&random_controller, &objects[i]);
-        }
 
         process_input();
 
@@ -118,6 +142,20 @@ static void process_input() {
         case 's':
             PlayerControls_handle_input_char(input, hero);
             break;
+    }
+}
+
+static void on_tick(GameObject objects[], int num_elements) {
+    int i;
+    for (i = 0; i < num_elements; i++) {
+        GameObject *current_object = &objects[i];
+        if (current_object == NULL) {
+            continue;
+        }
+        GameObject_Controller *controller = current_object->m->get_controller(current_object);
+        if (controller != NULL) {
+            controller->m->on_tick(controller, current_object);
+        }
     }
 }
 

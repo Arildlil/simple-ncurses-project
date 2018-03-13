@@ -94,6 +94,7 @@ struct GameObject_Methods {
     void (*free)(struct GameObject *object);
     boolean (*is_active)(struct GameObject *object);
     Player *(*get_owner)(struct GameObject *object);
+    GameObject_Controller *(*get_controller)(struct GameObject *object);
     void (*set_controller)(struct GameObject *object, struct GameObject_Controller *controller);
 
     /* Orders */

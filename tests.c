@@ -304,9 +304,11 @@ static void test_GameObject_Controller(void **state) {
     GameObject_Controller_Methods methods = {.on_tick = dummy_on_tick};
     GameObject_Controller_init(&controller, &methods);
     assert_non_null(controller.m);
+    object.m->set_controller(&object, &controller);
     int old_x = object.m->get_x(&object);
     int old_y = object.m->get_y(&object);
-    controller.m->on_tick(&controller, &object);
+    GameObject_Controller *retrieved_controller = object.m->get_controller(&object);
+    retrieved_controller->m->on_tick(&retrieved_controller, &object);
     assert_int_equal(object.m->get_x(&object), old_x + 1);
     assert_int_equal(object.m->get_y(&object), old_y + 1);
 }
