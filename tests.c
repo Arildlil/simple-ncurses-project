@@ -343,9 +343,9 @@ static void test_GameObject_Order(void **state) {
     assert_non_null(object.m->get_current_order(&object));
     assert_int_equal(object.m->get_current_order(&object)->type, ORDER_TYPE_NONE);
     assert_int_equal(object.m->get_order_count(&object), 0);
-    object.m->move_to(&object, 20, 30, FALSE);
-    assert_int_equal(object.m->get_order_count(&object), 1);
     object.m->move_to(&object, 10, 5, FALSE);
+    assert_int_equal(object.m->get_order_count(&object), 1);
+    object.m->attack(&object, &object2, FALSE);
     assert_int_equal(object.m->get_order_count(&object), 1);
     object.m->move_to(&object, 15, 2, TRUE);
     assert_int_equal(object.m->get_order_count(&object), 2);
@@ -359,6 +359,8 @@ static void test_GameObject_Order(void **state) {
     current_order = object.m->get_current_order(&object);
     assert_non_null(current_order);
     assert_int_equal(current_order->type, ORDER_TYPE_MOVE);
+    assert_int_equal(current_order->destination.coordinates.x, 15);
+    assert_int_equal(current_order->destination.coordinates.y, 2);
 }
 
 

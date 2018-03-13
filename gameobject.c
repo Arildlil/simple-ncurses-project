@@ -14,8 +14,10 @@ static void GameObject_set_controller(struct GameObject *object, struct GameObje
 
 /* Orders */
 static boolean insert_order(struct GameObject *object, Order *order, boolean queued);
+static void remove_current_order(struct GameObject *object);
 static void clear_order_queue(struct GameObject *object);
 
+static void GameObject_on_tick(struct GameObject *object);
 static int GameObject_get_order_count(struct GameObject *object);
 static Order *GameObject_get_current_order(struct GameObject *object);
 static boolean GameObject_move_to(struct GameObject *object, int x, int y, boolean queued);
@@ -46,6 +48,7 @@ static GameObject_Methods methods = {
     .get_owner = GameObject_get_owner,
     .set_controller = GameObject_set_controller,
 
+    .on_tick = GameObject_on_tick,
     .get_order_count = GameObject_get_order_count,
     .get_current_order = GameObject_get_current_order,
     .move_to = GameObject_move_to,
@@ -87,6 +90,7 @@ struct GameObject* GameObject_init(struct GameObject *object, Player *owner, int
     memset(&object->order_queue, 0, sizeof(Order) * MAX_ORDERS);
     object->order_count = 0;
     object->order_queue[0].type = ORDER_TYPE_NONE;
+    object->current_order_index = 0;
 
     object->m = &methods;
     
@@ -107,6 +111,7 @@ static void GameObject_free(struct GameObject *object) {
         Orders_free(&object->order_queue[i]);
     }
     object->order_queue[0].type = ORDER_TYPE_NONE;
+    object->current_order_index = 0;
 }
 
 static boolean GameObject_is_active(struct GameObject *object) {
@@ -132,6 +137,7 @@ static void clear_order_queue(struct GameObject *object) {
         Orders_free(&object->order_queue[i]);
     }
     object->order_count = 0;
+    object->current_order_index = 0;
 }
 
 static boolean insert_order(struct GameObject *object, Order *order, boolean queued) {
@@ -147,12 +153,38 @@ static boolean insert_order(struct GameObject *object, Order *order, boolean que
     return TRUE;
 }
 
+static void remove_current_order(struct GameObject *object) {
+    if (object->order_count == 0) {
+        return;
+    }
+    
+    object->order_count--;
+    Orders_free(&object->order_queue[object->current_order_index]);
+    object->current_order_index++;
+    if (object->current_order_index >= MAX_ORDERS) {
+        object->current_order_index = 0;
+    }
+}
+
+static void GameObject_on_tick(struct GameObject *object) {
+    if (object->order_count == 0) {
+        return;
+    }
+
+    Order *current_order = object->m->get_current_order(object);
+    int is_finished = Orders_update(current_order, object);
+    if (is_finished == TRUE) {
+        remove_current_order(object);
+    }
+}
+
 static int GameObject_get_order_count(struct GameObject *object) {
     return object->order_count;
 }
 
 static Order *GameObject_get_current_order(struct GameObject *object) {
-    return &object->order_queue[object->order_count-1];
+    int first_order_index = object->current_order_index;
+    return &object->order_queue[first_order_index];
 }
 
 static boolean GameObject_move_to(struct GameObject *object, int x, int y, boolean queued) {

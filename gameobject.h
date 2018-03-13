@@ -74,6 +74,7 @@ struct GameObject {
     boolean active;
     Order order_queue[MAX_ORDERS];
     int order_count;
+    int current_order_index;
 
     /* Controls the behavior of this object, if set */
     GameObject_Controller *controller;
@@ -96,6 +97,7 @@ struct GameObject_Methods {
     void (*set_controller)(struct GameObject *object, struct GameObject_Controller *controller);
 
     /* Orders */
+    void (*on_tick)(struct GameObject *object);
     int (*get_order_count)(struct GameObject *object);
     Order *(*get_current_order)(struct GameObject *object);
     boolean (*move_to)(struct GameObject *object, int x, int y, boolean queued);
@@ -155,6 +157,15 @@ GameObject_Controller* GameObject_Controller_init(GameObject_Controller *control
  * @arg order: The order struct to modify.
  */
 void Orders_free(Order *order);
+
+/*
+ * Continue execution of the current Order.
+ * 
+ * @arg order: The current Order to execute.
+ * @arg object: The object that performs the Order.
+ * @return: TRUE if Order is finished, FALSE otherwise.
+ */
+boolean Orders_update(Order *order, GameObject *object);
 
 /*
  * Issues a movement order to the unit.
