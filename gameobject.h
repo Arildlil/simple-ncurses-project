@@ -6,11 +6,24 @@
 #include "gameobject.h"
 #include "player.h"
 
-/* Necessary forward declaration */
+
+
+/* ----- | Typedefs and Forward Declarations | ----- */
+
+/* GameObject */
 typedef struct GameObject GameObject;
 typedef struct GameObject_Methods GameObject_Methods;
 typedef struct GameObject_Controller GameObject_Controller;
 typedef struct GameObject_Controller_Methods GameObject_Controller_Methods;
+
+/* Orders */
+typedef struct Coordinates Coordinates;
+typedef struct Destination Destination;
+typedef struct Order Order;
+
+
+
+/* ----- | Type Definitions | ----- */
 
 struct GameObject {
     Player *owner;
@@ -60,6 +73,41 @@ struct GameObject_Controller_Methods {
     void (*on_tick)(struct GameObject_Controller *controller, struct GameObject *object);
 };
 
+
+
+/* Orders */
+
+typedef enum Order_Type {
+    ORDER_TYPE_MOVE, ORDER_TYPE_ATTACK
+} Order_Type;
+
+typedef enum Destination_Type {
+    DEST_TYPE_GAMEOBJECT, DEST_TYPE_COORDINATES
+} Destination_Type; 
+
+struct Coordinates {
+    int x;
+    int y;
+};
+
+struct Destination {
+    Destination_Type desttype;
+    union {
+        GameObject *object;
+        Coordinates coordinates;
+    };
+};
+
+struct Order {
+    boolean is_active;
+    Order_Type type;
+    Destination destination;
+};
+
+
+
+/* ----- | Constructors | ----- */
+
 /*
  * Constructor for GameObjects.
  * 
@@ -82,5 +130,24 @@ GameObject* GameObject_init(GameObject *object, Player *owner, int x, int y, con
  */
 GameObject_Controller* GameObject_Controller_init(GameObject_Controller *controller, 
     struct GameObject_Controller_Methods *methods);
+
+/*
+ * Issues a movement order to the unit.
+ * 
+ * @arg order: The order struct to modify.
+ * @arg x: The target x-coordinate.
+ * @arg y: The target y-coordinate.
+ * @return: The order object.
+ */
+Order *Orders_move(Order *order, int x, int y);
+
+/*
+ * Issues an attack order on the target.
+ * 
+ * @arg order: The order struct to modify.
+ * @arg target: The object to move towards for combat.
+ * @return: The order object.
+ */
+Order *Orders_attack(Order *order, GameObject *target);
 
 #endif

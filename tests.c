@@ -310,6 +310,28 @@ static void test_GameObject_Controller(void **state) {
     assert_int_equal(object.m->get_y(&object), old_y + 1);
 }
 
+static void test_Order(void **state) {
+    (void)state;
+
+    GameObject object;
+    Units_init_archer(&object, &dummy_player, 0, 0);
+
+    Order order;
+    Orders_move(&order, 4, 6);
+    assert_int_equal(order.is_active, TRUE);
+    assert_int_equal(order.type, ORDER_TYPE_MOVE);
+    assert_int_equal(order.destination.desttype, DEST_TYPE_COORDINATES);
+    assert_int_equal(order.destination.coordinates.x, 4);
+    assert_int_equal(order.destination.coordinates.y, 6);
+
+    memset(&order, 0, sizeof(Order));
+    Orders_attack(&order, &object);
+    assert_int_equal(order.is_active, TRUE);
+    assert_int_equal(order.type, ORDER_TYPE_ATTACK);
+    assert_int_equal(order.destination.desttype, DEST_TYPE_GAMEOBJECT);
+    assert_ptr_equal(order.destination.object, &object);
+}
+
 
 
 /* ----- | Other | ------ */
@@ -340,6 +362,7 @@ int main(void) {
         cmocka_unit_test(test_Player),
 
         cmocka_unit_test(test_GameObject_Controller),
+        cmocka_unit_test(test_Order),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
