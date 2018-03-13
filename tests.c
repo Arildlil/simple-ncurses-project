@@ -253,6 +253,7 @@ static void test_Gameobject(void **state) {
     char **pixels = object.m->get_pixels(&object);
     char **pixels_original = UNIT_IMAGE_ARCHER.get_pixels(&UNIT_IMAGE_ARCHER);
     assert_memory_equal(pixels[0], pixels_original[0], sizeof(char) * image_width);
+
     object.m->free(&object);
     assert_int_equal(object.m->is_active(&object), FALSE);
 
@@ -332,6 +333,34 @@ static void test_Order(void **state) {
     assert_ptr_equal(order.destination.object, &object);
 }
 
+static void test_GameObject_Order(void **state) {
+    (void)state;
+
+    GameObject object;
+    GameObject object2;
+    Units_init_archer(&object, &dummy_player, 5, 10);
+    Units_init_archer(&object2, &dummy_player, 10, 5);
+    assert_non_null(object.m->get_current_order(&object));
+    assert_int_equal(object.m->get_current_order(&object)->type, ORDER_TYPE_NONE);
+    assert_int_equal(object.m->get_order_count(&object), 0);
+    object.m->move_to(&object, 20, 30, FALSE);
+    assert_int_equal(object.m->get_order_count(&object), 1);
+    object.m->move_to(&object, 10, 5, FALSE);
+    assert_int_equal(object.m->get_order_count(&object), 1);
+    object.m->move_to(&object, 15, 2, TRUE);
+    assert_int_equal(object.m->get_order_count(&object), 2);
+    object.m->attack(&object, &object2, TRUE);
+    assert_int_equal(object.m->get_order_count(&object), 3);
+    Order *current_order = object.m->get_current_order(&object);
+    assert_non_null(current_order);
+    assert_int_equal(current_order->type, ORDER_TYPE_ATTACK);
+    object.m->move_to(&object, 15, 2, FALSE);
+    assert_int_equal(object.m->get_order_count(&object), 1);
+    current_order = object.m->get_current_order(&object);
+    assert_non_null(current_order);
+    assert_int_equal(current_order->type, ORDER_TYPE_MOVE);
+}
+
 
 
 /* ----- | Other | ------ */
@@ -363,6 +392,7 @@ int main(void) {
 
         cmocka_unit_test(test_GameObject_Controller),
         cmocka_unit_test(test_Order),
+        cmocka_unit_test(test_GameObject_Order),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

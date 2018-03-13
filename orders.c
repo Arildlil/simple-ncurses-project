@@ -1,6 +1,11 @@
 #include "utils.h"
 #include "gameobject.h"
 
+void Orders_free(Order *order) {
+    order->is_active = FALSE;
+    order->type = ORDER_TYPE_NONE;
+}
+
 Order *Orders_move(Order *order, int x, int y) {
     order->is_active = TRUE;
     order->type = ORDER_TYPE_MOVE;

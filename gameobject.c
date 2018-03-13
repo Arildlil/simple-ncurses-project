@@ -12,6 +12,15 @@ static boolean GameObject_is_active(struct GameObject *object);
 static Player *GameObject_get_owner(struct GameObject *object);
 static void GameObject_set_controller(struct GameObject *object, struct GameObject_Controller *controller);
 
+/* Orders */
+static boolean insert_order(struct GameObject *object, Order *order, boolean queued);
+static void clear_order_queue(struct GameObject *object);
+
+static int GameObject_get_order_count(struct GameObject *object);
+static Order *GameObject_get_current_order(struct GameObject *object);
+static boolean GameObject_move_to(struct GameObject *object, int x, int y, boolean queued);
+static boolean GameObject_attack(struct GameObject *object, struct GameObject *target, boolean queued);
+
 /* Movement and coordinates */
 static void GameObject_movement(struct GameObject *object, int x, int y);
 static int GameObject_get_x(struct GameObject *object);
@@ -36,6 +45,11 @@ static GameObject_Methods methods = {
     .is_active = GameObject_is_active,
     .get_owner = GameObject_get_owner,
     .set_controller = GameObject_set_controller,
+
+    .get_order_count = GameObject_get_order_count,
+    .get_current_order = GameObject_get_current_order,
+    .move_to = GameObject_move_to,
+    .attack = GameObject_attack,
 
     .movement = GameObject_movement,
     .get_x = GameObject_get_x,
@@ -70,6 +84,9 @@ struct GameObject* GameObject_init(struct GameObject *object, Player *owner, int
     object->y = y;
     object->active = TRUE;
     Surface_init_image(&object->surface, image, x, y, NULL);
+    memset(&object->order_queue, 0, sizeof(Order) * MAX_ORDERS);
+    object->order_count = 0;
+    object->order_queue[0].type = ORDER_TYPE_NONE;
 
     object->m = &methods;
     
@@ -84,6 +101,12 @@ static void GameObject_free(struct GameObject *object) {
     object->y = 0;
     Surface *surface = &object->surface;
     surface->free(surface);
+    object->order_count = 0;
+    int i;
+    for (i = 0; i < MAX_ORDERS; i++) {
+        Orders_free(&object->order_queue[i]);
+    }
+    object->order_queue[0].type = ORDER_TYPE_NONE;
 }
 
 static boolean GameObject_is_active(struct GameObject *object) {
@@ -99,6 +122,52 @@ static void GameObject_set_controller(struct GameObject *object,
 
     object->controller = controller;
 }
+
+
+
+/* Orders */
+static void clear_order_queue(struct GameObject *object) {
+    int i;
+    for (i = 0; i < MAX_ORDERS; i++) {
+        Orders_free(&object->order_queue[i]);
+    }
+    object->order_count = 0;
+}
+
+static boolean insert_order(struct GameObject *object, Order *order, boolean queued) {
+    if (queued == FALSE) {
+        clear_order_queue(object);
+    }
+    int index = GameObject_get_order_count(object);
+    if (index >= MAX_ORDERS) {
+        return FALSE;
+    }
+    memcpy(&object->order_queue[index], order, sizeof(Order));
+    object->order_count++;
+    return TRUE;
+}
+
+static int GameObject_get_order_count(struct GameObject *object) {
+    return object->order_count;
+}
+
+static Order *GameObject_get_current_order(struct GameObject *object) {
+    return &object->order_queue[object->order_count-1];
+}
+
+static boolean GameObject_move_to(struct GameObject *object, int x, int y, boolean queued) {
+    Order order;
+    Orders_move(&order, x, y);
+    return insert_order(object, &order, queued);
+}
+
+static boolean GameObject_attack(struct GameObject *object, struct GameObject *target, boolean queued) {
+    Order order;
+    Orders_attack(&order, target);
+    return insert_order(object, &order, queued);
+}
+
+
 
 /* Movement and coordinates */
 static void GameObject_movement(struct GameObject *object, int x, int y) {
@@ -136,6 +205,8 @@ static void GameObject_set_xy(struct GameObject *object, int x, int y) {
 static Surface *GameObject_get_surface(struct GameObject *object) {
     return &object->surface;
 }
+
+
 
 /* Image */
 static Image *GameObject_get_image(struct GameObject *object) {

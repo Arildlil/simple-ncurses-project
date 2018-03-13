@@ -23,62 +23,20 @@ typedef struct Order Order;
 
 
 
+/* ----- | Constants | ----- */
+
+enum {
+    MAX_ORDERS = 10
+};
+
+
+
 /* ----- | Type Definitions | ----- */
-
-struct GameObject {
-    Player *owner;
-    int x;
-    int y;
-    Surface surface;
-    boolean active;
-
-    /* Controls the behavior of this object, if set */
-    GameObject_Controller *controller;
-
-    /* Common methods for all GameObjects */
-    GameObject_Methods *m;
-};
-
-struct GameObject_Controller {
-    /* Contains function pointers. These can vary from 
-     * object to object. */
-    GameObject_Controller_Methods *m;
-};
-
-struct GameObject_Methods {
-    /* Utils */
-    void (*free)(struct GameObject *object);
-    boolean (*is_active)(struct GameObject *object);
-    Player *(*get_owner)(struct GameObject *object);
-    void (*set_controller)(struct GameObject *object, struct GameObject_Controller *controller);
-
-    /* Movement and coordinates */
-    void (*movement)(struct GameObject *object, int x, int y);
-    int (*get_x)(struct GameObject *object);
-    int (*get_y)(struct GameObject *object);
-    void (*set_x)(struct GameObject *object, int x);
-    void (*set_y)(struct GameObject *object, int y);
-    void (*set_xy)(struct GameObject *object, int x, int y);
-    Surface *(*get_surface)(struct GameObject *object);
-
-    /* Image */
-    Image *(*get_image)(struct GameObject *object);
-    int (*get_width)(struct GameObject *object);
-    int (*get_height)(struct GameObject *object);
-    char **(*get_pixels)(struct GameObject *object);
-};
-
-/* This struct should be filled manually! */
-struct GameObject_Controller_Methods {
-    void (*on_tick)(struct GameObject_Controller *controller, struct GameObject *object);
-};
-
-
 
 /* Orders */
 
 typedef enum Order_Type {
-    ORDER_TYPE_MOVE, ORDER_TYPE_ATTACK
+    ORDER_TYPE_NONE, ORDER_TYPE_MOVE, ORDER_TYPE_ATTACK
 } Order_Type;
 
 typedef enum Destination_Type {
@@ -102,6 +60,66 @@ struct Order {
     boolean is_active;
     Order_Type type;
     Destination destination;
+};
+
+
+
+/* GameObjects */
+
+struct GameObject {
+    Player *owner;
+    int x;
+    int y;
+    Surface surface;
+    boolean active;
+    Order order_queue[MAX_ORDERS];
+    int order_count;
+
+    /* Controls the behavior of this object, if set */
+    GameObject_Controller *controller;
+
+    /* Common methods for all GameObjects */
+    GameObject_Methods *m;
+};
+
+struct GameObject_Controller {
+    /* Contains function pointers. These can vary from 
+     * object to object. */
+    GameObject_Controller_Methods *m;
+};
+
+struct GameObject_Methods {
+    /* Utils */
+    void (*free)(struct GameObject *object);
+    boolean (*is_active)(struct GameObject *object);
+    Player *(*get_owner)(struct GameObject *object);
+    void (*set_controller)(struct GameObject *object, struct GameObject_Controller *controller);
+
+    /* Orders */
+    int (*get_order_count)(struct GameObject *object);
+    Order *(*get_current_order)(struct GameObject *object);
+    boolean (*move_to)(struct GameObject *object, int x, int y, boolean queued);
+    boolean (*attack)(struct GameObject *object, struct GameObject *target, boolean queued);
+
+    /* Movement and coordinates */
+    void (*movement)(struct GameObject *object, int x, int y);
+    int (*get_x)(struct GameObject *object);
+    int (*get_y)(struct GameObject *object);
+    void (*set_x)(struct GameObject *object, int x);
+    void (*set_y)(struct GameObject *object, int y);
+    void (*set_xy)(struct GameObject *object, int x, int y);
+    Surface *(*get_surface)(struct GameObject *object);
+
+    /* Image */
+    Image *(*get_image)(struct GameObject *object);
+    int (*get_width)(struct GameObject *object);
+    int (*get_height)(struct GameObject *object);
+    char **(*get_pixels)(struct GameObject *object);
+};
+
+/* This struct should be filled manually! */
+struct GameObject_Controller_Methods {
+    void (*on_tick)(struct GameObject_Controller *controller, struct GameObject *object);
 };
 
 
@@ -130,6 +148,13 @@ GameObject* GameObject_init(GameObject *object, Player *owner, int x, int y, con
  */
 GameObject_Controller* GameObject_Controller_init(GameObject_Controller *controller, 
     struct GameObject_Controller_Methods *methods);
+
+/*
+ * Clears up the Order struct for future use.
+ * 
+ * @arg order: The order struct to modify.
+ */
+void Orders_free(Order *order);
 
 /*
  * Issues a movement order to the unit.
