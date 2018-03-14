@@ -49,8 +49,6 @@ static boolean update_attack_order(Order *order, GameObject *object) {
     return FALSE;
 }
 
-
-
 void Orders_free(Order *order) {
     order->is_active = FALSE;
     order->type = ORDER_TYPE_NONE;
@@ -95,4 +93,41 @@ Order *Orders_attack(Order *order, GameObject *target) {
     order->destination.object = target;
 
     return order;
+}
+
+
+
+/* Utils */
+
+void clear_order_queue(struct GameObject *object) {
+    int i;
+    for (i = 0; i < MAX_ORDERS; i++) {
+        Orders_free(&object->order_queue[i]);
+    }
+    object->order_count = 0;
+    object->current_order_index = 0;
+}
+
+boolean insert_order(struct GameObject *object, Order *order, boolean queued) {
+    if (queued == FALSE) {
+        clear_order_queue(object);
+    }
+    int order_count = object->order_count;
+    if (order_count >= MAX_ORDERS) {
+        return FALSE;
+    }
+    int index = (object->current_order_index + order_count) % MAX_ORDERS;
+    memcpy(&object->order_queue[index], order, sizeof(Order));
+    object->order_count++;
+    return TRUE;
+}
+
+void remove_current_order(struct GameObject *object) {
+    if (object->order_count == 0) {
+        return;
+    }
+    
+    object->order_count--;
+    Orders_free(&object->order_queue[object->current_order_index]);
+    object->current_order_index = ++object->current_order_index % MAX_ORDERS;
 }

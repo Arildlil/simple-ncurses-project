@@ -14,9 +14,11 @@ static GameObject_Controller *GameObject_get_controller(struct GameObject *objec
 static void GameObject_set_controller(struct GameObject *object, struct GameObject_Controller *controller);
 
 /* Orders */
+/*
 static boolean insert_order(struct GameObject *object, Order *order, boolean queued);
 static void remove_current_order(struct GameObject *object);
 static void clear_order_queue(struct GameObject *object);
+*/
 
 static void GameObject_on_tick(struct GameObject *object);
 static int GameObject_get_order_count(struct GameObject *object);
@@ -137,41 +139,6 @@ static void GameObject_set_controller(struct GameObject *object,
 
 
 /* Orders */
-static void clear_order_queue(struct GameObject *object) {
-    int i;
-    for (i = 0; i < MAX_ORDERS; i++) {
-        Orders_free(&object->order_queue[i]);
-    }
-    object->order_count = 0;
-    object->current_order_index = 0;
-}
-
-static boolean insert_order(struct GameObject *object, Order *order, boolean queued) {
-    if (queued == FALSE) {
-        clear_order_queue(object);
-    }
-    int order_count = object->order_count;
-    if (order_count >= MAX_ORDERS) {
-        return FALSE;
-    }
-    int index = (object->current_order_index + order_count) % MAX_ORDERS;
-    memcpy(&object->order_queue[index], order, sizeof(Order));
-    object->order_count++;
-    return TRUE;
-}
-
-static void remove_current_order(struct GameObject *object) {
-    if (object->order_count == 0) {
-        return;
-    }
-    
-    object->order_count--;
-    Orders_free(&object->order_queue[object->current_order_index]);
-    object->current_order_index++;
-    if (object->current_order_index >= MAX_ORDERS) {
-        object->current_order_index = 0;
-    }
-}
 
 static void GameObject_on_tick(struct GameObject *object) {
     if (object->order_count == 0) {

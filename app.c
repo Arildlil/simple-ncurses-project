@@ -145,6 +145,10 @@ static void process_input() {
     }
 }
 
+/*
+ * Go through the controller of all the units and perform their
+ * 'on_tick' method.
+ */
 static void on_tick(GameObject objects[], int num_elements) {
     int i;
     for (i = 0; i < num_elements; i++) {
