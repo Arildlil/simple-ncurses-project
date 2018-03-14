@@ -9,6 +9,7 @@
 #include "units.h"
 #include "player_controls.h"
 #include "player.h"
+#include "orders_utils.h"
 
 #include <string.h>
 #include <curses.h>
@@ -365,6 +366,35 @@ static void test_GameObject_Order(void **state) {
     assert_int_equal(current_order->destination.coordinates.y, 2);
 }
 
+static void test_GameObject_Order_queue(void **state) {
+    (void)state;
+    
+    GameObject object;
+    Units_init_archer(&object, &dummy_player, 5, 5);
+    
+    Order order1, order2, order3;
+    Orders_move(&order1, 10, 15);
+    Orders_move(&order2, 7, 8);
+    Orders_move(&order3, 2, 2);
+    assert_int_equal(insert_order(&object, &order3, FALSE), TRUE);
+    assert_int_equal(object.m->get_order_count(&object), 1);
+
+    assert_int_equal(insert_order(&object, &order1, FALSE), TRUE);
+    assert_int_equal(object.m->get_order_count(&object), 1);
+    assert_int_equal(insert_order(&object, &order2, TRUE), TRUE);
+    assert_int_equal(object.m->get_order_count(&object), 2);
+    assert_int_equal(insert_order(&object, &order3, TRUE), TRUE);
+    assert_int_equal(object.current_order_index, 0);
+    assert_int_equal(object.m->get_order_count(&object), 3);
+    remove_current_order(&object);
+    assert_int_equal(object.current_order_index, 1);
+    assert_int_equal(object.m->get_order_count(&object), 2);
+
+    Order *current_order = object.m->get_current_order(&object);
+    assert_int_equal(current_order->destination.coordinates.x, order2.destination.coordinates.x);
+    assert_int_equal(current_order->destination.coordinates.y, order2.destination.coordinates.y);
+}
+
 
 
 /* ----- | Other | ------ */
@@ -397,6 +427,7 @@ int main(void) {
         cmocka_unit_test(test_GameObject_Controller),
         cmocka_unit_test(test_Order),
         cmocka_unit_test(test_GameObject_Order),
+        cmocka_unit_test(test_GameObject_Order_queue),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
