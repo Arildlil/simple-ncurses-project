@@ -27,6 +27,8 @@ static int move_towards_goal(GameObject *object, int destination_x, int destinat
         move_y--;
     }
 
+    object->m->movement(object, move_x, move_y);
+
     if (x_reached && y_reached) {
         return TRUE;
     }
@@ -54,7 +56,8 @@ void Orders_free(Order *order) {
     order->type = ORDER_TYPE_NONE;
 }
 
-boolean Orders_update(Order *order, GameObject *object) {
+boolean Orders_update(GameObject *object) {
+    Order *order = object->m->get_current_order(object);
     if (order->is_active == FALSE) {
         return FALSE;
     }

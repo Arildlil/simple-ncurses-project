@@ -160,13 +160,12 @@ GameObject_Controller* GameObject_Controller_init(GameObject_Controller *control
 void Orders_free(Order *order);
 
 /*
- * Continue execution of the current Order.
+ * Continue execution of the current Order of the object.
  * 
- * @arg order: The current Order to execute.
  * @arg object: The object that performs the Order.
  * @return: TRUE if Order is finished, FALSE otherwise.
  */
-boolean Orders_update(Order *order, GameObject *object);
+boolean Orders_update(GameObject *object);
 
 /*
  * Issues a movement order to the unit.

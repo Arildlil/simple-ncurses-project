@@ -92,8 +92,8 @@ struct GameObject* GameObject_init(struct GameObject *object, Player *owner, int
     object->active = TRUE;
     Surface_init_image(&object->surface, image, x, y, NULL);
     memset(&object->order_queue, 0, sizeof(Order) * MAX_ORDERS);
-    object->order_count = 0;
     object->order_queue[0].type = ORDER_TYPE_NONE;
+    object->order_count = 0;
     object->current_order_index = 0;
 
     object->m = &methods;
@@ -109,12 +109,12 @@ static void GameObject_free(struct GameObject *object) {
     object->y = 0;
     Surface *surface = &object->surface;
     surface->free(surface);
-    object->order_count = 0;
     int i;
     for (i = 0; i < MAX_ORDERS; i++) {
         Orders_free(&object->order_queue[i]);
     }
     object->order_queue[0].type = ORDER_TYPE_NONE;
+    object->order_count = 0;
     object->current_order_index = 0;
 }
 
@@ -145,8 +145,7 @@ static void GameObject_on_tick(struct GameObject *object) {
         return;
     }
 
-    Order *current_order = object->m->get_current_order(object);
-    int is_finished = Orders_update(current_order, object);
+    int is_finished = Orders_update(object);
     if (is_finished == TRUE) {
         remove_current_order(object);
     }

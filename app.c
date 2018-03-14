@@ -11,9 +11,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <math.h>
 #include <signal.h>
 #include <assert.h>
 #include <time.h>
+#include <sys/param.h>
 
 #include <ncurses.h>
 
@@ -33,7 +35,7 @@ static void cleanup(int sig);
 #define FPS 10
 #define US_PER_SEC 1000000
 #define UPDATE_RATE_US (US_PER_SEC / FPS)
-#define MOVE_RANGE 10
+#define MOVE_RANGE 5
 static GameObject *hero;
 
 /* ----- | Functions | ----- */
@@ -41,36 +43,22 @@ static GameObject *hero;
 
 
 static void default_on_tick(GameObject_Controller *controller, GameObject *object) {
-    int move_x = (rand() % 3) - 1;
-    int move_y = (rand() % 3) - 1;
-    move_x *= MOVE_RANGE;
-    move_y *= MOVE_RANGE;
-    int new_x = object->m->get_x(object) + move_x;
-    int new_y = object->m->get_y(object) + move_y;
+    int direction_x = (rand() % 3) - 1;             /* -1 to 1 */
+    int direction_y = (rand() % 3) - 1;             /* -1 to 1 */
+    int movement_multiplier = (rand() % 2) + 2;     
+    int movement_x = direction_x * MOVE_RANGE * movement_multiplier;
+    int movement_y = direction_y * MOVE_RANGE * movement_multiplier;
+    int new_x = object->m->get_x(object) + movement_x;
+    int new_y = object->m->get_y(object) + movement_y;
 
-    if (new_x < 0) {
-        new_x = 0;
-    } else if (new_x > max_x) {
-        new_x = max_x;
-    }
+    new_x = MIN(MAX(new_x, 0), max_x);
+    new_y = MIN(MAX(new_y, 0), max_y);
 
-    if (new_y < 0) {
-        new_y = 0;
-    } else if (new_y > max_y) {
-        new_y = max_y;
-    }
-    
     boolean result = FALSE;
     if (object->m->get_order_count(object) == 0) {
         result = object->m->move_to(object, new_x, new_y, FALSE);
     }
     object->m->on_tick(object);
-
-    /*
-    if (result == FALSE) {
-      object->m->movement(object, 1, 0);  
-    }*/
-    //object->m->movement(object, move_x, move_y);
 }
 
 int main(int argc, char *argv[]) {
