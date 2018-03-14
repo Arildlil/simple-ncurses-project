@@ -36,6 +36,7 @@ static void cleanup(int sig);
 #define US_PER_SEC 1000000
 #define UPDATE_RATE_US (US_PER_SEC / FPS)
 #define MOVE_RANGE 5
+static int MIDDLE_X = 0;
 static GameObject *hero;
 
 /* ----- | Functions | ----- */
@@ -43,21 +44,35 @@ static GameObject *hero;
 
 
 static void default_on_tick(GameObject_Controller *controller, GameObject *object) {
-    int direction_x = (rand() % 3) - 1;             /* -1 to 1 */
-    int direction_y = (rand() % 3) - 1;             /* -1 to 1 */
+    if (object->m->get_order_count(object) > 0) {
+        object->m->on_tick(object);
+        return;
+    }
+    
+    int direction_x = (rand() % 5) - 2;             /* -2 to 2 */
+    int direction_y = (rand() % 5) - 2;             /* -2 to 2 */
     int movement_multiplier = (rand() % 2) + 2;     
     int movement_x = direction_x * MOVE_RANGE * movement_multiplier;
     int movement_y = direction_y * MOVE_RANGE * movement_multiplier;
     int new_x = object->m->get_x(object) + movement_x;
     int new_y = object->m->get_y(object) + movement_y;
 
-    new_x = MIN(MAX(new_x, 0), max_x);
-    new_y = MIN(MAX(new_y, 0), max_y);
+    int object_height = object->m->get_height(object);
+
+    if (new_x <= object_height) {
+        new_x += object_height + movement_x * -1;
+    } else if (new_y <= object_height) {
+        new_y += object_height + movement_y * -1;
+    } else if (new_x >= max_x - object_height) {
+        new_x -= max_x - object_height - movement_x * -1;;
+    } else if (new_y >= max_y - object_height) {
+        new_y -= max_y - object_height - movement_y * -1;;
+    }
+    new_x = MIN(MAX(new_x, 0), max_x - object_height);
+    new_y = MIN(MAX(new_y, 0), max_y - object_height);
 
     boolean result = FALSE;
-    if (object->m->get_order_count(object) == 0) {
-        result = object->m->move_to(object, new_x, new_y, FALSE);
-    }
+    object->m->move_to(object, new_x, new_y, FALSE);
     object->m->on_tick(object);
 }
 
@@ -84,12 +99,13 @@ int main(int argc, char *argv[]) {
     GameObject_Controller_init(&random_controller, &random_methods);
     //GameObject_Controller_init(&random_controller, NULL);
 
+    MIDDLE_X = max_x / 2;
     #define NUM_TROOPS 4
     #define NUM_OBJECTS (NUM_TROOPS + 1)
     GameObject objects[NUM_OBJECTS];
     int i;
     for (i = 0; i < NUM_TROOPS; i++) {
-        Units_init_name(&objects[i], &neutrals, 0, 10+5*i, units_to_spawn[i]);
+        Units_init_name(&objects[i], &neutrals, MIDDLE_X, 10+5*i, units_to_spawn[i]);
         objects[i].m->set_controller(&objects[i], &random_controller);
     }
     /* Initialize a unit for the player to control */

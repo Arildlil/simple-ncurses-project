@@ -393,6 +393,10 @@ static void test_GameObject_Order_queue(void **state) {
     Order *current_order = object.m->get_current_order(&object);
     assert_int_equal(current_order->destination.coordinates.x, order2.destination.coordinates.x);
     assert_int_equal(current_order->destination.coordinates.y, order2.destination.coordinates.y);
+
+    clear_order_queue(&object);
+    assert_int_equal(object.m->get_order_count(&object), 0);
+    assert_int_equal(object.current_order_index, 0);
 }
 
 
