@@ -7,10 +7,18 @@
 
 /* ----- | Static Variables | ------ */
 
-#define MOVE_UP 'w'
-#define MOVE_DOWN 's'
-#define MOVE_RIGHT 'd'
-#define MOVE_LEFT 'a'
+enum {
+    MOVEMENT_PER_UPDATE = 3,
+
+    MOVE_UP = 'w',
+    MOVE_DOWN = 's',
+    MOVE_RIGHT = 'd',
+    MOVE_LEFT = 'a',
+    MOVE_UP_LEFT = 'q',
+    MOVE_UP_RIGHT = 'e',
+    MOVE_DOWN_LEFT = '<',
+    MOVE_DOWN_RIGHT = 'x'
+};
 
 
 
@@ -26,19 +34,30 @@ boolean PlayerControls_handle_input_char(char input, GameObject *hero) {
 
     switch (input) {
         case MOVE_UP:
-            hero->m->movement(hero, 0, -1);
+            hero->m->movement(hero, 0, -MOVEMENT_PER_UPDATE);
             break;
         case MOVE_DOWN:
-            hero->m->movement(hero, 0, 1);
+            hero->m->movement(hero, 0, MOVEMENT_PER_UPDATE);
             break;
         case MOVE_RIGHT: 
-            hero->m->movement(hero, 1, 0);
+            hero->m->movement(hero, MOVEMENT_PER_UPDATE, 0);
             break;
         case MOVE_LEFT:
-            hero->m->movement(hero, -1, 0);
+            hero->m->movement(hero, -MOVEMENT_PER_UPDATE, 0);
+            break;
+        case MOVE_UP_LEFT:
+            hero->m->movement(hero, -MOVEMENT_PER_UPDATE, -MOVEMENT_PER_UPDATE);
+            break;
+        case MOVE_UP_RIGHT:
+            hero->m->movement(hero, MOVEMENT_PER_UPDATE, -MOVEMENT_PER_UPDATE);
+            break;
+        case MOVE_DOWN_LEFT:
+            hero->m->movement(hero, -MOVEMENT_PER_UPDATE, MOVEMENT_PER_UPDATE);
+            break;
+        case MOVE_DOWN_RIGHT:
+            hero->m->movement(hero, MOVEMENT_PER_UPDATE, MOVEMENT_PER_UPDATE);
             break;
         default:
-
             return FALSE;
     }
 
