@@ -1,6 +1,7 @@
 #include "gameobject.h"
 #include "unit_images.h"
 #include "utils.h"
+#include "orders_utils.h"
 
 
 
@@ -81,6 +82,8 @@ static GameObject_Methods methods = {
  */
 struct GameObject* GameObject_init(struct GameObject *object, Player *owner, int x, int y, const Image *image, 
     Surface_Options *options) {
+
+    (void)options;
     
     if (object == NULL) {
         return NULL;
@@ -178,6 +181,8 @@ static boolean GameObject_attack(struct GameObject *object, struct GameObject *t
 static void GameObject_movement(struct GameObject *object, int x, int y) {
     int width = object->m->get_width(object);
     int height = object->m->get_height(object);
+    (void)width; // Stop complaints about unused.
+    (void)height; // Stop complaints about unused.
     object->x += x;
     object->y += y;
     Surface *surface = &object->surface;

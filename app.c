@@ -7,6 +7,7 @@
 #include "units.h"
 #include "player_controls.h"
 #include "player.h"
+#include "terrain.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,7 +27,7 @@
 static int init();
 static void process_input();
 static void on_tick(GameObject objects[], int num_elements);
-static void render_objects(GameObject objects[], int num_objects);
+static void render_objects(Map *map, GameObject objects[], int num_objects);
 static void render(Surface *surfaces[], int num_objects);
 static void cleanup(int sig);
 
@@ -85,7 +86,10 @@ int main(int argc, char *argv[]) {
 
     Player player, neutrals;
     Player_init(&player, COLOR_PAIR_RED, TRUE);
-    Player_init(&neutrals, COLOR_PAIR_GREEN, FALSE);
+    Player_init(&neutrals, COLOR_PAIR_YELLOW, FALSE);
+
+    Map default_map;
+    Map_init(&default_map, max_x, max_y);
 
     char *units_to_spawn[] = {
         "archer",
@@ -115,7 +119,7 @@ int main(int argc, char *argv[]) {
     int counter = 0;
     while (1) {
         on_tick(objects, NUM_TROOPS);
-        render_objects(objects, NUM_OBJECTS);
+        render_objects(&default_map, objects, NUM_OBJECTS);
 
         process_input();
 
@@ -178,10 +182,46 @@ static void on_tick(GameObject objects[], int num_elements) {
 /*
  * Redraws the GameObjects.
  */
-void Curses_redraw_objects(GameObject objects[], int num_elements) {
+void Curses_redraw_objects(Map *map, GameObject objects[], int num_elements) {
     int i, j, k;
     getmaxyx(stdscr, max_y, max_x);
     clear();
+
+    /* Draw the background Map. */
+    for (i = 0; i < map->m->get_max_x(map); i++) {
+        for (j = 0; j < map->m->get_max_y(map); j++) {
+            Square *current_square = map->m->get_square(map, i, j);
+            if (current_square == NULL) {
+                fprintf(stderr, "Curses_redraw_objects: Warning - square (%d, %d) was NULL!\n", i, j);
+                continue;
+            }
+
+            Color_Pair color;
+            switch (current_square->m->get_terrain_type(current_square)) {
+                case TERRAIN_GRASS: 
+                    color = COLOR_PAIR_GREEN;
+                    break;
+                case TERRAIN_STONE:
+                    
+                    break;
+                case TERRAIN_TREE:
+
+                    break;
+                case TERRAIN_WATER:
+                    color = COLOR_PAIR_BLUE;
+                    break;
+                default: 
+                    fprintf(stderr, "Curses_redraw_objects: Error - Invalid Terrain_Type!\n");
+                    break;
+            }
+
+            attron(COLOR_PAIR(color));
+            mvaddch(i, j, ' ');
+            attroff(COLOR_PAIR(color));
+        }
+    }
+
+    /* Draw the GameObjects. */
     for (i = 0; i < num_elements; i++) {
         GameObject* cur = &objects[i];
         /*assert(cur != NULL);*/
@@ -214,11 +254,11 @@ void Curses_redraw_objects(GameObject objects[], int num_elements) {
     refresh();
 }
 
-static void render_objects(GameObject objects[], int num_objects) {
+static void render_objects(Map *map, GameObject objects[], int num_objects) {
     assert(objects != NULL);
     assert(num_objects >= 0);
 
-    Curses_redraw_objects(objects, num_objects);
+    Curses_redraw_objects(map, objects, num_objects);
 }
 
 /* 

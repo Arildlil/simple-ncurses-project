@@ -9,7 +9,7 @@ typedef enum {
     COLOR_PAIR_RED = 1, 
     COLOR_PAIR_GREEN, 
     COLOR_PAIR_BLUE, 
-    COLOR_PAIR_YELLOW
+    COLOR_PAIR_YELLOW,
 } Color_Pair;
 
 typedef enum {

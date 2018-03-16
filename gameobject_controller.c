@@ -37,5 +37,6 @@ GameObject_Controller* GameObject_Controller_init(GameObject_Controller *control
 }
 
 static void GameObject_Controller_Methods_on_tick(GameObject_Controller *controller, GameObject *object) {
+    (void)controller;
     object->m->movement(object, 1, 0);
 }

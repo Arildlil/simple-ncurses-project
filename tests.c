@@ -10,6 +10,7 @@
 #include "player_controls.h"
 #include "player.h"
 #include "orders_utils.h"
+#include "terrain.h"
 
 #include <string.h>
 #include <curses.h>
@@ -290,6 +291,7 @@ static void test_Player(void **state) {
 }
 
 static void dummy_on_tick(GameObject_Controller *controller, GameObject *object) {
+    (void)controller;
     object->m->movement(object, 1, 1);
 }
 static void test_GameObject_Controller(void **state) {
@@ -309,7 +311,7 @@ static void test_GameObject_Controller(void **state) {
     int old_x = object.m->get_x(&object);
     int old_y = object.m->get_y(&object);
     GameObject_Controller *retrieved_controller = object.m->get_controller(&object);
-    retrieved_controller->m->on_tick(&retrieved_controller, &object);
+    retrieved_controller->m->on_tick(retrieved_controller, &object);
     assert_int_equal(object.m->get_x(&object), old_x + 1);
     assert_int_equal(object.m->get_y(&object), old_y + 1);
 }
@@ -399,6 +401,44 @@ static void test_GameObject_Order_queue(void **state) {
     assert_int_equal(object.current_order_index, 0);
 }
 
+static void test_Square_and_Map(void **state) {
+    (void)state;
+
+    Square_init(NULL, 0, 0, TERRAIN_GRASS);
+
+    Map map;
+    Map_init(&map, 2, 2);
+    assert_int_equal(Square_init(&map, 0, 0, TERRAIN_GRASS), TRUE);
+    assert_int_equal(Square_init(&map, 1, 0, TERRAIN_STONE), TRUE);
+    assert_int_equal(Square_init(&map, -1, 0, TERRAIN_TREE), TRUE);
+    assert_int_equal(Square_init(&map, 0, -1, TERRAIN_WATER), TRUE);
+    assert_int_equal(Square_init(&map, 2, 2, TERRAIN_GRASS), TRUE);
+    assert_int_equal(Square_init(&map, -2, -2, TERRAIN_GRASS), TRUE);
+    assert_int_equal(Square_init(&map, 3, 3, TERRAIN_GRASS), FALSE);
+    assert_int_equal(Square_init(&map, -3, -3, TERRAIN_GRASS), FALSE);
+    assert_int_equal(Square_init(&map, 2, 3, TERRAIN_GRASS), FALSE);
+    assert_int_equal(Square_init(&map, -3, 2, TERRAIN_GRASS), FALSE);
+
+    assert_int_equal(map.m->is_inited(&map), TRUE);
+    assert_int_equal(map.m->get_max_x(&map), 2);
+    assert_int_equal(map.m->get_max_y(&map), 2);
+    assert_int_equal(map.m->get_width(&map), 5);
+    assert_int_equal(map.m->get_height(&map), 5);
+
+    assert_non_null(map.m->get_square(&map, -2, -2));
+    assert_non_null(map.m->get_square(&map, 2, 2));
+    assert_null(map.m->get_square(&map, -3, 0));
+    assert_null(map.m->get_square(&map, 0, -3));
+
+    Square *square = map.m->get_square(&map, 1, 0);
+    assert_non_null(square);
+    assert_int_equal(square->m->get_x(square), 1);
+    assert_int_equal(square->m->get_y(square), 0);
+    assert_int_equal(square->m->get_terrain_type(square), TERRAIN_STONE);
+
+    map.m->free(&map);
+}
+
 
 
 /* ----- | Other | ------ */
@@ -432,6 +472,8 @@ int main(void) {
         cmocka_unit_test(test_Order),
         cmocka_unit_test(test_GameObject_Order),
         cmocka_unit_test(test_GameObject_Order_queue),
+        
+        cmocka_unit_test(test_Square_and_Map),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

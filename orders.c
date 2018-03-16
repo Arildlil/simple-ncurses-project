@@ -132,5 +132,5 @@ void remove_current_order(struct GameObject *object) {
     
     object->order_count--;
     Orders_free(&object->order_queue[object->current_order_index]);
-    object->current_order_index = ++object->current_order_index % MAX_ORDERS;
+    object->current_order_index = ++(object->current_order_index) % MAX_ORDERS;
 }
