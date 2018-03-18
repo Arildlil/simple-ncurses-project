@@ -434,9 +434,26 @@ static void test_Square_and_Map(void **state) {
     assert_non_null(square);
     assert_int_equal(square->m->get_x(square), 1);
     assert_int_equal(square->m->get_y(square), 0);
-    assert_int_equal(square->m->get_terrain_type(square), TERRAIN_STONE);
+    TerrainType *terrain = square->m->get_terrain_type(square);
+    assert_int_equal(terrain->m->get_tag(terrain), TERRAIN_STONE);
 
     map.m->free(&map);
+}
+
+static void test_TerrainType(void **state) {
+    (void)state;
+
+    Map map;
+    Map_init(&map, 5, 5);
+    Square_init(&map, 0, 0, TERRAIN_TREE);
+    Square *square = map.m->get_square(&map, 0, 0);
+    TerrainType *terrain = square->m->get_terrain_type(square);
+    assert_int_equal(terrain->m->get_tag(terrain), TERRAIN_TREE);
+    Image *image = terrain->m->get_image(terrain);
+    assert_non_null(image);
+    assert_int_equal(image->get_width(image), terrain->m->get_width(terrain));
+    assert_int_equal(image->get_height(image), terrain->m->get_height(terrain));
+    assert_int_equal(terrain->m->get_colors(terrain), COLOR_PAIR_TREE);
 }
 
 
@@ -474,6 +491,7 @@ int main(void) {
         cmocka_unit_test(test_GameObject_Order_queue),
         
         cmocka_unit_test(test_Square_and_Map),
+        cmocka_unit_test(test_TerrainType),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
