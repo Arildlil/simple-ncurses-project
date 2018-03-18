@@ -82,23 +82,24 @@ static void generate_default_map(Map *map) {
     int map_width = map->m->get_width(map);
     int map_height = map->m->get_height(map);
     int w, h;
+    /*
     for (h = 0; h < map_height; h++) {
         for (w = 0; w < map_width; w++) {
             Square_init(map, w, h, TERRAIN_GRASS);
         }
-    }
+    }*/
 
-    /*
-    enum { NUM_TERRAIN_PIECES = 5};
+    enum {NUM_TERRAIN_PIECES = 5};
     TerrainType_Tag tags[NUM_TERRAIN_PIECES] = {
-        TERRAIN_TREE
-    }
+        TERRAIN_TREE, TERRAIN_TREE, TERRAIN_STONE, TERRAIN_STONE, TERRAIN_TREE
+    };
+    int x_coords[NUM_TERRAIN_PIECES] = {15, 25, 50, 65, 90};
+    int y_coords[NUM_TERRAIN_PIECES] = {4, 15, 7, 23, 6};
 
     int i;
-    for (i = 0; i < num_elements; i++) {
-        x = 
-        Square_init(map, x, y, tag);
-    }*/
+    for (i = 0; i < NUM_TERRAIN_PIECES; i++) {
+        Square_init(map, x_coords[i], y_coords[i], tags[i]);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -220,8 +221,8 @@ static void Curses_redraw_objects(Map *map, GameObject objects[], int num_elemen
     clear();
 
     /* Draw the background Map. */
-    for (x = 0; x < map->m->get_max_x(map); x++) {
-        for (y = 0; y < map->m->get_max_y(map); y++) {
+    for (y = 0; y < map->m->get_max_y(map); y++) {
+        for (x = 0; x < map->m->get_max_x(map); x++) {
             Square *current_square = map->m->get_square(map, x, y);
             if (current_square == NULL) {
                 fprintf(stderr, "Curses_redraw_objects: Warning - square (%d, %d) was NULL!\n", x, y);
@@ -229,6 +230,10 @@ static void Curses_redraw_objects(Map *map, GameObject objects[], int num_elemen
             }
 
             TerrainType *terrain = current_square->m->get_terrain_type(current_square);
+            if (terrain->m->get_tag(terrain) == TERRAIN_NONE) {
+                continue;
+            }
+
             Color_Pair color = terrain->m->get_colors(terrain);
             Image *image = terrain->m->get_image(terrain);
             char **pixels = image->get_pixels(image);

@@ -14,7 +14,7 @@ typedef struct Map Map;
 typedef struct Map_Methods Map_Methods;
 
 enum TerrainType_Tag {
-    TERRAIN_GRASS, TERRAIN_WATER, TERRAIN_STONE, TERRAIN_TREE, TERRAIN_ENUM_SIZE
+    TERRAIN_NONE, TERRAIN_GRASS, TERRAIN_WATER, TERRAIN_STONE, TERRAIN_TREE, TERRAIN_ENUM_SIZE
 };
 
 struct TerrainType {

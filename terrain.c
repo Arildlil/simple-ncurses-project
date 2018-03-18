@@ -52,7 +52,10 @@ static TerrainType_Methods terrain_methods = {
     .get_height = TerrainType_get_height
 };
 
-static const char *TERRAIN_STRINGS[TERRAIN_ENUM_SIZE][3] = {
+static const char *TERRAIN_STRINGS[TERRAIN_ENUM_SIZE][5] = {
+    {
+        ""
+    },
     {
         "v"
     },
@@ -60,18 +63,29 @@ static const char *TERRAIN_STRINGS[TERRAIN_ENUM_SIZE][3] = {
         "~"
     },
     {
-        "O"
+        " OOO ",
+        "OOOOO",
     },
     {
-        " A ",
-        "AAA",
-        " | "
+        "  A  ",
+        " AAA ",
+        "AAAAA",
+        "AAAAA",
+        " ||| ",
     },
 };
 
 static Image TERRAIN_IMAGES[TERRAIN_ENUM_SIZE] = {0};
 
 static TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
+    {
+        .tag = TERRAIN_NONE,
+        .image = &TERRAIN_IMAGES[TERRAIN_NONE],
+        .colors = COLOR_PAIR_NONE,
+        .width = 1,
+        .height = 1,
+        .m = &terrain_methods,
+    },
     {
         .tag = TERRAIN_GRASS,
         .image = &TERRAIN_IMAGES[TERRAIN_GRASS],
@@ -92,16 +106,16 @@ static TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
         .tag = TERRAIN_STONE,
         .image = &TERRAIN_IMAGES[TERRAIN_STONE],
         .colors = COLOR_PAIR_STONE,
-        .width = 1,
-        .height = 1,
+        .width = 5,
+        .height = 2,
         .m = &terrain_methods,
     },
     {
         .tag = TERRAIN_TREE,
         .image = &TERRAIN_IMAGES[TERRAIN_TREE],
         .colors = COLOR_PAIR_TREE,
-        .width = 3,
-        .height = 3,
+        .width = 5,
+        .height = 5,
         .m = &terrain_methods,
     }
 };
@@ -144,7 +158,7 @@ boolean Map_init(Map *map, int max_x, int max_y) {
     for (h = 0; h < height; h++) {
         map->squares[h] = calloc(width, sizeof(Square));
         for (w = 0; w < width; w++) {
-            Square_init(map, w - max_x, h - max_y, TERRAIN_GRASS);
+            Square_init(map, w - max_x, h - max_y, TERRAIN_NONE);
         }
     }
 
