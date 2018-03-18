@@ -15,6 +15,7 @@ extern const char *UNIT_STRING_SPEARMAN[];
 extern Image UNIT_IMAGE_ARCHER;
 extern Image UNIT_IMAGE_SWORDMAN;
 extern Image UNIT_IMAGE_SPEARMAN;
+extern Image UNIT_IMAGE_PEASANT;
 
 
 

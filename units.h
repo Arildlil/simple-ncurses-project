@@ -16,6 +16,7 @@
 GameObject *Units_init_archer(GameObject *object, Player *owner, int x, int y);
 GameObject *Units_init_swordman(GameObject *object, Player *owner, int x, int y);
 GameObject *Units_init_spearman(GameObject *object, Player *owner, int x, int y);
+GameObject *Units_init_peasant(GameObject *object, Player *owner, int x, int y);
 
 /* 
  * Like the functions above, except that 'unit_name' specifies which of 

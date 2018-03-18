@@ -25,3 +25,8 @@ Surface* UnitSurface_spearman(Surface *surface, int x, int y) {
     check_init();
     return Surface_init_image(surface, &UNIT_IMAGE_SPEARMAN, x, y, NULL);
 }
+
+Surface* UnitSurface_peasant(Surface *surface, int x, int y) {
+    check_init();
+    return Surface_init_image(surface, &UNIT_IMAGE_PEASANT, x, y, NULL);
+}

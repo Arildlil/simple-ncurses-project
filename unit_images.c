@@ -7,24 +7,31 @@ static boolean inited = FALSE;
 const char *UNIT_STRING_ARCHER[] = {
     "|\\ ",
     "+->", 
-    "|/ "
+    "|/ ",
 };
 
 const char *UNIT_STRING_SWORDMAN[] = {
     " | ", 
     " | ",
-    "-+-"
+    "-+-",
 };
 
 const char *UNIT_STRING_SPEARMAN[] = {
     " ^ ",
     " | ",
-    " | "
+    " | ",
+};
+
+const char *UNIT_STRING_PEASANT[] = {
+    "\\|/",
+    " | ",
+    " | ",
 };
 
 Image UNIT_IMAGE_ARCHER;
 Image UNIT_IMAGE_SWORDMAN;
 Image UNIT_IMAGE_SPEARMAN;
+Image UNIT_IMAGE_PEASANT;
 
 void UnitImages_init() {
     if (inited != FALSE) {
@@ -35,4 +42,5 @@ void UnitImages_init() {
     Image_init_2D(&UNIT_IMAGE_ARCHER, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_STRING_ARCHER);
     Image_init_2D(&UNIT_IMAGE_SWORDMAN, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_STRING_SWORDMAN);
     Image_init_2D(&UNIT_IMAGE_SPEARMAN, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_STRING_SPEARMAN);
+    Image_init_2D(&UNIT_IMAGE_PEASANT, UNIT_IMAGE_WIDTH, UNIT_IMAGE_HEIGHT, UNIT_STRING_PEASANT);
 }

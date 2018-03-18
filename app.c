@@ -151,7 +151,8 @@ int main(int argc, char *argv[]) {
         "archer",
         "archer",
         "swordman",
-        "spearman"
+        "spearman",
+        "peasant",
     };
 
     GameObject_Controller random_controller;
@@ -160,7 +161,7 @@ int main(int argc, char *argv[]) {
     //GameObject_Controller_init(&random_controller, NULL);
 
     MIDDLE_X = max_x / 2;
-    #define NUM_TROOPS 4
+    #define NUM_TROOPS 5
     #define NUM_OBJECTS (NUM_TROOPS + 1)
     GameObject objects[NUM_OBJECTS];
     int i;

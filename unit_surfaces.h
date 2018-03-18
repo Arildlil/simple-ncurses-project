@@ -14,5 +14,6 @@
 Surface* UnitSurface_archer(Surface *surface, int x, int y);
 Surface* UnitSurface_swordman(Surface *surface, int x, int y);
 Surface* UnitSurface_spearman(Surface *surface, int x, int y);
+Surface* UnitSurface_peasant(Surface *surface, int x, int y);
 
 #endif
