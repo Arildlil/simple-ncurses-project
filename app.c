@@ -89,12 +89,42 @@ static void generate_default_map(Map *map) {
         }
     }*/
 
-    enum {NUM_TERRAIN_PIECES = 5};
+    /* Add some water. */
+    enum {NUM_WATER_SEGMENTS = 6};
+    Coordinates water_start[NUM_WATER_SEGMENTS] = 
+        {
+            {.x = 0, .y = 35},
+            {.x = 45, .y = 30},
+            {.x = 46, .y = 30},
+            {.x = 116, .y = 28},
+            {.x = 123, .y = 15},
+            {.x = 123, .y = 15},
+        };
+    Coordinates water_end[NUM_WATER_SEGMENTS] = 
+        {
+            {.x = 45, .y = 35},
+            {.x = 46, .y = 35},
+            {.x = 115, .y = 30},
+            {.x = 130, .y = 32},
+            {.x = 124, .y = 32},
+            {.x = 145, .y = 15},
+        };
+    int s, x, y;
+    for (s = 0; s < NUM_WATER_SEGMENTS; s++) {
+        for (y = water_start[s].y; y <= water_end[s].y; y++) {
+            for (x = water_start[s].x; x <= water_end[s].x; x++) {
+                Square_init(map, x, y, TERRAIN_WATER);
+            }
+        }
+    }
+
+    /* Add some terrain features for variation. */
+    enum {NUM_TERRAIN_PIECES = 6};
     TerrainType_Tag tags[NUM_TERRAIN_PIECES] = {
-        TERRAIN_TREE, TERRAIN_TREE, TERRAIN_STONE, TERRAIN_STONE, TERRAIN_TREE
+        TERRAIN_TREE, TERRAIN_TREE, TERRAIN_STONE, TERRAIN_STONE, TERRAIN_TREE, TERRAIN_TREE
     };
-    int x_coords[NUM_TERRAIN_PIECES] = {15, 25, 50, 65, 90};
-    int y_coords[NUM_TERRAIN_PIECES] = {4, 15, 7, 23, 6};
+    int x_coords[NUM_TERRAIN_PIECES] = {15, 25, 50, 65, 90, 135};
+    int y_coords[NUM_TERRAIN_PIECES] = {4, 15, 7, 23, 6, 20};
 
     int i;
     for (i = 0; i < NUM_TERRAIN_PIECES; i++) {
