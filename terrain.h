@@ -2,19 +2,42 @@
 #define TERRAIN_H
 
 #include "utils.h"
+#include "curses.h"
+#include "image.h"
 
 typedef struct Square Square;
 typedef struct Square_Methods Square_Methods;
-typedef enum Terrain_Type Terrain_Type;
+typedef enum TerrainType_Tag TerrainType_Tag;
+typedef struct TerrainType TerrainType;
+typedef struct TerrainType_Methods TerrainType_Methods;
 typedef struct Map Map;
 typedef struct Map_Methods Map_Methods;
 
-enum Terrain_Type {
-    TERRAIN_GRASS, TERRAIN_TREE, TERRAIN_WATER, TERRAIN_STONE
+enum TerrainType_Tag {
+    TERRAIN_GRASS, TERRAIN_WATER, TERRAIN_STONE, TERRAIN_TREE, TERRAIN_ENUM_SIZE
+};
+
+struct TerrainType {
+    TerrainType_Tag tag;
+    Image *image;
+    Color_Pair colors;
+    char **image_string;
+    int width;
+    int height;
+
+    TerrainType_Methods *m;
+};
+
+struct TerrainType_Methods {
+    TerrainType_Tag (*get_tag)(struct TerrainType *type);
+    Image *(*get_image)(struct TerrainType *type);
+    Color_Pair (*get_colors)(struct TerrainType *type);
+    int (*get_width)(struct TerrainType *type);
+    int (*get_height)(struct TerrainType *type);
 };
 
 struct Square {
-    Terrain_Type terrain;
+    TerrainType *terrain;
     int x;
     int y;
 
@@ -22,7 +45,7 @@ struct Square {
 };
 
 struct Square_Methods {
-    Terrain_Type (*get_terrain_type)(struct Square *square);
+    TerrainType *(*get_terrain_type)(struct Square *square);
     int (*get_x)(struct Square *square);
     int (*get_y)(struct Square *square);
 };
@@ -69,6 +92,6 @@ boolean Map_init(Map *map, int max_x, int max_y);
  * @arg type: The terrain type to use.
  * @return: TRUE of success, FALSE otherwise.
  */
-boolean Square_init(Map *map, int x, int y, enum Terrain_Type type);
+boolean Square_init(Map *map, int x, int y, TerrainType_Tag type);
 
 #endif
