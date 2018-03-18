@@ -27,6 +27,7 @@
 static int init();
 static void process_input();
 static void on_tick(GameObject objects[], int num_elements);
+static void Curses_redraw_objects(Map *map, GameObject objects[], int num_elements);
 static void render_objects(Map *map, GameObject objects[], int num_objects);
 static void render(Surface *surfaces[], int num_objects);
 static void cleanup(int sig);
@@ -77,6 +78,29 @@ static void default_on_tick(GameObject_Controller *controller, GameObject *objec
     object->m->on_tick(object);
 }
 
+static void generate_default_map(Map *map) {
+    int map_width = map->m->get_width(map);
+    int map_height = map->m->get_height(map);
+    int w, h;
+    for (h = 0; h < map_height; h++) {
+        for (w = 0; w < map_width; w++) {
+            Square_init(map, w, h, TERRAIN_GRASS);
+        }
+    }
+
+    /*
+    enum { NUM_TERRAIN_PIECES = 5};
+    TerrainType_Tag tags[NUM_TERRAIN_PIECES] = {
+        TERRAIN_TREE
+    }
+
+    int i;
+    for (i = 0; i < num_elements; i++) {
+        x = 
+        Square_init(map, x, y, tag);
+    }*/
+}
+
 int main(int argc, char *argv[]) {
     dnprintf("Main!\n");
     init();
@@ -90,6 +114,7 @@ int main(int argc, char *argv[]) {
 
     Map default_map;
     Map_init(&default_map, max_x, max_y);
+    generate_default_map(&default_map);
 
     char *units_to_spawn[] = {
         "archer",
@@ -179,44 +204,43 @@ static void on_tick(GameObject objects[], int num_elements) {
     }
 }
 
+static void render_objects(Map *map, GameObject objects[], int num_objects) {
+    assert(objects != NULL);
+    assert(num_objects >= 0);
+
+    Curses_redraw_objects(map, objects, num_objects);
+}
+
 /*
  * Redraws the GameObjects.
  */
-void Curses_redraw_objects(Map *map, GameObject objects[], int num_elements) {
-    int i, j, k;
+static void Curses_redraw_objects(Map *map, GameObject objects[], int num_elements) {
+    int i, j, k, x, y;
     getmaxyx(stdscr, max_y, max_x);
     clear();
 
     /* Draw the background Map. */
-    for (i = 0; i < map->m->get_max_x(map); i++) {
-        for (j = 0; j < map->m->get_max_y(map); j++) {
-            Square *current_square = map->m->get_square(map, i, j);
+    for (x = 0; x < map->m->get_max_x(map); x++) {
+        for (y = 0; y < map->m->get_max_y(map); y++) {
+            Square *current_square = map->m->get_square(map, x, y);
             if (current_square == NULL) {
-                fprintf(stderr, "Curses_redraw_objects: Warning - square (%d, %d) was NULL!\n", i, j);
+                fprintf(stderr, "Curses_redraw_objects: Warning - square (%d, %d) was NULL!\n", x, y);
                 continue;
             }
 
-            Color_Pair color;
-            switch (current_square->m->get_terrain_type(current_square)) {
-                case TERRAIN_GRASS: 
-                    color = COLOR_PAIR_GREEN;
-                    break;
-                case TERRAIN_STONE:
-                    
-                    break;
-                case TERRAIN_TREE:
-
-                    break;
-                case TERRAIN_WATER:
-                    color = COLOR_PAIR_BLUE;
-                    break;
-                default: 
-                    fprintf(stderr, "Curses_redraw_objects: Error - Invalid Terrain_Type!\n");
-                    break;
-            }
+            TerrainType *terrain = current_square->m->get_terrain_type(current_square);
+            Color_Pair color = terrain->m->get_colors(terrain);
+            Image *image = terrain->m->get_image(terrain);
+            char **pixels = image->get_pixels(image);
 
             attron(COLOR_PAIR(color));
-            mvaddch(i, j, ' ');
+            for (j = 0; j < image->get_height(image); j++) {
+                for (k = 0; k < image->get_width(image); k++) {
+                    char cur_pixel = pixels[j][k];
+                    mvaddch(y+j, x+k, cur_pixel);
+                }
+            }
+            //mvaddch(i, j, ' ');
             attroff(COLOR_PAIR(color));
         }
     }
@@ -252,13 +276,6 @@ void Curses_redraw_objects(Map *map, GameObject objects[], int num_elements) {
         attroff(COLOR_PAIR(colors));
     }
     refresh();
-}
-
-static void render_objects(Map *map, GameObject objects[], int num_objects) {
-    assert(objects != NULL);
-    assert(num_objects >= 0);
-
-    Curses_redraw_objects(map, objects, num_objects);
 }
 
 /* 

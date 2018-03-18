@@ -10,6 +10,11 @@ typedef enum {
     COLOR_PAIR_GREEN, 
     COLOR_PAIR_BLUE, 
     COLOR_PAIR_YELLOW,
+
+    COLOR_PAIR_GRASS,
+    COLOR_PAIR_WATER,
+    COLOR_PAIR_STONE,
+    COLOR_PAIR_TREE
 } Color_Pair;
 
 typedef enum {
