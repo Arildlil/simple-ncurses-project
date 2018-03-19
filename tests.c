@@ -12,6 +12,7 @@
 #include "orders_utils.h"
 #include "terrain.h"
 #include "resources.h"
+#include "resources_units.h"
 
 #include <string.h>
 #include <curses.h>
@@ -513,6 +514,27 @@ static void test_Resources(void **state) {
     Resources_exit();
 }
 
+static void test_Resources_Units(void **state) {
+    (void)state;
+
+    assert_int_equal(Resources_init(4, 4), TRUE);
+
+    GameObject *archer = new_Unit(&dummy_player, 5, 10, "archer");
+    assert_non_null(archer);
+    assert_non_null(new_Unit(&dummy_player, 13, 4, "swordman"));
+    assert_null(new_Unit(&dummy_player, 0, 0, "agfdgsdfg"));
+    assert_null(new_Unit(NULL, 0, 0, "archer"));
+    assert_non_null(new_Unit(&dummy_player, 1, -2, "spearman"));
+    assert_non_null(new_Unit(&dummy_player, -1, -5, "peasant"));
+    assert_null(new_Unit(&dummy_player, -3, -5, "peasant"));
+
+    assert_int_equal(archer->m->get_x(archer), 5);
+    assert_int_equal(archer->m->get_y(archer), 10);
+    assert_int_equal(archer->m->get_owner(archer), &dummy_player);
+
+    Resources_exit();
+}
+
 
 
 /* ----- | Other | ------ */
@@ -552,6 +574,7 @@ int main(void) {
         cmocka_unit_test(test_TerrainType),
 
         cmocka_unit_test(test_Resources),
+        cmocka_unit_test(test_Resources_Units),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
