@@ -177,7 +177,6 @@ int main(int argc, char *argv[]) {
         .shoot = default_shoot,
     };
     GameObject_Controller_init(&random_controller, &random_methods);
-    //GameObject_Controller_init(&random_controller, NULL);
     PlayerControls_init();
 
     MIDDLE_X = max_x / 2;
