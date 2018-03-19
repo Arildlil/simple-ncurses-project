@@ -118,6 +118,16 @@ static void generate_default_map(Map *map) {
         }
     }
 
+    /* Add some grass patches. */
+    int patch_size_x = 6, patch_size_y = 4;
+    int start_x = 15, start_y = 20;
+    int j, k;
+    for (k = start_y; k < patch_size_y + start_y; k++) {
+        for (j = start_x; j < patch_size_x + start_x; j++) {
+            Square_init(map, j, k, TERRAIN_GRASS);
+        }
+    }
+
     /* Add some terrain features for variation. */
     enum {NUM_TERRAIN_PIECES = 6};
     TerrainType_Tag tags[NUM_TERRAIN_PIECES] = {
@@ -211,6 +221,8 @@ static void process_input() {
         case 'e':
             /* Intentional fall-through */
         case '<':
+            /* Intentional fall-through */
+        case ' ':
             /* Intentional fall-through */
         case 'x':
             PlayerControls_handle_input_char(input, hero);
