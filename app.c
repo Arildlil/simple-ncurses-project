@@ -78,6 +78,11 @@ static void default_on_tick(GameObject_Controller *controller, GameObject *objec
     object->m->on_tick(object);
 }
 
+static void default_shoot(GameObject_Controller *controller, GameObject *object) {
+    (void)controller;
+    (void)object;
+}
+
 static void generate_default_map(Map *map) {
     int map_width = map->m->get_width(map);
     int map_height = map->m->get_height(map);
@@ -166,9 +171,13 @@ int main(int argc, char *argv[]) {
     };
 
     GameObject_Controller random_controller;
-    GameObject_Controller_Methods random_methods = {.on_tick = default_on_tick};
+    GameObject_Controller_Methods random_methods = {
+        .on_tick = default_on_tick,
+        .shoot = default_shoot,
+    };
     GameObject_Controller_init(&random_controller, &random_methods);
     //GameObject_Controller_init(&random_controller, NULL);
+    PlayerControls_init();
 
     MIDDLE_X = max_x / 2;
     #define NUM_TROOPS 5
@@ -182,6 +191,9 @@ int main(int argc, char *argv[]) {
     /* Initialize a unit for the player to control */
     Units_init_archer(&objects[NUM_OBJECTS-1], &player, 20, 20);
     hero = &objects[NUM_OBJECTS-1];
+    //hero->m->set_controller(hero, &player_controller);
+
+
 
     int counter = 0;
     while (1) {

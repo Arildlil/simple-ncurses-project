@@ -17,12 +17,18 @@ enum {
     MOVE_UP_LEFT = 'q',
     MOVE_UP_RIGHT = 'e',
     MOVE_DOWN_LEFT = '<',
-    MOVE_DOWN_RIGHT = 'x'
+    MOVE_DOWN_RIGHT = 'x',
+
+    ATTACK = ' ',
 };
 
 
 
 /* ----- | Functions | ----- */
+
+void PlayerControls_init() {
+    
+}
 
 
 
@@ -57,6 +63,8 @@ boolean PlayerControls_handle_input_char(char input, GameObject *hero) {
         case MOVE_DOWN_RIGHT:
             hero->m->movement(hero, MOVEMENT_PER_UPDATE, MOVEMENT_PER_UPDATE);
             break;
+        case ATTACK:
+            hero->m->shoot(hero);
         default:
             return FALSE;
     }

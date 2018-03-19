@@ -3,6 +3,13 @@
 
 #include "gameobject.h"
 
+
+
+/*
+ * Initialize the player controller.
+ */
+void PlayerControls_init();
+
 /*
  * Takes the next character typed in the input buffer
  * and decides what to do with it.
