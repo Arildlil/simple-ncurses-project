@@ -401,6 +401,35 @@ static void test_GameObject_Order_queue(void **state) {
     assert_int_equal(object.current_order_index, 0);
 }
 
+static void test_GameObject_direction(void **state) {
+    (void)state;
+
+    enum {ORDER_COUNT = 8};
+    struct Command {
+        int x;
+        int y;
+        Direction direction;
+    };
+    struct Command commands[] = {
+        {-1, -1, NORTH_WEST},
+        {-1, 0, WEST},
+        {-1, 1, SOUTH_WEST},
+        {0, 1, SOUTH},
+        {1, 1, SOUTH_EAST},
+        {1, 0, EAST},
+        {1, -1, NORTH_EAST},
+        {0, -1, NORTH},
+    };
+    GameObject object;
+    int i;
+    for (i = 0; i < ORDER_COUNT; i++) {
+        Units_init_archer(&object, &dummy_player, 0, 0);
+        object.m->move_to(&object, commands[i].x, commands[i].y, FALSE);
+        object.m->on_tick(&object);
+        assert_int_equal(object.m->get_direction(&object), commands[i].direction);
+    }
+}
+
 static void test_Square_and_Map(void **state) {
     (void)state;
 
@@ -489,6 +518,7 @@ int main(void) {
         cmocka_unit_test(test_Order),
         cmocka_unit_test(test_GameObject_Order),
         cmocka_unit_test(test_GameObject_Order_queue),
+        cmocka_unit_test(test_GameObject_direction),
         
         cmocka_unit_test(test_Square_and_Map),
         cmocka_unit_test(test_TerrainType),

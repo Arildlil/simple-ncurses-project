@@ -27,6 +27,22 @@ static int move_towards_goal(GameObject *object, int destination_x, int destinat
         move_y--;
     }
 
+    /* Set the direction faced by the object */
+    if (move_x < 0) {
+        if (move_y < 0) {object->direction = NORTH_WEST;}
+        else if (move_y == 0) {object->direction = WEST;}
+        else if (move_y > 0) {object->direction = SOUTH_WEST;}
+    } else if (move_x == 0) {
+        if (move_y < 0) {object->direction = NORTH;}
+        else if (move_y == 0) {/* Keep last direction */}
+        else if (move_y > 0) {object->direction = SOUTH;}
+    } else if (move_x > 0) {
+        if (move_y < 0) {object->direction = NORTH_EAST;}
+        else if (move_y == 0) {object->direction = EAST;}
+        else if (move_y > 0) {object->direction = SOUTH_EAST;}
+    }
+
+    /* Execute order */
     object->m->movement(object, move_x, move_y);
 
     if (x_reached && y_reached) {
