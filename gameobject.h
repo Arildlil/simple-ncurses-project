@@ -23,11 +23,17 @@ typedef struct Order Order;
 
 
 
+
+
 /* ----- | Constants | ----- */
 
 enum {
     MAX_ORDERS = 10
 };
+
+typedef enum Direction {
+    NORTH, SOUTH, EAST, WEST, NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST
+} Direction;
 
 
 
@@ -75,6 +81,7 @@ struct GameObject {
     Order order_queue[MAX_ORDERS];
     int order_count;
     int current_order_index;
+    Direction direction;
 
     /* Controls the behavior of this object, if set */
     GameObject_Controller *controller;
@@ -96,6 +103,8 @@ struct GameObject_Methods {
     Player *(*get_owner)(struct GameObject *object);
     GameObject_Controller *(*get_controller)(struct GameObject *object);
     void (*set_controller)(struct GameObject *object, struct GameObject_Controller *controller);
+    Direction (*get_direction)(struct GameObject *object);
+    void (*set_direction)(struct GameObject *object, Direction direction);
 
     /* Orders */
     void (*on_tick)(struct GameObject *object);
@@ -103,6 +112,7 @@ struct GameObject_Methods {
     Order *(*get_current_order)(struct GameObject *object);
     boolean (*move_to)(struct GameObject *object, int x, int y, boolean queued);
     boolean (*attack)(struct GameObject *object, struct GameObject *target, boolean queued);
+    boolean (*shoot)(struct GameObject *object);
 
     /* Movement and coordinates */
     void (*movement)(struct GameObject *object, int x, int y);
@@ -123,6 +133,7 @@ struct GameObject_Methods {
 /* This struct should be filled manually! */
 struct GameObject_Controller_Methods {
     void (*on_tick)(struct GameObject_Controller *controller, struct GameObject *object);
+    boolean (*shoot)(struct GameObject_Controller *controller, struct GameObject *object);
 };
 
 

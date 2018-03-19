@@ -13,6 +13,8 @@ static boolean GameObject_is_active(struct GameObject *object);
 static Player *GameObject_get_owner(struct GameObject *object);
 static GameObject_Controller *GameObject_get_controller(struct GameObject *object);
 static void GameObject_set_controller(struct GameObject *object, struct GameObject_Controller *controller);
+static Direction GameObject_get_direction(struct GameObject *object);
+static void GameObject_set_direction(struct GameObject *object, Direction direction);
 
 /* Orders */
 /*
@@ -26,6 +28,7 @@ static int GameObject_get_order_count(struct GameObject *object);
 static Order *GameObject_get_current_order(struct GameObject *object);
 static boolean GameObject_move_to(struct GameObject *object, int x, int y, boolean queued);
 static boolean GameObject_attack(struct GameObject *object, struct GameObject *target, boolean queued);
+static boolean GameObject_shoot(struct GameObject *object);
 
 /* Movement and coordinates */
 static void GameObject_movement(struct GameObject *object, int x, int y);
@@ -52,12 +55,15 @@ static GameObject_Methods methods = {
     .get_owner = GameObject_get_owner,
     .get_controller = GameObject_get_controller,
     .set_controller = GameObject_set_controller,
+    .get_direction = GameObject_get_direction,
+    .set_direction = GameObject_set_direction,
 
     .on_tick = GameObject_on_tick,
     .get_order_count = GameObject_get_order_count,
     .get_current_order = GameObject_get_current_order,
     .move_to = GameObject_move_to,
     .attack = GameObject_attack,
+    .shoot = GameObject_shoot,
 
     .movement = GameObject_movement,
     .get_x = GameObject_get_x,
@@ -98,6 +104,7 @@ struct GameObject* GameObject_init(struct GameObject *object, Player *owner, int
     object->order_queue[0].type = ORDER_TYPE_NONE;
     object->order_count = 0;
     object->current_order_index = 0;
+    object->direction = EAST;
 
     object->m = &methods;
     
@@ -119,6 +126,7 @@ static void GameObject_free(struct GameObject *object) {
     object->order_queue[0].type = ORDER_TYPE_NONE;
     object->order_count = 0;
     object->current_order_index = 0;
+    object->direction = EAST;
 }
 
 static boolean GameObject_is_active(struct GameObject *object) {
@@ -137,6 +145,14 @@ static void GameObject_set_controller(struct GameObject *object,
     struct GameObject_Controller *controller) {
 
     object->controller = controller;
+}
+
+static Direction GameObject_get_direction(struct GameObject *object) {
+    return object->direction;
+}
+
+static void GameObject_set_direction(struct GameObject *object, Direction direction) {
+    object->direction = direction;
 }
 
 
@@ -173,6 +189,13 @@ static boolean GameObject_attack(struct GameObject *object, struct GameObject *t
     Order order;
     Orders_attack(&order, target);
     return insert_order(object, &order, queued);
+}
+
+static boolean GameObject_shoot(struct GameObject *object) {
+    if (object->controller != NULL) {
+        return object->controller->m->shoot(object->controller, object);
+    }
+    return FALSE;
 }
 
 
