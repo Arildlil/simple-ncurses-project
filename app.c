@@ -234,7 +234,7 @@ static void process_input() {
             /* Intentional fall-through */
         case '<':
             /* Intentional fall-through */
-        case ' ':
+        //case ' ':
             /* Intentional fall-through */
         case 'x':
             PlayerControls_handle_input_char(input, hero);
