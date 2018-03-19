@@ -8,6 +8,7 @@
 #include "player_controls.h"
 #include "player.h"
 #include "terrain.h"
+#include "resources.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -354,6 +355,7 @@ static void render(Surface *surfaces[], int num_objects) {
 static int init() {
     UnitImages_init();
     srand(clock());
+    Resources_init(DEFAULT_MAX_GAMEOBJECT_COUNT, DEFAULT_MAX_PROJECTILE_COUNT);
 
     signal(SIGINT, cleanup);
     signal(SIGTERM, cleanup);
@@ -371,6 +373,7 @@ static int init() {
 static void cleanup(int sig) {
     (void)sig;
     Curses_exit();
+    Resources_exit();
     dprintf("Cleaning up and exiting with sig %d...\n", sig);
     exit(0);
 }

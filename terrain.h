@@ -7,15 +7,14 @@
 
 typedef struct Square Square;
 typedef struct Square_Methods Square_Methods;
-typedef enum TerrainType_Tag TerrainType_Tag;
 typedef struct TerrainType TerrainType;
 typedef struct TerrainType_Methods TerrainType_Methods;
 typedef struct Map Map;
 typedef struct Map_Methods Map_Methods;
 
-enum TerrainType_Tag {
+typedef enum TerrainType_Tag {
     TERRAIN_NONE, TERRAIN_GRASS, TERRAIN_WATER, TERRAIN_STONE, TERRAIN_TREE, TERRAIN_ENUM_SIZE
-};
+} TerrainType_Tag;
 
 struct TerrainType {
     TerrainType_Tag tag;

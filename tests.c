@@ -11,6 +11,7 @@
 #include "player.h"
 #include "orders_utils.h"
 #include "terrain.h"
+#include "resources.h"
 
 #include <string.h>
 #include <curses.h>
@@ -485,6 +486,33 @@ static void test_TerrainType(void **state) {
     assert_int_equal(terrain->m->get_colors(terrain), COLOR_PAIR_TREE);
 }
 
+static void test_Resources(void **state) {
+    (void)state;
+    
+    assert_null(new_GameObject(RESOURCE_PLAIN));
+    
+    assert_int_equal(Resources_init(1, 1), TRUE);
+    assert_int_equal(Resources_init(2, 3), FALSE);
+    
+    GameObject *object1 = new_GameObject(RESOURCE_PLAIN);
+    assert_non_null(object1);
+    assert_null(new_GameObject(RESOURCE_PLAIN));
+    GameObject *projectile1 = new_GameObject(RESOURCE_PROJECTILE);
+    assert_non_null(projectile1);
+    
+    assert_null(new_GameObject(RESOURCE_PROJECTILE));
+    free_GameObject(object1);
+    assert_null(new_GameObject(RESOURCE_PROJECTILE));
+    GameObject *object2 = new_GameObject(RESOURCE_PLAIN);
+    assert_non_null(object2);
+    assert_null(new_GameObject(RESOURCE_PLAIN));
+    free_GameObject(object2);
+
+    Resources_exit();
+    assert_int_equal(Resources_init(4, 4), TRUE);
+    Resources_exit();
+}
+
 
 
 /* ----- | Other | ------ */
@@ -522,6 +550,8 @@ int main(void) {
         
         cmocka_unit_test(test_Square_and_Map),
         cmocka_unit_test(test_TerrainType),
+
+        cmocka_unit_test(test_Resources),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

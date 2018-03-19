@@ -86,6 +86,10 @@ static void projectile_on_tick(GameObject *object) {
 }
 
 static GameObject *create_projectile(Player *owner, Direction direction, int x, int y) {
+    (void)owner;
+    (void)direction;
+    (void)x;
+    (void)y;
     return NULL;
     /*
     const char *projectile_string = "*";
@@ -107,6 +111,7 @@ static GameObject *create_projectile(Player *owner, Direction direction, int x, 
 
 static boolean GameObject_Controller_Methods_shoot(struct GameObject_Controller *controller, GameObject *object) {
     (void)controller;
+    (void)object;
     /*
     GameObject *projectile = create_projectile(object->m->get_owner(object), 
         object->m->get_direction(object), object->m->get_x(object), object->m->get_y(object));
