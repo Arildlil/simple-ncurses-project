@@ -42,11 +42,16 @@ boolean Resources_init(size_t max_objects, size_t max_projectiles) {
     assert(max_objects > 0);
     assert(max_projectiles > 0);
 
+    int i;
+
     plain_objects_max = max_objects;
     plain_objects = calloc(plain_objects_max, sizeof(GameObject_Container));
     if (plain_objects == NULL) {
         fprintf(stderr, "Resources_init: Not enough memory! Exiting...\n");
         return FALSE;
+    }
+    for (i = 0; i < plain_objects_max; i++) {
+        plain_objects[i].in_use = FALSE;
     }
 
     projectiles_max = max_projectiles;
@@ -54,6 +59,9 @@ boolean Resources_init(size_t max_objects, size_t max_projectiles) {
     if (projectiles == NULL) {
         fprintf(stderr, "Resources_init: Not enough memory! Exiting...\n");
         return FALSE;
+    }
+    for (i = 0; i < projectiles_max; i++) {
+        projectiles[i].in_use = FALSE;
     }
 
     inited = TRUE;
@@ -85,10 +93,13 @@ static void on_tick_container(GameObject_Container *container, size_t container_
     size_t i;
     for (i = 0; i < container_size; i++) {
         GameObject_Container *current = &container[i];
+        
         if (current->in_use == TRUE) {
             GameObject *object = &current->object;
             GameObject_Controller *controller = object->m->get_controller(object);
-            controller->m->on_tick(controller, object);
+            if (controller != NULL) {
+                controller->m->on_tick(controller, object);
+            }
         }
     }
 }

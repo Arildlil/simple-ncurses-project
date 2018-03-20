@@ -9,6 +9,7 @@
 #include "player.h"
 #include "terrain.h"
 #include "resources.h"
+#include "resources_units.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,10 +29,12 @@
 static int init();
 static void process_input();
 static void on_tick(GameObject objects[], int num_elements);
-static void Curses_redraw_objects(Map *map, GameObject objects[], int num_elements);
-static void render_objects(Map *map, GameObject objects[], int num_objects);
+static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_elements);
+static void render_objects(Map *map, GameObject *objects[], int num_objects);
 static void render(Surface *surfaces[], int num_objects);
 static void cleanup(int sig);
+
+
 
 /* ----- | Static Variables | ------ */
 
@@ -42,9 +45,9 @@ static void cleanup(int sig);
 static int MIDDLE_X = 0;
 static GameObject *hero;
 
+
+
 /* ----- | Functions | ----- */
-
-
 
 static void default_on_tick(GameObject_Controller *controller, GameObject *object) {
     if (object->m->get_order_count(object) > 0) {
@@ -87,6 +90,8 @@ static void default_shoot(GameObject_Controller *controller, GameObject *object)
 static void generate_default_map(Map *map) {
     int map_width = map->m->get_width(map);
     int map_height = map->m->get_height(map);
+    (void)map_width;
+    (void)map_height;
     int w, h;
     /*
     for (h = 0; h < map_height; h++) {
@@ -182,23 +187,41 @@ int main(int argc, char *argv[]) {
     MIDDLE_X = max_x / 2;
     #define NUM_TROOPS 5
     #define NUM_OBJECTS (NUM_TROOPS + 1)
+    //GameObject *objects[NUM_OBJECTS];
+    GameObject *all_objects[NUM_OBJECTS];
+    //GameObject *neutral_soldiers[NUM_TROOPS];
+    int i;
+    for (i = 0; i < NUM_TROOPS; i++) {
+        all_objects[i] = new_Unit(&neutrals, MIDDLE_X, 10+5*i, units_to_spawn[i]);
+        all_objects[i]->m->set_controller(all_objects[i], &random_controller);
+    }
+    /*
+    #define NUM_TROOPS 5
+    #define NUM_OBJECTS (NUM_TROOPS + 1)
     GameObject objects[NUM_OBJECTS];
     int i;
     for (i = 0; i < NUM_TROOPS; i++) {
         Units_init_name(&objects[i], &neutrals, MIDDLE_X, 10+5*i, units_to_spawn[i]);
         objects[i].m->set_controller(&objects[i], &random_controller);
     }
+    */
     /* Initialize a unit for the player to control */
-    Units_init_archer(&objects[NUM_OBJECTS-1], &player, 20, 20);
-    hero = &objects[NUM_OBJECTS-1];
+    //Units_init_archer(&objects[NUM_OBJECTS-1], &player, 20, 20);
+    //hero = &objects[NUM_OBJECTS-1];
     //hero->m->set_controller(hero, &player_controller);
 
 
+//TODO: LEGG TIL DEFAULT CONTROLLER TIL NYE OBJEKTER!
+
+
+    hero = new_Unit(&player, 20, 20, "peasant");
+    all_objects[NUM_OBJECTS-1] = hero;
 
     int counter = 0;
     while (1) {
-        on_tick(objects, NUM_TROOPS);
-        render_objects(&default_map, objects, NUM_OBJECTS);
+        Resources_on_tick();
+        //on_tick(objects, NUM_TROOPS);
+        render_objects(&default_map, all_objects, NUM_OBJECTS);
 
         process_input();
 
@@ -260,7 +283,7 @@ static void on_tick(GameObject objects[], int num_elements) {
     }
 }
 
-static void render_objects(Map *map, GameObject objects[], int num_objects) {
+static void render_objects(Map *map, GameObject *objects[], int num_objects) {
     assert(objects != NULL);
     assert(num_objects >= 0);
 
@@ -270,7 +293,7 @@ static void render_objects(Map *map, GameObject objects[], int num_objects) {
 /*
  * Redraws the GameObjects.
  */
-static void Curses_redraw_objects(Map *map, GameObject objects[], int num_elements) {
+static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_elements) {
     int i, j, k, x, y;
     getmaxyx(stdscr, max_y, max_x);
     clear();
@@ -307,7 +330,7 @@ static void Curses_redraw_objects(Map *map, GameObject objects[], int num_elemen
 
     /* Draw the GameObjects. */
     for (i = 0; i < num_elements; i++) {
-        GameObject* cur = &objects[i];
+        GameObject* cur = objects[i];
         /*assert(cur != NULL);*/
         /*
         if (cur->state == DEAD) {
