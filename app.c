@@ -28,10 +28,8 @@
 
 static int init();
 static void process_input();
-static void on_tick(GameObject objects[], int num_elements);
 static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_elements);
 static void render_objects(Map *map, GameObject *objects[], int num_objects);
-static void render(Surface *surfaces[], int num_objects);
 static void cleanup(int sig);
 
 
@@ -50,6 +48,8 @@ static GameObject *hero;
 /* ----- | Functions | ----- */
 
 static void default_on_tick(GameObject_Controller *controller, GameObject *object) {
+    (void)controller;
+
     if (object->m->get_order_count(object) > 0) {
         object->m->on_tick(object);
         return;
@@ -77,14 +77,15 @@ static void default_on_tick(GameObject_Controller *controller, GameObject *objec
     new_x = MIN(MAX(new_x, 0), max_x - object_height);
     new_y = MIN(MAX(new_y, 0), max_y - object_height);
 
-    boolean result = FALSE;
+    /*boolean result = FALSE;*/
     object->m->move_to(object, new_x, new_y, FALSE);
     object->m->on_tick(object);
 }
 
-static void default_shoot(GameObject_Controller *controller, GameObject *object) {
+static boolean default_shoot(GameObject_Controller *controller, GameObject *object) {
     (void)controller;
     (void)object;
+    return TRUE;
 }
 
 static void generate_default_map(Map *map) {
@@ -92,7 +93,7 @@ static void generate_default_map(Map *map) {
     int map_height = map->m->get_height(map);
     (void)map_width;
     (void)map_height;
-    int w, h;
+    /*int w, h;*/
     /*
     for (h = 0; h < map_height; h++) {
         for (w = 0; w < map_width; w++) {
@@ -187,32 +188,14 @@ int main(int argc, char *argv[]) {
     MIDDLE_X = max_x / 2;
     #define NUM_TROOPS 5
     #define NUM_OBJECTS (NUM_TROOPS + 1)
-    //GameObject *objects[NUM_OBJECTS];
+
     GameObject *all_objects[NUM_OBJECTS];
-    //GameObject *neutral_soldiers[NUM_TROOPS];
+    
     int i;
     for (i = 0; i < NUM_TROOPS; i++) {
         all_objects[i] = new_Unit(&neutrals, MIDDLE_X, 10+5*i, units_to_spawn[i]);
         all_objects[i]->m->set_controller(all_objects[i], &random_controller);
     }
-    /*
-    #define NUM_TROOPS 5
-    #define NUM_OBJECTS (NUM_TROOPS + 1)
-    GameObject objects[NUM_OBJECTS];
-    int i;
-    for (i = 0; i < NUM_TROOPS; i++) {
-        Units_init_name(&objects[i], &neutrals, MIDDLE_X, 10+5*i, units_to_spawn[i]);
-        objects[i].m->set_controller(&objects[i], &random_controller);
-    }
-    */
-    /* Initialize a unit for the player to control */
-    //Units_init_archer(&objects[NUM_OBJECTS-1], &player, 20, 20);
-    //hero = &objects[NUM_OBJECTS-1];
-    //hero->m->set_controller(hero, &player_controller);
-
-
-//TODO: LEGG TIL DEFAULT CONTROLLER TIL NYE OBJEKTER!
-
 
     hero = new_Unit(&player, 20, 20, "peasant");
     all_objects[NUM_OBJECTS-1] = hero;
@@ -220,7 +203,6 @@ int main(int argc, char *argv[]) {
     int counter = 0;
     while (1) {
         Resources_on_tick();
-        //on_tick(objects, NUM_TROOPS);
         render_objects(&default_map, all_objects, NUM_OBJECTS);
 
         process_input();
@@ -262,24 +244,6 @@ static void process_input() {
         case 'x':
             PlayerControls_handle_input_char(input, hero);
             break;
-    }
-}
-
-/*
- * Go through the controller of all the units and perform their
- * 'on_tick' method.
- */
-static void on_tick(GameObject objects[], int num_elements) {
-    int i;
-    for (i = 0; i < num_elements; i++) {
-        GameObject *current_object = &objects[i];
-        if (current_object == NULL) {
-            continue;
-        }
-        GameObject_Controller *controller = current_object->m->get_controller(current_object);
-        if (controller != NULL) {
-            controller->m->on_tick(controller, current_object);
-        }
     }
 }
 
@@ -359,16 +323,6 @@ static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_eleme
         attroff(COLOR_PAIR(colors));
     }
     refresh();
-}
-
-/* 
- * Render the specified objects.
- */
-static void render(Surface *surfaces[], int num_objects) {
-    assert(surfaces != NULL);
-    assert(num_objects >= 0);
-
-    Curses_redraw(surfaces, num_objects);
 }
 
 /*

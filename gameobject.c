@@ -163,7 +163,7 @@ static void GameObject_on_tick(struct GameObject *object) {
     if (object->order_count == 0) {
         return;
     }
-
+    
     int is_finished = Orders_update(object);
     if (is_finished == TRUE) {
         remove_current_order(object);

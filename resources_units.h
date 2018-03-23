@@ -6,6 +6,21 @@
 
 
 /*
+ * Map a function over all the currently active GameObjects
+ * allocated through this file.
+ * 
+ * @arg func: The map function.
+ */
+void for_each_GameObject(void (*func)(GameObject *object));
+
+/*
+ * Frees the memory used by the specified object.
+ * 
+ * @arg object: The GameObject to free.
+ */
+void free_Unit(GameObject *object);
+
+/*
  * Allocates memory for a new unit, specified by 'name'.
  * 
  * @arg owner: The owning player.

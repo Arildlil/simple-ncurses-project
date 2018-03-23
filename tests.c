@@ -493,6 +493,7 @@ static void test_Resources(void **state) {
     assert_null(new_GameObject(RESOURCE_PLAIN));
     
     assert_int_equal(Resources_init(1, 1), TRUE);
+    assert_int_equal(Resources_max_objects(), 2);
     assert_int_equal(Resources_init(2, 3), FALSE);
     
     GameObject *object1 = new_GameObject(RESOURCE_PLAIN);
@@ -511,6 +512,7 @@ static void test_Resources(void **state) {
 
     Resources_exit();
     assert_int_equal(Resources_init(4, 4), TRUE);
+    assert_int_equal(Resources_max_objects(), 8);
     Resources_exit();
 }
 
@@ -531,6 +533,8 @@ static void test_Resources_Units(void **state) {
     assert_int_equal(archer->m->get_x(archer), 5);
     assert_int_equal(archer->m->get_y(archer), 10);
     assert_int_equal(archer->m->get_owner(archer), &dummy_player);
+
+    //for_each_GameObject(archer->m->on_tick);
 
     Resources_exit();
 }

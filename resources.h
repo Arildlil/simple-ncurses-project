@@ -22,7 +22,7 @@
 /* ----- | Type Definitions | ----- */
 
 typedef enum Resources_Type {
-    RESOURCE_PLAIN, RESOURCE_PROJECTILE
+    RESOURCE_ALL, RESOURCE_PLAIN, RESOURCE_PROJECTILE
 } Resources_Type;
 
 
@@ -46,9 +46,25 @@ boolean Resources_init(size_t max_objects, size_t max_projectiles);
 void Resources_exit();
 
 /*
+ * Returns the maximum number of GameObjects that can be stored with
+ * the currently allocated memory pool.
+ * 
+ * @return: The maximum number of objects that can be stored.
+ */
+size_t Resources_max_objects();
+
+/*
  * Call the on_tick methods of all the objects in use.
  */
 void Resources_on_tick();
+
+/* 
+ * Map a function over all the currently active GameObjects.
+ * 
+ * @arg func: The mapping function.
+ * @arg type: The type of GameObject to map over.
+ */
+void Resources_for_each(void (*func)(GameObject *object), enum Resources_Type type);
 
 /*
  * Get a fresh GameObject.

@@ -40,7 +40,8 @@ GameObject_Controller* GameObject_Controller_init(GameObject_Controller *control
 
 static void GameObject_Controller_Methods_on_tick(GameObject_Controller *controller, GameObject *object) {
     (void)controller;
-    object->m->movement(object, 1, 0);
+    (void)object;
+    object->m->on_tick(object);
 }
 
 static void projectile_on_tick(GameObject *object) {

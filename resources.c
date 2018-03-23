@@ -42,7 +42,7 @@ boolean Resources_init(size_t max_objects, size_t max_projectiles) {
     assert(max_objects > 0);
     assert(max_projectiles > 0);
 
-    int i;
+    size_t i;
 
     plain_objects_max = max_objects;
     plain_objects = calloc(plain_objects_max, sizeof(GameObject_Container));
@@ -87,6 +87,13 @@ void Resources_exit() {
     inited = FALSE;
 }
 
+size_t Resources_max_objects() {
+    size_t max_objects = plain_objects_max;
+    max_objects += projectiles_max;
+    
+    return max_objects;
+}
+
 static void on_tick_container(GameObject_Container *container, size_t container_size) {
     assert(container);
 
@@ -96,8 +103,9 @@ static void on_tick_container(GameObject_Container *container, size_t container_
         
         if (current->in_use == TRUE) {
             GameObject *object = &current->object;
+            //object->m->on_tick(object);
             GameObject_Controller *controller = object->m->get_controller(object);
-            if (controller != NULL) {
+            if (controller != NULL && controller->m->on_tick != NULL) {
                 controller->m->on_tick(controller, object);
             }
         }
@@ -107,6 +115,33 @@ static void on_tick_container(GameObject_Container *container, size_t container_
 void Resources_on_tick() {
     on_tick_container(plain_objects, plain_objects_max);
     on_tick_container(projectiles, projectiles_max);
+}
+
+static void for_each_container(GameObject_Container *container, size_t container_size, 
+    void (*func)(GameObject *object)) {
+
+    size_t i;
+    for (i = 0; i < container_size; i++) {
+        GameObject_Container *current = &container[i];
+        if (current->in_use == TRUE) {
+            func(&current->object);
+        }
+    }
+}
+
+void Resources_for_each(void (*func)(GameObject *object), enum Resources_Type type) {
+    switch (type) {
+        case RESOURCE_ALL:
+            for_each_container(plain_objects, plain_objects_max, func);
+            for_each_container(projectiles, projectiles_max, func);
+            break;
+        case RESOURCE_PLAIN:
+            for_each_container(plain_objects, plain_objects_max, func);
+            break;
+        case RESOURCE_PROJECTILE:
+            for_each_container(projectiles, projectiles_max, func);
+            break;
+    }
 }
 
 GameObject *new_GameObject(enum Resources_Type type) {

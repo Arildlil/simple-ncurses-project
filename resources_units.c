@@ -5,6 +5,26 @@
 
 
 
+/* ----- | Static Variables | ------ */
+
+
+
+
+
+/* ----- | Functions | ----- */
+
+void for_each_GameObject(void (*func)(GameObject *object)) {
+    Resources_for_each(func, RESOURCE_ALL);
+}
+
+void free_Unit(GameObject *object) {
+    if (object == NULL) {
+        return;
+    }
+
+    free_GameObject(object);
+}
+
 GameObject *new_Unit(Player *owner, int x, int y, char *name) {
     if (owner == NULL || name == NULL) {
         //fprintf(stderr, "new_Unit: Error - 'owner' or 'name' was NULL!\n");

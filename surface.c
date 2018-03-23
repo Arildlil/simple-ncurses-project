@@ -29,8 +29,6 @@ static int Surface_get_width(Surface *surface);
 static int Surface_get_height(Surface *surface);
 static char **Surface_get_pixels(Surface *surface);
 
-static boolean is_outside_screen(Surface *surface);
-
 
 
 /*
@@ -156,15 +154,4 @@ static int Surface_get_height(Surface *surface) {
 
 static char **Surface_get_pixels(Surface *surface) {
     return surface->image->get_pixels(surface->image);
-}
-
-
-/* Other */
-
-/*
- * Checks if the Surface is outside the screen.
- */
-static boolean is_outside_screen(Surface *surface) {
-    return (surface->x >= max_x || surface->y >= max_y ||
-        surface->x < 0 || surface->y < 0);
 }
