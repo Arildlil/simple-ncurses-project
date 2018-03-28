@@ -11,11 +11,15 @@
 
 /* ----- | Constants | ----- */
 
-#define DEFAULT_MAX_GAMEOBJECT_COUNT 100
+enum {
+    DEFAULT_MAX_GAMEOBJECT_COUNT = 100,
 
-/* Projectiles are also GameObjects, but they have 
- * their own memory pool */
-#define DEFAULT_MAX_PROJECTILE_COUNT 100
+    /* Projectiles are also GameObjects, but they have 
+    * their own memory pool */
+    DEFAULT_MAX_PROJECTILE_COUNT = 100,
+};
+
+#define DEFAULT_MAX_TOTAL (DEFAULT_MAX_GAMEOBJECT_COUNT + DEFAULT_MAX_PROJECTILE_COUNT)
 
 
 
@@ -33,11 +37,10 @@ typedef enum Resources_Type {
  * Initialize the module, by setting aside the necessary memory
  * and such.
  * 
- * @arg max_objects: The maximum number of normal GameObjects to store.
- * @arg max_projectiles: The maximum number of projectile GameObjects to store.
+ * @arg max_objects: The maximum number of GameObjects to store.
  * @return: TRUE on success, FALSE otherwise.
  */
-boolean Resources_init(size_t max_objects, size_t max_projectiles);
+boolean Resources_init(size_t max_objects);
 
 /*
  * Free up all the used memory of the Resource handler. Should

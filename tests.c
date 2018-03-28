@@ -492,34 +492,34 @@ static void test_Resources(void **state) {
     
     assert_null(new_GameObject(RESOURCE_PLAIN));
     
-    assert_int_equal(Resources_init(1, 1), TRUE);
-    assert_int_equal(Resources_max_objects(), 2);
-    assert_int_equal(Resources_init(2, 3), FALSE);
+    assert_int_equal(Resources_init(3), TRUE);
+    assert_int_equal(Resources_max_objects(), 3);
+    assert_int_equal(Resources_init(7), FALSE);
     
     GameObject *object1 = new_GameObject(RESOURCE_PLAIN);
     assert_non_null(object1);
-    assert_null(new_GameObject(RESOURCE_PLAIN));
     GameObject *projectile1 = new_GameObject(RESOURCE_PROJECTILE);
     assert_non_null(projectile1);
+    GameObject *projectile2 = new_GameObject(RESOURCE_PROJECTILE);
+    assert_non_null(projectile2);
     
     assert_null(new_GameObject(RESOURCE_PROJECTILE));
     free_GameObject(object1);
-    assert_null(new_GameObject(RESOURCE_PROJECTILE));
     GameObject *object2 = new_GameObject(RESOURCE_PLAIN);
     assert_non_null(object2);
     assert_null(new_GameObject(RESOURCE_PLAIN));
     free_GameObject(object2);
 
     Resources_exit();
-    assert_int_equal(Resources_init(4, 4), TRUE);
-    assert_int_equal(Resources_max_objects(), 8);
+    assert_int_equal(Resources_init(4), TRUE);
+    assert_int_equal(Resources_max_objects(), 4);
     Resources_exit();
 }
 
 static void test_Resources_Units(void **state) {
     (void)state;
 
-    assert_int_equal(Resources_init(4, 4), TRUE);
+    assert_int_equal(Resources_init(4), TRUE);
 
     GameObject *archer = new_Unit(&dummy_player, 5, 10, "archer");
     assert_non_null(archer);

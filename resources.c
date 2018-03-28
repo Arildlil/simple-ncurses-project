@@ -7,6 +7,12 @@
 
 
 
+/* ----- | Constants | ----- */
+
+static const char *ERROR_NO_MEMORY = "Error: not enough memory! Exiting...\n";
+
+
+
 /* ----- | Function Prototypes | ----- */
 
 typedef struct GameObject_Container {
@@ -18,50 +24,54 @@ typedef struct GameObject_Container {
 
 /* ----- | Function Prototypes | ----- */
 
-
+/* TODO:
+    * Used-array
+    * Free-array
+    * Update upon allocation or deallocation
+*/
 
 
 
 /* ----- | Static Variables | ------ */
 
 static boolean inited = FALSE;
-static GameObject_Container *plain_objects = NULL;
-static GameObject_Container *projectiles = NULL;
 
-static size_t plain_objects_max = 0;
-static size_t projectiles_max = 0;
+static GameObject_Container *used_objects = NULL;
+static GameObject_Container *free_objects = NULL;
+static GameObject_Container *items = NULL;
+
+static size_t max_size = 0;
+static size_t cur_size = 0;
 
 
 
 /* ----- | Functions | ----- */
 
-boolean Resources_init(size_t max_objects, size_t max_projectiles) {
+boolean Resources_init(size_t max_objects) {
     if (inited == TRUE) {
         return FALSE;
     }
     assert(max_objects > 0);
-    assert(max_projectiles > 0);
 
     size_t i;
 
-    plain_objects_max = max_objects;
-    plain_objects = calloc(plain_objects_max, sizeof(GameObject_Container));
-    if (plain_objects == NULL) {
-        fprintf(stderr, "Resources_init: Not enough memory! Exiting...\n");
+    max_size = max_objects;
+    cur_size = 0;
+
+    used_objects = calloc(max_size, sizeof(GameObject_Container*));
+    free_objects = calloc(max_size, sizeof(GameObject_Container*));
+    if (used_objects == NULL || free_objects == NULL) {
+        fprintf(stderr, ERROR_NO_MEMORY);
         return FALSE;
-    }
-    for (i = 0; i < plain_objects_max; i++) {
-        plain_objects[i].in_use = FALSE;
     }
 
-    projectiles_max = max_projectiles;
-    projectiles = calloc(projectiles_max, sizeof(GameObject_Container));
-    if (projectiles == NULL) {
-        fprintf(stderr, "Resources_init: Not enough memory! Exiting...\n");
+    items = calloc(max_size, sizeof(GameObject_Container));
+    if (items == NULL) {
+        fprintf(stderr, ERROR_NO_MEMORY);
         return FALSE;
     }
-    for (i = 0; i < projectiles_max; i++) {
-        projectiles[i].in_use = FALSE;
+    for (i = 0; i < max_size; i++) {
+        items[i].in_use = FALSE;
     }
 
     inited = TRUE;
@@ -73,25 +83,29 @@ void Resources_exit() {
         return;
     }
 
-    if (plain_objects != NULL) {
-        free(plain_objects);
-        plain_objects = NULL;
-        plain_objects_max = 0;
+    max_size = 0;
+    cur_size = 0;
+
+    if (used_objects != NULL) {
+        free(used_objects);
+        used_objects = NULL;
     }
-    if (projectiles != NULL) {
-        free(projectiles);
-        projectiles = NULL;
-        projectiles_max = 0;
+
+    if (free_objects != NULL) {
+        free(free_objects);
+        free_objects = NULL;
+    }
+
+    if (items != NULL) {
+        free(items);
+        items = NULL;
     }
 
     inited = FALSE;
 }
 
 size_t Resources_max_objects() {
-    size_t max_objects = plain_objects_max;
-    max_objects += projectiles_max;
-    
-    return max_objects;
+    return max_size;
 }
 
 static void on_tick_container(GameObject_Container *container, size_t container_size) {
@@ -113,8 +127,7 @@ static void on_tick_container(GameObject_Container *container, size_t container_
 }
 
 void Resources_on_tick() {
-    on_tick_container(plain_objects, plain_objects_max);
-    on_tick_container(projectiles, projectiles_max);
+    on_tick_container(items, max_size);
 }
 
 static void for_each_container(GameObject_Container *container, size_t container_size, 
@@ -132,14 +145,11 @@ static void for_each_container(GameObject_Container *container, size_t container
 void Resources_for_each(void (*func)(GameObject *object), enum Resources_Type type) {
     switch (type) {
         case RESOURCE_ALL:
-            for_each_container(plain_objects, plain_objects_max, func);
-            for_each_container(projectiles, projectiles_max, func);
-            break;
+            /* Intentional fall-through */
         case RESOURCE_PLAIN:
-            for_each_container(plain_objects, plain_objects_max, func);
-            break;
+            /* Intentional fall-through */
         case RESOURCE_PROJECTILE:
-            for_each_container(projectiles, projectiles_max, func);
+            for_each_container(items, max_size, func);
             break;
     }
 }
@@ -153,17 +163,17 @@ GameObject *new_GameObject(enum Resources_Type type) {
     int container_size;
     switch (type) {
         case RESOURCE_PLAIN:
-            container = plain_objects;
-            container_size = plain_objects_max;
-            break;
+            /* Intentional fall-through */
         case RESOURCE_PROJECTILE:
-            container = projectiles;
-            container_size = projectiles_max;
+            container = items;
+            container_size = max_size;
             break;
         default:
             fprintf(stderr, "new_GameObject: Error - invalid Resource_Type!\n");
             return NULL;
     }
+
+    /* TODO: Stop using resource types and rather have one array instead? */
 
     /* Currently using the First-Fit algorithm */
     int i;
@@ -191,6 +201,5 @@ static boolean free_in_container(GameObject_Container *container, size_t size, G
 }
 
 void free_GameObject(GameObject *object) {
-    if (free_in_container(plain_objects, plain_objects_max, object) == TRUE) {return;}
-    if (free_in_container(projectiles, projectiles_max, object) == TRUE) {return;}
+    if (free_in_container(items, max_size, object) == TRUE) {return;}
 }

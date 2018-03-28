@@ -10,6 +10,7 @@
 #include "terrain.h"
 #include "resources.h"
 #include "resources_units.h"
+#include "rendering.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -239,7 +240,7 @@ static void process_input() {
             /* Intentional fall-through */
         case '<':
             /* Intentional fall-through */
-        //case ' ':
+        case ' ':
             /* Intentional fall-through */
         case 'x':
             PlayerControls_handle_input_char(input, hero);
@@ -293,35 +294,21 @@ static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_eleme
     }
 
     /* Draw the GameObjects. */
+    Resources_for_each(Rendering_render_object, RESOURCE_ALL);
+    /*
     for (i = 0; i < num_elements; i++) {
         GameObject* cur = objects[i];
-        /*assert(cur != NULL);*/
-        /*
+        assert(cur != NULL);
+        
         if (cur->state == DEAD) {
             continue;
-        }*/
+        }
         if (cur == NULL) {
             continue;
         }
         
-        char **pixels = cur->m->get_pixels(cur);
-        assert(pixels != NULL);
-        dprintf("Object <%d> (x,y)\n", i);
- 
-        Player *owner = cur->m->get_owner(cur);
-        Color_Pair colors = owner->m->get_colors(owner);
-        attron(COLOR_PAIR(colors));
-        for (j = 0; j < cur->m->get_height(cur); j++) {
-            for (k = 0; k < cur->m->get_width(cur); k++) {
-                char cur_pixel = pixels[j][k];
-                dprintf("\t(%d,", cur->x+k);
-                dprintf("%d) ", cur->y+j);
-                mvaddch(cur->y+j, cur->x+k,cur_pixel);
-            }
-            dnprintf("\n");
-        }
-        attroff(COLOR_PAIR(colors));
-    }
+        //Rendering_render_object(cur);
+    }*/
     refresh();
 }
 
