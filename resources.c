@@ -106,26 +106,17 @@ size_t Resources_max_objects() {
     return max_size;
 }
 
-static void on_tick_container(GameObject_Container *container, size_t container_size) {
-    assert(container);
-
-    size_t i;
-    for (i = 0; i < container_size; i++) {
-        GameObject_Container *current = &container[i];
-        
-        if (current->in_use == TRUE) {
-            GameObject *object = &current->object;
-            //object->m->on_tick(object);
+void Resources_on_tick() {
+    size_t i, counted;
+    for (i = 0, counted = 0; i < max_size && counted < cur_size; i++, counted++) {
+        if (used_objects[i] != NULL) {
+            GameObject *object = used_objects[i];
             GameObject_Controller *controller = object->m->get_controller(object);
             if (controller != NULL && controller->m->on_tick != NULL) {
                 controller->m->on_tick(controller, object);
             }
         }
     }
-}
-
-void Resources_on_tick() {
-    on_tick_container(items, max_size);
 }
 
 static void for_each_container(GameObject_Container *container, size_t container_size, 
