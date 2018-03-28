@@ -498,7 +498,7 @@ static void test_Resources(void **state) {
     
     GameObject *object1 = new_GameObject(RESOURCE_PLAIN);
     assert_non_null(object1);
-    GameObject *projectile1 = new_GameObject(RESOURCE_PROJECTILE);
+    GameObject *projectile1 = new_GameObject(RESOURCE_PLAIN);
     assert_non_null(projectile1);
     GameObject *projectile2 = new_GameObject(RESOURCE_PROJECTILE);
     assert_non_null(projectile2);

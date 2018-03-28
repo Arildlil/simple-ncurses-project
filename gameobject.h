@@ -82,6 +82,7 @@ struct GameObject {
     int order_count;
     int current_order_index;
     Direction direction;
+    size_t memory_id;
 
     /* Controls the behavior of this object, if set */
     GameObject_Controller *controller;

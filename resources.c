@@ -9,7 +9,8 @@
 
 /* ----- | Constants | ----- */
 
-static const char *ERROR_NO_MEMORY = "Error: not enough memory! Exiting...\n";
+#define ERROR_NO_MEMORY "Error: not enough memory! Exiting...\n"
+#define ERROR_FULL "Error: no space for new GameObject!\n"
 
 
 
@@ -36,12 +37,12 @@ typedef struct GameObject_Container {
 
 static boolean inited = FALSE;
 
-static GameObject_Container *used_objects = NULL;
-static GameObject_Container *free_objects = NULL;
+static GameObject **used_objects = NULL;
 static GameObject_Container *items = NULL;
 
 static size_t max_size = 0;
 static size_t cur_size = 0;
+static size_t first_free = 0;
 
 
 
@@ -53,25 +54,26 @@ boolean Resources_init(size_t max_objects) {
     }
     assert(max_objects > 0);
 
-    size_t i;
-
     max_size = max_objects;
     cur_size = 0;
-
-    used_objects = calloc(max_size, sizeof(GameObject_Container*));
-    free_objects = calloc(max_size, sizeof(GameObject_Container*));
-    if (used_objects == NULL || free_objects == NULL) {
-        fprintf(stderr, ERROR_NO_MEMORY);
-        return FALSE;
-    }
+    first_free = 0;
 
     items = calloc(max_size, sizeof(GameObject_Container));
     if (items == NULL) {
-        fprintf(stderr, ERROR_NO_MEMORY);
+        //fprintf(stderr, ERROR_NO_MEMORY);
         return FALSE;
     }
+
+    used_objects = calloc(max_size, sizeof(GameObject*));
+    if (used_objects == NULL) {
+        //fprintf(stderr, ERROR_NO_MEMORY);
+        return FALSE;
+    }
+
+    size_t i;
     for (i = 0; i < max_size; i++) {
         items[i].in_use = FALSE;
+        used_objects[i] = NULL;
     }
 
     inited = TRUE;
@@ -85,15 +87,11 @@ void Resources_exit() {
 
     max_size = 0;
     cur_size = 0;
+    first_free = 0;
 
     if (used_objects != NULL) {
         free(used_objects);
         used_objects = NULL;
-    }
-
-    if (free_objects != NULL) {
-        free(free_objects);
-        free_objects = NULL;
     }
 
     if (items != NULL) {
@@ -155,51 +153,53 @@ void Resources_for_each(void (*func)(GameObject *object), enum Resources_Type ty
 }
 
 GameObject *new_GameObject(enum Resources_Type type) {
+    (void)type;
+
     if (inited == FALSE) {
         return NULL;
     }
 
-    GameObject_Container *container;
-    int container_size;
-    switch (type) {
-        case RESOURCE_PLAIN:
-            /* Intentional fall-through */
-        case RESOURCE_PROJECTILE:
-            container = items;
-            container_size = max_size;
-            break;
-        default:
-            fprintf(stderr, "new_GameObject: Error - invalid Resource_Type!\n");
-            return NULL;
+    if (cur_size >= max_size || first_free >= max_size) {
+        //fprintf(stderr, ERROR_FULL);
+        return NULL;
     }
 
-    /* TODO: Stop using resource types and rather have one array instead? */
+    GameObject_Container *current_container = &items[first_free];
+    assert(current_container != NULL);
+    assert(current_container->in_use == FALSE);
+    current_container->in_use = TRUE; 
+    GameObject *object = &current_container->object;
+    object->memory_id = first_free;
+    cur_size++;
 
-    /* Currently using the First-Fit algorithm */
-    int i;
-    for (i = 0; i < container_size; i++) {
-        GameObject_Container *current = &container[i];
-        if (current->in_use == FALSE) {
-            current->in_use = TRUE;
-            return &current->object;
-        }
-    }
-    return NULL;
-}
+    //fprintf(stderr, "first_free was %d!\n", first_free);
 
-static boolean free_in_container(GameObject_Container *container, size_t size, GameObject *object) {
-    assert(container);
-    
+    used_objects[object->memory_id] = object;
+
     size_t i;
-    for (i = 0; i < size; i++) {
-        if (container[i].in_use && &container[i].object == object) {
-            container[i].in_use = FALSE;
-            return TRUE;
+    for (i = first_free; i < max_size; i++, first_free++) {
+        if (items[i].in_use == FALSE) {
+            break;
         }
     }
-    return FALSE;
+
+    //fprintf(stderr, "first_free is now %d!\n", first_free);
+
+    return object;
 }
 
 void free_GameObject(GameObject *object) {
-    if (free_in_container(items, max_size, object) == TRUE) {return;}
+    if (object == NULL) {
+        return;
+    }
+
+    size_t memory_id = object->memory_id;
+    assert(memory_id < max_size);
+    items[memory_id].in_use = FALSE;
+    used_objects[memory_id] = NULL;
+
+    cur_size--;
+    if (memory_id < first_free) {
+        first_free = memory_id;
+    }
 }

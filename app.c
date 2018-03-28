@@ -318,7 +318,7 @@ static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_eleme
 static int init() {
     UnitImages_init();
     srand(clock());
-    Resources_init(DEFAULT_MAX_GAMEOBJECT_COUNT, DEFAULT_MAX_PROJECTILE_COUNT);
+    Resources_init(DEFAULT_MAX_GAMEOBJECT_COUNT);
 
     signal(SIGINT, cleanup);
     signal(SIGTERM, cleanup);
