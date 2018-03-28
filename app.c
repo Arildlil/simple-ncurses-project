@@ -288,27 +288,13 @@ static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_eleme
                     mvaddch(y+j, x+k, cur_pixel);
                 }
             }
-            //mvaddch(i, j, ' ');
             attroff(COLOR_PAIR(color));
         }
     }
 
     /* Draw the GameObjects. */
     Resources_for_each(Rendering_render_object, RESOURCE_ALL);
-    /*
-    for (i = 0; i < num_elements; i++) {
-        GameObject* cur = objects[i];
-        assert(cur != NULL);
-        
-        if (cur->state == DEAD) {
-            continue;
-        }
-        if (cur == NULL) {
-            continue;
-        }
-        
-        //Rendering_render_object(cur);
-    }*/
+
     refresh();
 }
 
@@ -319,6 +305,7 @@ static int init() {
     UnitImages_init();
     srand(clock());
     Resources_init(DEFAULT_MAX_GAMEOBJECT_COUNT);
+    Rendering_init(max_x, max_y);
 
     signal(SIGINT, cleanup);
     signal(SIGTERM, cleanup);

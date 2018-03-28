@@ -37,7 +37,7 @@ typedef struct GameObject_Container {
 
 static boolean inited = FALSE;
 
-static GameObject **used_objects = NULL;
+GameObject **used_objects = NULL;
 static GameObject_Container *items = NULL;
 
 static size_t max_size = 0;

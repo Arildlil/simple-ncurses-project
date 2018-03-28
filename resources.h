@@ -21,6 +21,8 @@ enum {
 
 #define DEFAULT_MAX_TOTAL (DEFAULT_MAX_GAMEOBJECT_COUNT + DEFAULT_MAX_PROJECTILE_COUNT)
 
+extern GameObject **used_objects;
+
 
 
 /* ----- | Type Definitions | ----- */
