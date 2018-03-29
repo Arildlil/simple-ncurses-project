@@ -66,6 +66,8 @@ struct Map_Methods {
     boolean (*is_inited)(struct Map *map);
     int (*get_max_x)(struct Map *map);
     int (*get_max_y)(struct Map *map);
+    int (*get_min_x)(struct Map *map);
+    int (*get_min_y)(struct Map *map);
     int (*get_width)(struct Map *map);
     int (*get_height)(struct Map *map);
     Square *(*get_square)(struct Map *map, int x, int y);

@@ -259,41 +259,16 @@ static void render_objects(Map *map, GameObject *objects[], int num_objects) {
  * Redraws the GameObjects.
  */
 static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_elements) {
-    int i, j, k, x, y;
     getmaxyx(stdscr, max_y, max_x);
     clear();
 
     /* Draw the background Map. */
-    for (y = 0; y < map->m->get_max_y(map); y++) {
-        for (x = 0; x < map->m->get_max_x(map); x++) {
-            Square *current_square = map->m->get_square(map, x, y);
-            if (current_square == NULL) {
-                fprintf(stderr, "Curses_redraw_objects: Warning - square (%d, %d) was NULL!\n", x, y);
-                continue;
-            }
-
-            TerrainType *terrain = current_square->m->get_terrain_type(current_square);
-            if (terrain->m->get_tag(terrain) == TERRAIN_NONE) {
-                continue;
-            }
-
-            Color_Pair color = terrain->m->get_colors(terrain);
-            Image *image = terrain->m->get_image(terrain);
-            char **pixels = image->get_pixels(image);
-
-            attron(COLOR_PAIR(color));
-            for (j = 0; j < image->get_height(image); j++) {
-                for (k = 0; k < image->get_width(image); k++) {
-                    char cur_pixel = pixels[j][k];
-                    mvaddch(y+j, x+k, cur_pixel);
-                }
-            }
-            attroff(COLOR_PAIR(color));
-        }
-    }
+    Rendering_add_background(map, hero->m->get_x(hero), hero->m->get_y(hero));
 
     /* Draw the GameObjects. */
-    Resources_for_each(Rendering_render_object, RESOURCE_ALL);
+    //Rendering_for_each(Rendering_render_object, RESOURCE_ALL);
+
+    Rendering_render_frame();
 
     refresh();
 }

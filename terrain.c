@@ -9,6 +9,8 @@
 static boolean Map_is_inited(struct Map *map);
 static int Map_get_max_x(struct Map *map);
 static int Map_get_max_y(struct Map *map);
+static int Map_get_min_x(struct Map *map);
+static int Map_get_min_y(struct Map *map);
 static int Map_get_width(struct Map *map);
 static int Map_get_height(struct Map *map);
 static Square *Map_get_square(struct Map *map, int x, int y);
@@ -32,6 +34,8 @@ static Map_Methods map_methods = {
     .is_inited = Map_is_inited,
     .get_max_x = Map_get_max_x,
     .get_max_y = Map_get_max_y,
+    .get_min_x = Map_get_min_x,
+    .get_min_y = Map_get_min_y,
     .get_width = Map_get_width,
     .get_height = Map_get_height,
     .get_square = Map_get_square,
@@ -201,6 +205,14 @@ static int Map_get_max_x(struct Map *map) {
 
 static int Map_get_max_y(struct Map *map) {
     return map->max_y;
+}
+
+static int Map_get_min_x(struct Map *map) {
+    return map->min_x;
+}
+
+static int Map_get_min_y(struct Map *map) {
+    return map->min_y;
 }
 
 static int Map_get_width(struct Map *map) {
