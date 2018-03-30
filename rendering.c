@@ -151,7 +151,7 @@ void Rendering_add_background(Map *map, int center_x, int center_y) {
                 for (k = 0; k < image->get_width(image); k++) {
                     char cur_pixel = pixels[j][k];
                     //mvaddch(y+j, x+k, cur_pixel);
-                    size_t inner_index = to_y * current_width + to_x;
+                    size_t inner_index = (to_y + j) * current_width + to_x + k;
                     Pixel *current_pixel = &current_frame->pixels[inner_index];
                     current_pixel->color = color;
                     current_pixel->symbol = cur_pixel;
