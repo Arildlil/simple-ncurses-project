@@ -13,6 +13,7 @@
 #include "terrain.h"
 #include "resources.h"
 #include "resources_units.h"
+#include "rendering.h"
 
 #include <string.h>
 #include <curses.h>
@@ -539,6 +540,27 @@ static void test_Resources_Units(void **state) {
     Resources_exit();
 }
 
+static void test_Rendering_convert_coordinates(void **state) {
+    (void)state;
+
+    Map map;
+    Map_init(&map, 4, 4);   /* -4 to 4 in both directions */
+    RenderCoordinateBorders borders = {0};
+    assert_int_equal(map.m->get_max_x(&map), 4);
+    assert_int_equal(map.m->get_max_y(&map), 4);
+    assert_int_equal(map.m->get_min_x(&map), -4);
+    assert_int_equal(map.m->get_min_y(&map), -4);
+    Rendering_convert_coordinates(&map, 2, 2, -1, -1, &borders);
+    assert_int_equal(borders.top_y, -3);
+    assert_int_equal(borders.left_x, -3);
+    assert_int_equal(borders.bottom_y, 1);
+    assert_int_equal(borders.right_x, 1);
+    assert_int_equal(borders.index_top_y, 1);
+    assert_int_equal(borders.index_left_x, 1);
+    assert_int_equal(borders.index_bottom_y, 5);
+    assert_int_equal(borders.index_right_x, 5);
+}
+
 
 
 /* ----- | Other | ------ */
@@ -579,6 +601,8 @@ int main(void) {
 
         cmocka_unit_test(test_Resources),
         cmocka_unit_test(test_Resources_Units),
+
+        cmocka_unit_test(test_Rendering_convert_coordinates),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
