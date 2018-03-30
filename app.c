@@ -106,21 +106,21 @@ static void generate_default_map(Map *map) {
     enum {NUM_WATER_SEGMENTS = 6};
     Coordinates water_start[NUM_WATER_SEGMENTS] = 
         {
-            {.x = 0, .y = 35},
-            {.x = 45, .y = 30},
-            {.x = 46, .y = 30},
-            {.x = 116, .y = 28},
-            {.x = 123, .y = 15},
-            {.x = 123, .y = 15},
+            {.x = 0-71, .y = 35-21},
+            {.x = 45-71, .y = 30-21},
+            {.x = 46-71, .y = 30-21},
+            {.x = 116-71, .y = 28-21},
+            {.x = 123-71, .y = 15-21},
+            {.x = 123-71, .y = 15-21},
         };
     Coordinates water_end[NUM_WATER_SEGMENTS] = 
         {
-            {.x = 45, .y = 35},
-            {.x = 46, .y = 35},
-            {.x = 115, .y = 30},
-            {.x = 130, .y = 32},
-            {.x = 124, .y = 32},
-            {.x = 145, .y = 15},
+            {.x = 45-71, .y = 35-21},
+            {.x = 46-71, .y = 35-21},
+            {.x = 115-71, .y = 30-21},
+            {.x = 130-71, .y = 32-21},
+            {.x = 124-71, .y = 32-21},
+            {.x = 145-71, .y = 15-21},
         };
     int s, x, y;
     for (s = 0; s < NUM_WATER_SEGMENTS; s++) {
@@ -133,7 +133,7 @@ static void generate_default_map(Map *map) {
 
     /* Add some grass patches. */
     int patch_size_x = 6, patch_size_y = 4;
-    int start_x = 15, start_y = 20;
+    int start_x = 15-71, start_y = 20-21;
     int j, k;
     for (k = start_y; k < patch_size_y + start_y; k++) {
         for (j = start_x; j < patch_size_x + start_x; j++) {
@@ -146,8 +146,8 @@ static void generate_default_map(Map *map) {
     TerrainType_Tag tags[NUM_TERRAIN_PIECES] = {
         TERRAIN_TREE, TERRAIN_TREE, TERRAIN_STONE, TERRAIN_STONE, TERRAIN_TREE, TERRAIN_TREE
     };
-    int x_coords[NUM_TERRAIN_PIECES] = {15, 25, 50, 65, 90, 135};
-    int y_coords[NUM_TERRAIN_PIECES] = {4, 15, 7, 23, 6, 20};
+    int x_coords[NUM_TERRAIN_PIECES] = {15-71, 25-71, 50-71, 65-71, 90-71, 135-71};
+    int y_coords[NUM_TERRAIN_PIECES] = {4-21, 15-21, 7-21, 23-21, 6-21, 20-21};
 
     int i;
     for (i = 0; i < NUM_TERRAIN_PIECES; i++) {
@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
     Player_init(&neutrals, COLOR_PAIR_YELLOW, FALSE);
 
     Map default_map;
-    Map_init(&default_map, max_x, max_y);
+    Map_init(&default_map, 200, 100);
     generate_default_map(&default_map);
 
     char *units_to_spawn[] = {
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
         all_objects[i]->m->set_controller(all_objects[i], &random_controller);
     }
 
-    hero = new_Unit(&player, 20, 20, "peasant");
+    hero = new_Unit(&player, 0, 0, "peasant");
     all_objects[NUM_OBJECTS-1] = hero;
 
     int counter = 0;
@@ -264,6 +264,7 @@ static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_eleme
 
     /* Draw the background Map. */
     Rendering_add_background(map, hero->m->get_x(hero), hero->m->get_y(hero));
+    //Rendering_add_background(map, 0, 0);
 
     /* Draw the GameObjects. */
     //Rendering_for_each(Rendering_render_object, RESOURCE_ALL);
@@ -280,12 +281,15 @@ static int init() {
     UnitImages_init();
     srand(clock());
     Resources_init(DEFAULT_MAX_GAMEOBJECT_COUNT);
-    Rendering_init(max_x, max_y);
+    //Rendering_init(40, 30);
 
     signal(SIGINT, cleanup);
     signal(SIGTERM, cleanup);
     signal(SIGKILL, cleanup);
     Curses_init();
+    if (Rendering_init(max_x, max_y) == FALSE) {
+        cleanup(0);
+    }
     return OK;
 }
 

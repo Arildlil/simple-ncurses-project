@@ -4,6 +4,8 @@
 #include "player.h"
 #include "curses.h"
 
+#include <stdlib.h>
+#include <string.h>
 #include <ncurses.h>
 #include <assert.h>
 
@@ -43,7 +45,7 @@ FrameBuffer *frames[NUM_FRAME_BUFFERS];
 
 boolean Rendering_init(size_t width, size_t height) {
     if (inited == TRUE) {
-        return;
+        return FALSE;
     }
 
     inited = TRUE;
@@ -61,6 +63,10 @@ boolean Rendering_init(size_t width, size_t height) {
             return FALSE;
         }
 
+        frames[i]->width = width;
+        frames[i]->height = height;
+        fprintf(stderr, "frames[%d]->width: %d, ->height: %d\n", i, frames[i]->width, frames[i]->height);
+
         for (j = 0; j < pixel_count; j++) {
             Pixel *current_pixel = &frames[i]->pixels[j];
             current_pixel->color = COLOR_PAIR_NONE;
@@ -71,16 +77,22 @@ boolean Rendering_init(size_t width, size_t height) {
     return TRUE;
 }
 
-static void Rendering_convert_coordinates(Map *map, int screen_width, int screen_height, 
-    int center_x, int center_y, int *left_x, int *top_y, size_t *index_left_x, size_t *index_top_y) {
+void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_screen_height, 
+    int center_x, int center_y, RenderCoordinateBorders *borders) {
     
     int map_max_x = map->m->get_max_x(map);
     int map_max_y = map->m->get_max_y(map);
 
-    *left_x = center_x - screen_width/2;
-    *top_y = center_y - screen_height/2;
-    *index_left_x = *left_x + map_max_x;
-    *index_top_y = *top_y + map_max_y;
+    //fprintf(stderr, "Convert: w %d, h %d, (%d, %d)\n", half_screen_width, half_screen_height, center_x, center_y);
+
+    borders->left_x = center_x - half_screen_width;
+    borders->right_x = center_x + half_screen_width;
+    borders->top_y = center_y - half_screen_height;
+    borders->bottom_y = center_y + half_screen_height;
+    borders->index_left_x = borders->left_x + map_max_x;
+    borders->index_right_x = borders->right_x + map_max_x;
+    borders->index_top_y = borders->top_y + map_max_y;
+    borders->index_bottom_y = borders->bottom_y + map_max_y;
 }
 
 void Rendering_add_background(Map *map, int center_x, int center_y) {
@@ -90,14 +102,63 @@ void Rendering_add_background(Map *map, int center_x, int center_y) {
     size_t current_height = current_frame->height;
     size_t current_width = current_frame->width;
 
-    int leftmost_x = 0;
-    int topmost_y = 0;
-    size_t index_leftmost_x = 0;
-    size_t index_topmost_y = 0;
-    Rendering_convert_coordinates(map, screen_width, screen_height, center_x, center_y,
-        &leftmost_x, &topmost_y, &index_leftmost_x, &index_topmost_y);
+    assert(current_height != 0);
+    assert(current_width != 0);
 
-    /* TODO: Make sure only the map around the center is rendered! */
+    RenderCoordinateBorders borders = {0};
+    Rendering_convert_coordinates(map, current_width/2, current_height/2, center_x, center_y, &borders);
+    
+    /*fprintf(stderr, "top_y: %d, left_x: %d, bottom_y: %d, right_x: %d, current_height: %d, current_width: %d\n", 
+        borders.top_y, borders.left_x, borders.bottom_y, borders.right_x, current_height, current_width);
+    */
+
+    int from_x, from_y; 
+    size_t to_x, to_y, j, k;
+    
+    /* Reset the buffer */
+    TerrainType *terrain = terrain_default;
+
+    for (from_y = borders.top_y, to_y = 0; from_y < borders.bottom_y && to_y < current_height; from_y++, to_y++) {
+        for (from_x = borders.left_x, to_x = 0; from_x < borders.right_x && to_x < current_width; from_x++, to_x++) {
+            size_t index = to_y * current_width + to_x;
+            Pixel *current_pixel = &current_frame->pixels[index];
+            current_pixel->color = terrain->colors;
+            current_pixel->symbol = terrain->image->pixels[0][0];
+        }
+    }
+
+    /* Paint the terrain */
+    for (from_y = borders.top_y, to_y = 0; from_y < borders.bottom_y && to_y < current_height; from_y++, to_y++) {
+        //fprintf(stderr, "from_y:  %d, to_y: %d, borders.bottom_y: %d\t", from_y, to_y, borders.index_bottom_y);
+        for (from_x = borders.left_x, to_x = 0; from_x < borders.right_x && to_x < current_width; from_x++, to_x++) {
+            
+            size_t index = to_y * current_width + to_x;
+            Square *current_square = map->m->get_square(map, from_x, from_y);
+            if (current_square == NULL) {
+                continue;
+            }
+
+            TerrainType *terrain = current_square->m->get_terrain_type(current_square);
+            if (terrain->m->get_tag(terrain) == TERRAIN_NONE) {
+                continue;
+            }
+
+            Color_Pair color = terrain->m->get_colors(terrain);
+            Image *image = terrain->m->get_image(terrain);
+            char **pixels = image->get_pixels(image);
+
+            for (j = 0; j < image->get_height(image); j++) {
+                for (k = 0; k < image->get_width(image); k++) {
+                    char cur_pixel = pixels[j][k];
+                    //mvaddch(y+j, x+k, cur_pixel);
+                    size_t inner_index = to_y * current_width + to_x;
+                    Pixel *current_pixel = &current_frame->pixels[inner_index];
+                    current_pixel->color = color;
+                    current_pixel->symbol = cur_pixel;
+                }
+            }
+        }
+    }
 
     /*
     int x, y, j, k;

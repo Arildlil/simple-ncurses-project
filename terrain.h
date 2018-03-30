@@ -74,6 +74,8 @@ struct Map_Methods {
     void (*free)(struct Map *map);
 };
 
+extern const TerrainType *terrain_default;
+
 /*
  * Initialize the Map object.
  * 

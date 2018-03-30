@@ -4,8 +4,26 @@
 #include "gameobject.h"
 #include "terrain.h"
 
+
+
+typedef struct RenderCoordinateBorders {
+    int left_x;
+    int right_x;
+    int top_y;
+    int bottom_y;
+    size_t index_left_x;
+    size_t index_right_x;
+    size_t index_top_y;
+    size_t index_bottom_y;
+} RenderCoordinateBorders;
+
+
+
 boolean Rendering_init(size_t width, size_t height);
 void Rendering_add_background(Map *map, int center_x, int center_y);
 void Rendering_render_object(GameObject *object);
+
+void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_screen_height, 
+    int center_x, int center_y, RenderCoordinateBorders *borders);
 
 #endif 

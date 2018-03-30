@@ -124,6 +124,8 @@ static TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
     }
 };
 
+const TerrainType *terrain_default = &terrain_types[TERRAIN_NONE];
+
 
 
 /* ----- | Functions | ----- */
