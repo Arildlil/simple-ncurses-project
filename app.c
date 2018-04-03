@@ -66,17 +66,18 @@ static void default_on_tick(GameObject_Controller *controller, GameObject *objec
 
     int object_height = object->m->get_height(object);
 
+    /*
     if (new_x <= object_height) {
         new_x += object_height + movement_x * -1;
     } else if (new_y <= object_height) {
         new_y += object_height + movement_y * -1;
     } else if (new_x >= max_x - object_height) {
-        new_x -= max_x - object_height - movement_x * -1;;
+        new_x -= max_x - object_height - movement_x * -1;
     } else if (new_y >= max_y - object_height) {
-        new_y -= max_y - object_height - movement_y * -1;;
-    }
-    new_x = MIN(MAX(new_x, 0), max_x - object_height);
-    new_y = MIN(MAX(new_y, 0), max_y - object_height);
+        new_y -= max_y - object_height - movement_y * -1;
+    }*/
+    //new_x = MIN(MAX(new_x, 0), max_x - object_height);
+    //new_y = MIN(MAX(new_y, 0), max_y - object_height);
 
     /*boolean result = FALSE;*/
     object->m->move_to(object, new_x, new_y, FALSE);
@@ -263,8 +264,7 @@ static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_eleme
     clear();
 
     /* Draw the background Map. */
-    Rendering_add_background(map, hero->m->get_x(hero), hero->m->get_y(hero));
-    //Rendering_add_background(map, 0, 0);
+    Rendering_fill_framebuffer(map, hero->m->get_x(hero), hero->m->get_y(hero), objects, num_elements);
 
     /* Draw the GameObjects. */
     //Rendering_for_each(Rendering_render_object, RESOURCE_ALL);
