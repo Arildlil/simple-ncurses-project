@@ -266,9 +266,6 @@ static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_eleme
     /* Draw the background Map. */
     Rendering_fill_framebuffer(map, hero->m->get_x(hero), hero->m->get_y(hero), objects, num_elements);
 
-    /* Draw the GameObjects. */
-    //Rendering_for_each(Rendering_render_object, RESOURCE_ALL);
-
     Rendering_render_frame();
 
     refresh();

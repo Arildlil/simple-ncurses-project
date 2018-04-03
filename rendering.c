@@ -85,8 +85,6 @@ void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_scr
     int map_max_x = map->m->get_max_x(map);
     int map_max_y = map->m->get_max_y(map);
 
-    //fprintf(stderr, "Convert: w %d, h %d, (%d, %d)\n", half_screen_width, half_screen_height, center_x, center_y);
-
     borders->left_x = center_x - half_screen_width;
     borders->right_x = center_x + half_screen_width;
     borders->top_y = center_y - half_screen_height;
@@ -95,15 +93,6 @@ void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_scr
     borders->index_right_x = borders->right_x + map_max_x;
     borders->index_top_y = borders->top_y + map_max_y;
     borders->index_bottom_y = borders->bottom_y + map_max_y;
-
-    /* 'max_x' and 'max_y' comes from ncurses itself */
-    /*
-    if (max_x % 2 == 1) {
-        borders->right_x++;
-    }
-    if (max_y % 2 == 1) {
-        borders->bottom_y++;
-    }*/
 }
 
 void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject *objects[], int num_elements) {
@@ -118,10 +107,6 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
 
     RenderCoordinateBorders borders = {0};
     Rendering_convert_coordinates(map, current_width/2, current_height/2, center_x, center_y, &borders);
-    
-    /*fprintf(stderr, "top_y: %d, left_x: %d, bottom_y: %d, right_x: %d, current_height: %d, current_width: %d\n", 
-        borders.top_y, borders.left_x, borders.bottom_y, borders.right_x, current_height, current_width);
-    */
 
     int from_x, from_y; 
     size_t to_x, to_y, j, k;
@@ -140,7 +125,6 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
 
     /* Paint the terrain */
     for (from_y = borders.top_y, to_y = 0; from_y < borders.bottom_y && to_y < current_height; from_y++, to_y++) {
-        //fprintf(stderr, "from_y:  %d, to_y: %d, borders.bottom_y: %d\t", from_y, to_y, borders.index_bottom_y);
         for (from_x = borders.left_x, to_x = 0; from_x < borders.right_x && to_x < current_width; from_x++, to_x++) {
             
             Square *current_square = map->m->get_square(map, from_x, from_y);
@@ -227,29 +211,4 @@ void Rendering_render_frame() {
     }
 
     current_frame_index = ++current_frame_index % NUM_FRAME_BUFFERS;
-}
-
-void Rendering_render_object(GameObject *object) {
-    if (inited == FALSE) {
-        return;
-    }
-
-    char **pixels = object->m->get_pixels(object);
-    assert(pixels != NULL);
-    dprintf("Object <%d> (x,y)\n", i);
- 
-    Player *owner = object->m->get_owner(object);
-    Color_Pair colors = owner->m->get_colors(owner);
-    attron(COLOR_PAIR(colors));
-    int j, k;
-    for (j = 0; j < object->m->get_height(object); j++) {
-        for (k = 0; k < object->m->get_width(object); k++) {
-            char object_pixel = pixels[j][k];
-            dprintf("\t(%d,", object->x+k);
-            dprintf("%d) ", object->y+j);
-            mvaddch(object->y+j, object->x+k,object_pixel);
-        }
-        dnprintf("\n");
-    }
-    attroff(COLOR_PAIR(colors));
 }
