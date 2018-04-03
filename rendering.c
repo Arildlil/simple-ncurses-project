@@ -21,6 +21,7 @@ typedef struct Pixel {
 typedef struct FrameBuffer {
     size_t width;
     size_t height;
+    int max_index;
     Pixel *pixels;
 } FrameBuffer;
 
@@ -29,7 +30,7 @@ typedef struct FrameBuffer {
 /* ----- | Static Variables | ------ */
 
 enum {
-    NUM_FRAME_BUFFERS = 2,
+    NUM_FRAME_BUFFERS = 1,
 };
 
 static boolean inited = FALSE;
@@ -65,6 +66,7 @@ boolean Rendering_init(size_t width, size_t height) {
 
         frames[i]->width = width;
         frames[i]->height = height;
+        frames[i]->max_index = width * height - 1;
         fprintf(stderr, "frames[%d]->width: %d, ->height: %d\n", i, frames[i]->width, frames[i]->height);
 
         for (j = 0; j < pixel_count; j++) {
@@ -93,9 +95,18 @@ void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_scr
     borders->index_right_x = borders->right_x + map_max_x;
     borders->index_top_y = borders->top_y + map_max_y;
     borders->index_bottom_y = borders->bottom_y + map_max_y;
+
+    /* 'max_x' and 'max_y' comes from ncurses itself */
+    /*
+    if (max_x % 2 == 1) {
+        borders->right_x++;
+    }
+    if (max_y % 2 == 1) {
+        borders->bottom_y++;
+    }*/
 }
 
-void Rendering_add_background(Map *map, int center_x, int center_y) {
+void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject *objects[], int num_elements) {
     assert(map);
 
     FrameBuffer *current_frame = frames[current_frame_index];
@@ -118,8 +129,8 @@ void Rendering_add_background(Map *map, int center_x, int center_y) {
     /* Reset the buffer */
     TerrainType *terrain = terrain_default;
 
-    for (from_y = borders.top_y, to_y = 0; from_y < borders.bottom_y && to_y < current_height; from_y++, to_y++) {
-        for (from_x = borders.left_x, to_x = 0; from_x < borders.right_x && to_x < current_width; from_x++, to_x++) {
+    for (from_y = borders.top_y, to_y = 0; from_y < borders.bottom_y + 1 && to_y < current_height; from_y++, to_y++) {
+        for (from_x = borders.left_x, to_x = 0; from_x < borders.right_x + 1 && to_x < current_width; from_x++, to_x++) {
             size_t index = to_y * current_width + to_x;
             Pixel *current_pixel = &current_frame->pixels[index];
             current_pixel->color = terrain->colors;
@@ -132,7 +143,6 @@ void Rendering_add_background(Map *map, int center_x, int center_y) {
         //fprintf(stderr, "from_y:  %d, to_y: %d, borders.bottom_y: %d\t", from_y, to_y, borders.index_bottom_y);
         for (from_x = borders.left_x, to_x = 0; from_x < borders.right_x && to_x < current_width; from_x++, to_x++) {
             
-            size_t index = to_y * current_width + to_x;
             Square *current_square = map->m->get_square(map, from_x, from_y);
             if (current_square == NULL) {
                 continue;
@@ -147,11 +157,14 @@ void Rendering_add_background(Map *map, int center_x, int center_y) {
             Image *image = terrain->m->get_image(terrain);
             char **pixels = image->get_pixels(image);
 
-            for (j = 0; j < image->get_height(image); j++) {
-                for (k = 0; k < image->get_width(image); k++) {
+            for (j = 0; j < (size_t)image->get_height(image) && to_y + j < current_height; j++) {
+                for (k = 0; k < (size_t)image->get_width(image) && to_x + k < current_width; k++) {
                     char cur_pixel = pixels[j][k];
-                    //mvaddch(y+j, x+k, cur_pixel);
-                    size_t inner_index = (to_y + j) * current_width + to_x + k;
+                    int inner_index = (to_y + j) * current_width + to_x + k;
+                    assert(inner_index >= 0);
+                    if (inner_index >= current_frame->max_index) {
+                        break;
+                    }
                     Pixel *current_pixel = &current_frame->pixels[inner_index];
                     current_pixel->color = color;
                     current_pixel->symbol = cur_pixel;
@@ -160,34 +173,38 @@ void Rendering_add_background(Map *map, int center_x, int center_y) {
         }
     }
 
-    /*
-    int x, y, j, k;
-    for (y = 0; y < map->m->get_max_y(map); y++) {
-        for (x = 0; x < map->m->get_max_x(map); x++) {
-            Square *current_square = map->m->get_square(map, x, y);
-            assert(current_square);
+    int i;
+    for (i = 0; i < num_elements; i++) {
+        GameObject *object = objects[i];
+        int object_x = object->m->get_x(object);
+        int object_y = object->m->get_y(object);
+        if (object_x < borders.left_x || object_x > borders.right_x || 
+            object_y < borders.top_y || object_y > borders.bottom_y ) {
+            
+            continue;
+        }
 
-            TerrainType *terrain = current_square->m->get_terrain_type(current_square);
-            if (terrain->m->get_tag(terrain) == TERRAIN_NONE) {
-                continue;
-            }
-
-            Color_Pair color = terrain->m->get_colors(terrain);
-            Image *image = terrain->m->get_image(terrain);
-            char **pixels = image->get_pixels(image);
-
-            for (j = 0; j < image->get_height(image); j++) {
-                for (k = 0; k < image->get_width(image); k++) {
-                    char cur_pixel = pixels[j][k];
-                    //mvaddch(y+j, x+k, cur_pixel);
-                    size_t index = y * current_width + x;
-                    Pixel *current_pixel = &current_frame->pixels[index];
-                    current_pixel->color = color;
-                    current_pixel->symbol = cur_pixel;
+        char **pixels = object->m->get_pixels(object);
+        Player *owner = object->m->get_owner(object);
+        Color_Pair colors = owner->m->get_colors(owner);
+        
+        attron(COLOR_PAIR(colors));
+        for (j = 0; j < (size_t)object->m->get_height(object) && object_y - borders.top_y + j < current_height; j++) {
+            for (k = 0; k < (size_t)object->m->get_width(object) && object_x - borders.left_x + k < current_width; k++) {
+                char cur_pixel = pixels[j][k];
+                int inner_index = (object_y - borders.top_y + j) * 
+                    current_width + object_x - borders.left_x + k;
+                assert(inner_index >= 0);
+                if (inner_index >= current_frame->max_index) {
+                    break;
                 }
+                Pixel *current_pixel = &current_frame->pixels[inner_index];
+                current_pixel->color = colors;
+                current_pixel->symbol = cur_pixel;
             }
         }
-    }*/
+        attroff(COLOR_PAIR(colors));
+    }
 } 
 
 void Rendering_render_frame() {

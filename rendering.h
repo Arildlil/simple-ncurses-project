@@ -20,8 +20,9 @@ typedef struct RenderCoordinateBorders {
 
 
 boolean Rendering_init(size_t width, size_t height);
-void Rendering_add_background(Map *map, int center_x, int center_y);
+void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject *objects[], int num_elements);
 void Rendering_render_object(GameObject *object);
+void Rendering_render_frame();
 
 void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_screen_height, 
     int center_x, int center_y, RenderCoordinateBorders *borders);
