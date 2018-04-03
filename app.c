@@ -43,6 +43,7 @@ static void cleanup(int sig);
 #define MOVE_RANGE 5
 static int MIDDLE_X = 0;
 static GameObject *hero;
+static Map *global_map;
 
 
 
@@ -66,16 +67,19 @@ static void default_on_tick(GameObject_Controller *controller, GameObject *objec
 
     int object_height = object->m->get_height(object);
 
-    /*
-    if (new_x <= object_height) {
-        new_x += object_height + movement_x * -1;
-    } else if (new_y <= object_height) {
-        new_y += object_height + movement_y * -1;
-    } else if (new_x >= max_x - object_height) {
-        new_x -= max_x - object_height - movement_x * -1;
-    } else if (new_y >= max_y - object_height) {
-        new_y -= max_y - object_height - movement_y * -1;
-    }*/
+    int map_min_x = global_map->m->get_min_x(global_map);
+    int map_min_y = global_map->m->get_min_y(global_map);
+    int map_max_x = global_map->m->get_max_x(global_map);
+    int map_max_y = global_map->m->get_max_y(global_map);
+    if (new_x <= map_min_x) {
+        new_x += map_min_x + movement_x * -1;
+    } else if (new_y <= map_min_y) {
+        new_y += map_min_y + movement_y * -1;
+    } else if (new_x >= map_max_x - object_height) {
+        new_x -= map_max_x - object_height - movement_x * -1;
+    } else if (new_y >= map_max_y - object_height) {
+        new_y -= map_max_y - object_height - movement_y * -1;
+    }
     //new_x = MIN(MAX(new_x, 0), max_x - object_height);
     //new_y = MIN(MAX(new_y, 0), max_y - object_height);
 
@@ -87,6 +91,11 @@ static void default_on_tick(GameObject_Controller *controller, GameObject *objec
 static boolean default_shoot(GameObject_Controller *controller, GameObject *object) {
     (void)controller;
     (void)object;
+    return TRUE;
+}
+
+static boolean peasant_shoot(GameObject_Controller *controller, GameObject *object) {
+    fprintf(stderr, "Get the hell off my lawn!\n");
     return TRUE;
 }
 
@@ -103,11 +112,16 @@ static void generate_default_map(Map *map) {
         }
     }*/
 
+    int map_min_x = global_map->m->get_min_x(global_map);
+    int map_min_y = global_map->m->get_min_y(global_map);
+    int map_max_x = global_map->m->get_max_x(global_map);
+    int map_max_y = global_map->m->get_max_y(global_map);
+
     /* Add some water. */
     enum {NUM_WATER_SEGMENTS = 6};
     Coordinates water_start[NUM_WATER_SEGMENTS] = 
         {
-            {.x = 0-71, .y = 35-21},
+            {.x = map_min_x, .y = 35-21},
             {.x = 45-71, .y = 30-21},
             {.x = 46-71, .y = 30-21},
             {.x = 116-71, .y = 28-21},
@@ -121,7 +135,7 @@ static void generate_default_map(Map *map) {
             {.x = 115-71, .y = 30-21},
             {.x = 130-71, .y = 32-21},
             {.x = 124-71, .y = 32-21},
-            {.x = 145-71, .y = 15-21},
+            {.x = map_max_x, .y = 15-21},
         };
     int s, x, y;
     for (s = 0; s < NUM_WATER_SEGMENTS; s++) {
@@ -154,6 +168,23 @@ static void generate_default_map(Map *map) {
     for (i = 0; i < NUM_TERRAIN_PIECES; i++) {
         Square_init(map, x_coords[i], y_coords[i], tags[i]);
     }
+
+    /* Add water to the borders around the map */
+    for (i = map_min_x; i < map_max_x; i++) {
+        Square_init(map, i, map_min_y, TERRAIN_WATER);
+    }
+
+    for (i = map_min_x; i < map_max_x; i++) {
+        Square_init(map, i, map_max_y, TERRAIN_WATER);
+    }
+
+    for (j = map_min_y; j < map_max_y; j++) {
+        Square_init(map, map_min_x, j, TERRAIN_WATER);
+    }
+
+    for (j = map_min_y; j < map_max_y; j++) {
+        Square_init(map, map_max_x, j, TERRAIN_WATER);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -168,7 +199,8 @@ int main(int argc, char *argv[]) {
     Player_init(&neutrals, COLOR_PAIR_YELLOW, FALSE);
 
     Map default_map;
-    Map_init(&default_map, 200, 100);
+    global_map = &default_map;
+    Map_init(&default_map, 100, 50);
     generate_default_map(&default_map);
 
     char *units_to_spawn[] = {
@@ -187,6 +219,13 @@ int main(int argc, char *argv[]) {
     GameObject_Controller_init(&random_controller, &random_methods);
     PlayerControls_init();
 
+    GameObject_Controller player_controller;
+    GameObject_Controller_Methods player_methods = {
+        .on_tick = NULL,
+        .shoot = peasant_shoot,
+    };
+    GameObject_Controller_init(&player_controller, &player_methods);
+
     MIDDLE_X = max_x / 2;
     #define NUM_TROOPS 5
     #define NUM_OBJECTS (NUM_TROOPS + 1)
@@ -201,6 +240,7 @@ int main(int argc, char *argv[]) {
 
     hero = new_Unit(&player, 0, 0, "peasant");
     all_objects[NUM_OBJECTS-1] = hero;
+    hero->m->set_controller(hero, &player_controller);
 
     int counter = 0;
     while (1) {
