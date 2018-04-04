@@ -11,6 +11,7 @@
 #include "resources.h"
 #include "resources_units.h"
 #include "rendering.h"
+#include "unit_controllers.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,64 +41,13 @@ static void cleanup(int sig);
 #define FPS 10
 #define US_PER_SEC 1000000
 #define UPDATE_RATE_US (US_PER_SEC / FPS)
-#define MOVE_RANGE 5
+
 static int MIDDLE_X = 0;
 static GameObject *hero;
-static Map *global_map;
 
 
 
 /* ----- | Functions | ----- */
-
-static void default_on_tick(GameObject_Controller *controller, GameObject *object) {
-    (void)controller;
-
-    if (object->m->get_order_count(object) > 0) {
-        object->m->on_tick(object);
-        return;
-    }
-    
-    int direction_x = (rand() % 5) - 2;             /* -2 to 2 */
-    int direction_y = (rand() % 5) - 2;             /* -2 to 2 */
-    int movement_multiplier = (rand() % 2) + 2;     
-    int movement_x = direction_x * MOVE_RANGE * movement_multiplier;
-    int movement_y = direction_y * MOVE_RANGE * movement_multiplier;
-    int new_x = object->m->get_x(object) + movement_x;
-    int new_y = object->m->get_y(object) + movement_y;
-
-    int object_height = object->m->get_height(object);
-
-    int map_min_x = global_map->m->get_min_x(global_map);
-    int map_min_y = global_map->m->get_min_y(global_map);
-    int map_max_x = global_map->m->get_max_x(global_map);
-    int map_max_y = global_map->m->get_max_y(global_map);
-    if (new_x <= map_min_x) {
-        new_x += map_min_x + movement_x * -1;
-    } else if (new_y <= map_min_y) {
-        new_y += map_min_y + movement_y * -1;
-    } else if (new_x >= map_max_x - object_height) {
-        new_x -= map_max_x - object_height - movement_x * -1;
-    } else if (new_y >= map_max_y - object_height) {
-        new_y -= map_max_y - object_height - movement_y * -1;
-    }
-    //new_x = MIN(MAX(new_x, 0), max_x - object_height);
-    //new_y = MIN(MAX(new_y, 0), max_y - object_height);
-
-    /*boolean result = FALSE;*/
-    object->m->move_to(object, new_x, new_y, FALSE);
-    object->m->on_tick(object);
-}
-
-static boolean default_shoot(GameObject_Controller *controller, GameObject *object) {
-    (void)controller;
-    (void)object;
-    return TRUE;
-}
-
-static boolean peasant_shoot(GameObject_Controller *controller, GameObject *object) {
-    fprintf(stderr, "Get the hell off my lawn!\n");
-    return TRUE;
-}
 
 static void generate_default_map(Map *map) {
     int map_width = map->m->get_width(map);
@@ -211,18 +161,12 @@ int main(int argc, char *argv[]) {
         "peasant",
     };
 
-    GameObject_Controller random_controller;
-    GameObject_Controller_Methods random_methods = {
-        .on_tick = default_on_tick,
-        .shoot = default_shoot,
-    };
-    GameObject_Controller_init(&random_controller, &random_methods);
     PlayerControls_init();
 
     GameObject_Controller player_controller;
     GameObject_Controller_Methods player_methods = {
         .on_tick = NULL,
-        .shoot = peasant_shoot,
+        .shoot = get_controller_peasant()->m->shoot,
     };
     GameObject_Controller_init(&player_controller, &player_methods);
 
@@ -235,7 +179,6 @@ int main(int argc, char *argv[]) {
     int i;
     for (i = 0; i < NUM_TROOPS; i++) {
         all_objects[i] = new_Unit(&neutrals, MIDDLE_X, 10+5*i, units_to_spawn[i]);
-        all_objects[i]->m->set_controller(all_objects[i], &random_controller);
     }
 
     hero = new_Unit(&player, 0, 0, "peasant");

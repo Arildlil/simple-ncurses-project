@@ -75,6 +75,7 @@ struct Map_Methods {
 };
 
 extern const TerrainType *terrain_default;
+extern Map *global_map;
 
 /*
  * Initialize the Map object.

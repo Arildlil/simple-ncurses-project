@@ -2,6 +2,7 @@
 #include "resources.h"
 #include "unit_images.h"
 #include "utils.h"
+#include "unit_controllers.h"
 
 
 
@@ -32,10 +33,24 @@ GameObject *new_Unit(Player *owner, int x, int y, char *name) {
     }
 
     Image *image = NULL;
-    if (StrRel(name, ==, "archer")) image = &UNIT_IMAGE_ARCHER;
-    if (StrRel(name, ==, "swordman")) image = &UNIT_IMAGE_SWORDMAN;
-    if (StrRel(name, ==, "spearman")) image = &UNIT_IMAGE_SPEARMAN;
-    if (StrRel(name, ==, "peasant")) image = &UNIT_IMAGE_PEASANT;
+    GameObject_Controller *controller = NULL;
+
+    if (StrRel(name, ==, "archer")) {
+        image = &UNIT_IMAGE_ARCHER;
+        controller = get_controller_archer();
+    }
+    if (StrRel(name, ==, "swordman")) {
+        image = &UNIT_IMAGE_SWORDMAN;
+        controller = get_controller_swordman();
+    }
+    if (StrRel(name, ==, "spearman")) {
+        image = &UNIT_IMAGE_SPEARMAN;
+        controller = get_controller_spearman();
+    }
+    if (StrRel(name, ==, "peasant")) {
+        image = &UNIT_IMAGE_PEASANT;
+        controller = get_controller_peasant();
+    }
 
     if (image == NULL) {
         return NULL;
@@ -46,7 +61,9 @@ GameObject *new_Unit(Player *owner, int x, int y, char *name) {
         //fprintf(stderr, "new_Unit: Error - failed to allocate memory for new GameObject!\n");
         return NULL;
     }
-    return GameObject_init(object, owner, x, y, image, NULL);
+    GameObject_init(object, owner, x, y, image, NULL);
+    object->m->set_controller(object, controller);
+    return object;
 }
 
 

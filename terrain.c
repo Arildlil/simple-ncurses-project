@@ -125,6 +125,7 @@ static TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
 };
 
 const TerrainType *terrain_default = &terrain_types[TERRAIN_NONE];
+Map *global_map = NULL;
 
 
 
@@ -167,6 +168,8 @@ boolean Map_init(Map *map, int max_x, int max_y) {
             Square_init(map, w - max_x, h - max_y, TERRAIN_NONE);
         }
     }
+
+    global_map = map;
 
     return TRUE;   
 }

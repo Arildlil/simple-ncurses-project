@@ -1,6 +1,5 @@
 #include "gameobject.h"
 #include "resources.h"
-#include "resources_units.h"
 #include "utils.h"
 
 
@@ -100,6 +99,10 @@ static void projectile_on_tick(GameObject *object) {
 }
 
 static GameObject *create_projectile(Player *owner, Direction direction, int x, int y) {
+    /* MOVE THIS OVER TO ANOTHER FILE! */
+
+    return NULL;
+    /*
     (void)owner;
     (void)direction;
     (void)x;
@@ -121,13 +124,15 @@ static GameObject *create_projectile(Player *owner, Direction direction, int x, 
     projectile->m->set_controller(projectile, &projectile_controller);
     projectile->m->set_direction(projectile, direction);
     return projectile;
+    */
 } 
 
 static boolean GameObject_Controller_Methods_shoot(struct GameObject_Controller *controller, GameObject *object) {
     (void)controller;
     (void)object;
     
-    new_Archer(object->m->get_owner(object), 10, 10);
+    fprintf(stderr, "Shoot!\n");
+    //new_Archer(object->m->get_owner(object), 10, 10);
     /*
     GameObject *projectile = create_projectile(object->m->get_owner(object), 
         object->m->get_direction(object), object->m->get_x(object), object->m->get_y(object));
