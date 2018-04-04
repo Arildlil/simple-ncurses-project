@@ -2,6 +2,8 @@
 #include "terrain.h"
 #include "utils.h"
 
+#include <stdlib.h>
+
 
 
 /* ----- | Prototypes | ------ */
@@ -135,6 +137,8 @@ static boolean default_shoot(GameObject_Controller *controller, GameObject *obje
 }
 
 static boolean peasant_shoot(GameObject_Controller *controller, GameObject *object) {
+    (void)controller;
+    (void)object;
     fprintf(stderr, "Get the hell off my lawn!\n");
     return TRUE;
 }

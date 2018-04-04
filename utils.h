@@ -24,4 +24,9 @@ typedef int boolean;
 /* Source: http://www.c-faq.com/style/strcmp.html. */
 #define StrRel(s1, op, s2) (strcmp(s1, s2) op 0)
 
+typedef struct Coordinates {
+    int x;
+    int y;
+} Coordinates;
+
 #endif

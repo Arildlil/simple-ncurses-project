@@ -17,7 +17,6 @@ typedef struct GameObject_Controller GameObject_Controller;
 typedef struct GameObject_Controller_Methods GameObject_Controller_Methods;
 
 /* Orders */
-typedef struct Coordinates Coordinates;
 typedef struct Destination Destination;
 typedef struct Order Order;
 
@@ -48,11 +47,6 @@ typedef enum Order_Type {
 typedef enum Destination_Type {
     DEST_TYPE_GAMEOBJECT, DEST_TYPE_COORDINATES
 } Destination_Type; 
-
-struct Coordinates {
-    int x;
-    int y;
-};
 
 struct Destination {
     Destination_Type desttype;
