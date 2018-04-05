@@ -481,6 +481,7 @@ static void test_TerrainType(void **state) {
     Square *square = map.m->get_square(&map, 0, 0);
     TerrainType *terrain = square->m->get_terrain_type(square);
     assert_int_equal(terrain->m->get_tag(terrain), TERRAIN_TREE);
+    assert_string_equal(terrain->m->get_name(terrain), "tree");
     Image *image = terrain->m->get_image(terrain);
     assert_non_null(image);
     assert_int_equal(image->get_width(image), terrain->m->get_width(terrain));
@@ -561,6 +562,23 @@ static void test_Rendering_convert_coordinates(void **state) {
     assert_int_equal(borders.index_right_x, 5);
 }
 
+static void test_Peasant_shoot(void **state) {
+    (void)state;
+
+    Map map;
+    Map_init(&map, 1, 1);
+    Square_init(&map, 0, 0, TERRAIN_NONE);
+    Square_init(&map, 1, 0, TERRAIN_WHEAT);
+    assert_int_equal(Resources_init(4), TRUE);
+    GameObject *object = new_Peasant(&dummy_player, 0, 0);
+    assert_non_null(object);
+    assert_non_null(object->m->get_controller);
+    assert_non_null(object->m->shoot);
+    assert_int_equal(object->m->shoot(object), TRUE);
+    object->m->set_xy(object, 1, 0);
+    assert_int_equal(object->m->shoot(object), TRUE);
+}
+
 
 
 /* ----- | Other | ------ */
@@ -603,6 +621,8 @@ int main(void) {
         cmocka_unit_test(test_Resources_Units),
 
         cmocka_unit_test(test_Rendering_convert_coordinates),
+
+        cmocka_unit_test(test_Peasant_shoot),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

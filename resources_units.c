@@ -39,20 +39,21 @@ GameObject *new_Unit(Player *owner, int x, int y, char *name) {
         image = &UNIT_IMAGE_ARCHER;
         controller = get_controller_archer();
     }
-    if (StrRel(name, ==, "swordman")) {
+    else if (StrRel(name, ==, "swordman")) {
         image = &UNIT_IMAGE_SWORDMAN;
         controller = get_controller_swordman();
     }
-    if (StrRel(name, ==, "spearman")) {
+    else if (StrRel(name, ==, "spearman")) {
         image = &UNIT_IMAGE_SPEARMAN;
         controller = get_controller_spearman();
     }
-    if (StrRel(name, ==, "peasant")) {
+    else if (StrRel(name, ==, "peasant")) {
         image = &UNIT_IMAGE_PEASANT;
         controller = get_controller_peasant();
     }
 
     if (image == NULL) {
+        //fprintf(stderr, "Error: 'image' was NULL!\n");
         return NULL;
     }
 

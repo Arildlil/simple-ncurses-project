@@ -12,6 +12,8 @@ static void default_on_tick(GameObject_Controller *controller, GameObject *objec
 static boolean default_shoot(GameObject_Controller *controller, GameObject *object);
 static boolean peasant_shoot(GameObject_Controller *controller, GameObject *object);
 
+static boolean farm_square(GameObject *object);
+
 
 
 /* ----- | Static Variables | ------ */
@@ -114,13 +116,13 @@ static void default_on_tick(GameObject_Controller *controller, GameObject *objec
     int map_max_x = global_map->m->get_max_x(global_map);
     int map_max_y = global_map->m->get_max_y(global_map);
     if (new_x <= map_min_x) {
-        new_x += map_min_x + movement_x * -1;
+        new_x += movement_x * -1;
     } else if (new_y <= map_min_y) {
-        new_y += map_min_y + movement_y * -1;
+        new_y += movement_y * -1;
     } else if (new_x >= map_max_x - object_height) {
-        new_x -= map_max_x - object_height - movement_x * -1;
+        new_x -= object_height - movement_x * -1;
     } else if (new_y >= map_max_y - object_height) {
-        new_y -= map_max_y - object_height - movement_y * -1;
+        new_y -= object_height - movement_y * -1;
     }
     //new_x = MIN(MAX(new_x, 0), max_x - object_height);
     //new_y = MIN(MAX(new_y, 0), max_y - object_height);
@@ -139,6 +141,19 @@ static boolean default_shoot(GameObject_Controller *controller, GameObject *obje
 static boolean peasant_shoot(GameObject_Controller *controller, GameObject *object) {
     (void)controller;
     (void)object;
-    fprintf(stderr, "Get the hell off my lawn!\n");
+    return farm_square(object);
+}
+
+static boolean farm_square(GameObject *object) {
+    size_t x = object->m->get_x(object); 
+    size_t y = object->m->get_y(object);
+    Square *current_square = global_map->m->get_square(global_map, x, y);
+    if (current_square == NULL) {
+        fprintf(stderr, "Nothing here...\n");
+        return FALSE;
+    }
+    TerrainType *type = current_square->m->get_terrain_type(current_square);
+    fprintf(stderr, "Looking at mah '%s'!\n", type->m->get_name(type));
+    //fprintf(stderr, "Get the hell off my lawn!\n");
     return TRUE;
 }

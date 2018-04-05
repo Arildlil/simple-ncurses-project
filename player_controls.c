@@ -8,7 +8,7 @@
 /* ----- | Static Variables | ------ */
 
 enum {
-    MOVEMENT_PER_UPDATE = 3,
+    MOVEMENT_PER_UPDATE = 2,
 
     MOVE_UP = 'w',
     MOVE_DOWN = 's',
