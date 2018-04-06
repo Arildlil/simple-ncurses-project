@@ -20,11 +20,12 @@ static GameObject_Controller_Methods default_methods = {
     .shoot = GameObject_Controller_Methods_shoot,
 };
 
+/*
 static GameObject_Controller_Methods projectile_methods = {
     .on_tick = projectile_on_tick,
-};
+};*/
 
-static GameObject_Controller projectile_controller = {0};
+//static GameObject_Controller projectile_controller = {0};
 
 static boolean inited = FALSE;
 
@@ -100,6 +101,10 @@ static void projectile_on_tick(GameObject *object) {
 
 static GameObject *create_projectile(Player *owner, Direction direction, int x, int y) {
     /* MOVE THIS OVER TO ANOTHER FILE! */
+    (void)owner;
+    (void)direction;
+    (void)x;
+    (void)y;
 
     return NULL;
     /*

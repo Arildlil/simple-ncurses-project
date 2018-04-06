@@ -31,11 +31,14 @@ typedef struct FrameBuffer {
 
 enum {
     NUM_FRAME_BUFFERS = 1,
+    MENU_BOTTOM_HEIGHT = 8,
 };
 
 static boolean inited = FALSE;
 static size_t screen_width = 0;
 static size_t screen_height = 0;
+static size_t menu_bottom_width = 0;
+static size_t menu_bottom_height = 0;
 
 size_t current_frame_index = 0;
 FrameBuffer *frames[NUM_FRAME_BUFFERS];
@@ -54,6 +57,10 @@ boolean Rendering_init(size_t width, size_t height) {
     screen_height = height;
     current_frame_index = 0;
     size_t pixel_count = width * height;
+
+    menu_bottom_width = screen_width;
+    menu_bottom_height = MENU_BOTTOM_HEIGHT;
+
     int i, j;
     for (i = 0; i < NUM_FRAME_BUFFERS; i++) {
         
@@ -67,7 +74,8 @@ boolean Rendering_init(size_t width, size_t height) {
         frames[i]->width = width;
         frames[i]->height = height;
         frames[i]->max_index = width * height - 1;
-        fprintf(stderr, "frames[%d]->width: %d, ->height: %d\n", i, frames[i]->width, frames[i]->height);
+        fprintf(stderr, "frames[%d]->width: %d, ->height: %d\n", 
+            i, frames[i]->width, frames[i]->height);
 
         for (j = 0; j < pixel_count; j++) {
             Pixel *current_pixel = &frames[i]->pixels[j];
@@ -95,6 +103,30 @@ void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_scr
     borders->index_bottom_y = borders->bottom_y + map_max_y;
 }
 
+/*
+ * Clear the framebuffer by filling it with the default terrain type.
+ * 
+ * @arg frame_buffer: The FrameBuffer to clear.
+ * @arg default_terrain: The terrain type to fill the buffer with.
+ */
+static void clear_framebuffer(FrameBuffer *frame_buffer, TerrainType *default_terrain) {
+    assert(frame_buffer);
+    assert(default_terrain);
+    
+    size_t current_height = frame_buffer->height;
+    size_t current_width = frame_buffer->width;
+
+    size_t to_x, to_y;
+    for (to_y = 0; to_y < current_height; to_y++) {
+        for (to_x = 0; to_x < current_width; to_x++) {
+            size_t index = to_y * current_width + to_x;
+            Pixel *current_pixel = &frame_buffer->pixels[index];
+            current_pixel->color = default_terrain->colors;
+            current_pixel->symbol = default_terrain->image->pixels[0][0];
+        }
+    }
+}
+
 void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject *objects[], int num_elements) {
     assert(map);
 
@@ -105,23 +137,26 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
     assert(current_height != 0);
     assert(current_width != 0);
 
+    RenderCoordinateBorders window_borders = {0};
+    Rendering_convert_coordinates(map, current_width / 2, current_height / 2, center_x, center_y, &window_borders);
+
+    /* Don't draw under the bottom menu */
+    current_height -= menu_bottom_height;
+    center_y += menu_bottom_height / 2;
+
     RenderCoordinateBorders borders = {0};
     Rendering_convert_coordinates(map, current_width/2, current_height/2, center_x, center_y, &borders);
+
+    RenderCoordinateBorders borders_menu_bottom = {0};
+    Rendering_convert_coordinates(map, menu_bottom_width / 2, menu_bottom_height / 2, center_x, 
+        borders.bottom_y + menu_bottom_height / 2, &borders_menu_bottom);
 
     int from_x, from_y; 
     size_t to_x, to_y, j, k;
     
     /* Reset the buffer */
     TerrainType *terrain = terrain_default;
-
-    for (from_y = borders.top_y, to_y = 0; from_y < borders.bottom_y + 1 && to_y < current_height; from_y++, to_y++) {
-        for (from_x = borders.left_x, to_x = 0; from_x < borders.right_x + 1 && to_x < current_width; from_x++, to_x++) {
-            size_t index = to_y * current_width + to_x;
-            Pixel *current_pixel = &current_frame->pixels[index];
-            current_pixel->color = terrain->colors;
-            current_pixel->symbol = terrain->image->pixels[0][0];
-        }
-    }
+    clear_framebuffer(current_frame, terrain);
 
     /* Paint the terrain */
     for (from_y = borders.top_y, to_y = 0; from_y < borders.bottom_y && to_y < current_height; from_y++, to_y++) {
