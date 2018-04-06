@@ -106,6 +106,8 @@ static GameObject *create_projectile(Player *owner, Direction direction, int x, 
     (void)x;
     (void)y;
 
+    (void)inited;
+
     return NULL;
     /*
     (void)owner;

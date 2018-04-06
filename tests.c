@@ -120,7 +120,7 @@ static void test_Surface_2D(void **state) {
 
     Surface surface2D;
     Image image2D;
-    Image_init_2D(&image2D, 5, 2, (char*[]){"AA AA", "BBBBBB"});
+    Image_init_2D(&image2D, 5, 2, (const char*[]){"AA AA", "BBBBBB"});
     Surface_init_image(&surface2D, &image2D, 9, 2, 
         &(Surface_Options){.screen_only = TRUE});
 
@@ -487,6 +487,13 @@ static void test_TerrainType(void **state) {
     assert_int_equal(image->get_width(image), terrain->m->get_width(terrain));
     assert_int_equal(image->get_height(image), terrain->m->get_height(terrain));
     assert_int_equal(terrain->m->get_colors(terrain), COLOR_PAIR_TREE);
+
+    square->m->set_terrain(square, TERRAIN_GRASS);
+    terrain = square->m->get_terrain_type(square);
+    assert_non_null(terrain);
+    assert_int_equal(terrain->m->get_tag(terrain), TERRAIN_GRASS);
+    assert_non_null(terrain->m->get_name(terrain));
+    assert_memory_equal(terrain->m->get_name(terrain), "grass", 5);
 }
 
 static void test_Resources(void **state) {

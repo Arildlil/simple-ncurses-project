@@ -49,6 +49,7 @@ struct Square_Methods {
     TerrainType *(*get_terrain_type)(struct Square *square);
     int (*get_x)(struct Square *square);
     int (*get_y)(struct Square *square);
+    void (*set_terrain)(struct Square *square, TerrainType_Tag tag);
 };
 
 struct Map {

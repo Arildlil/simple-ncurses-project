@@ -153,7 +153,18 @@ static boolean farm_square(GameObject *object) {
         return FALSE;
     }
     TerrainType *type = current_square->m->get_terrain_type(current_square);
-    fprintf(stderr, "Looking at mah '%s'!\n", type->m->get_name(type));
-    //fprintf(stderr, "Get the hell off my lawn!\n");
+    //fprintf(stderr, "Looking at mah '%s'!\n", type->m->get_name(type));
+    
+    switch (type->m->get_tag(type)) {
+        case TERRAIN_STONE:
+            fprintf(stderr, "*You picked up some rocks*\n");
+            break;
+        case TERRAIN_WHEAT:
+            fprintf(stderr, "WHEAT?!\n");
+            break;
+        default:
+            fprintf(stderr, "Get the hell off my lawn!\n");
+    }
+
     return TRUE;
 }
