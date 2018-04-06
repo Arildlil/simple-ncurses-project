@@ -27,6 +27,15 @@ typedef struct FrameBuffer {
 
 
 
+/* ----- | Function Prototypes | ----- */
+
+static void clear_framebuffer(FrameBuffer *frame_buffer, TerrainType *default_terrain);
+static void paint_terrain(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map);
+static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map, 
+    GameObject *objects[], int num_elements);
+
+
+
 /* ----- | Static Variables | ------ */
 
 enum {
@@ -105,9 +114,6 @@ void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_scr
 
 /*
  * Clear the framebuffer by filling it with the default terrain type.
- * 
- * @arg frame_buffer: The FrameBuffer to clear.
- * @arg default_terrain: The terrain type to fill the buffer with.
  */
 static void clear_framebuffer(FrameBuffer *frame_buffer, TerrainType *default_terrain) {
     assert(frame_buffer);
@@ -127,40 +133,18 @@ static void clear_framebuffer(FrameBuffer *frame_buffer, TerrainType *default_te
     }
 }
 
-void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject *objects[], int num_elements) {
-    assert(map);
-
-    FrameBuffer *current_frame = frames[current_frame_index];
-    size_t current_height = current_frame->height;
-    size_t current_width = current_frame->width;
-
-    assert(current_height != 0);
-    assert(current_width != 0);
-
-    RenderCoordinateBorders window_borders = {0};
-    Rendering_convert_coordinates(map, current_width / 2, current_height / 2, center_x, center_y, &window_borders);
-
-    /* Don't draw under the bottom menu */
-    current_height -= menu_bottom_height;
-    center_y += menu_bottom_height / 2;
-
-    RenderCoordinateBorders borders = {0};
-    Rendering_convert_coordinates(map, current_width/2, current_height/2, center_x, center_y, &borders);
-
-    RenderCoordinateBorders borders_menu_bottom = {0};
-    Rendering_convert_coordinates(map, menu_bottom_width / 2, menu_bottom_height / 2, center_x, 
-        borders.bottom_y + menu_bottom_height / 2, &borders_menu_bottom);
-
+/*
+ * Paint the terrain into the frame buffer.
+ */
+static void paint_terrain(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map) {
     int from_x, from_y; 
     size_t to_x, to_y, j, k;
-    
-    /* Reset the buffer */
-    TerrainType *terrain = terrain_default;
-    clear_framebuffer(current_frame, terrain);
 
-    /* Paint the terrain */
-    for (from_y = borders.top_y, to_y = 0; from_y < borders.bottom_y && to_y < current_height; from_y++, to_y++) {
-        for (from_x = borders.left_x, to_x = 0; from_x < borders.right_x && to_x < current_width; from_x++, to_x++) {
+    size_t current_height = borders->bottom_y - borders->top_y + 1;
+    size_t current_width = borders->right_x - borders->left_x + 1;
+    
+    for (from_y = borders->top_y, to_y = 0; from_y < borders->bottom_y && to_y < current_height; from_y++, to_y++) {
+        for (from_x = borders->left_x, to_x = 0; from_x < borders->right_x && to_x < current_width; from_x++, to_x++) {
             
             Square *current_square = map->m->get_square(map, from_x, from_y);
             if (current_square == NULL) {
@@ -181,24 +165,38 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
                     char cur_pixel = pixels[j][k];
                     int inner_index = (to_y + j) * current_width + to_x + k;
                     assert(inner_index >= 0);
-                    if (inner_index >= current_frame->max_index) {
+                    if (inner_index >= frame_buffer->max_index) {
                         break;
                     }
-                    Pixel *current_pixel = &current_frame->pixels[inner_index];
+                    Pixel *current_pixel = &frame_buffer->pixels[inner_index];
                     current_pixel->color = color;
                     current_pixel->symbol = cur_pixel;
                 }
             }
         }
     }
+}
+
+/*
+ * Paint the visible GameObjects into the frame buffer.
+ */
+static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map, 
+    GameObject *objects[], int num_elements) {
+    
+    (void)map;
+
+    size_t j, k;
+
+    size_t current_height = borders->bottom_y - borders->top_y + 1;
+    size_t current_width = borders->right_x - borders->left_x + 1;
 
     int i;
     for (i = 0; i < num_elements; i++) {
         GameObject *object = objects[i];
         int object_x = object->m->get_x(object);
         int object_y = object->m->get_y(object);
-        if (object_x < borders.left_x || object_x > borders.right_x || 
-            object_y < borders.top_y || object_y > borders.bottom_y ) {
+        if (object_x < borders->left_x || object_x > borders->right_x || 
+            object_y < borders->top_y || object_y > borders->bottom_y ) {
             
             continue;
         }
@@ -208,22 +206,49 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
         Color_Pair colors = owner->m->get_colors(owner);
         
         attron(COLOR_PAIR(colors));
-        for (j = 0; j < (size_t)object->m->get_height(object) && object_y - borders.top_y + j < current_height; j++) {
-            for (k = 0; k < (size_t)object->m->get_width(object) && object_x - borders.left_x + k < current_width; k++) {
+        for (j = 0; j < (size_t)object->m->get_height(object) && object_y - borders->top_y + j < current_height; j++) {
+            for (k = 0; k < (size_t)object->m->get_width(object) && object_x - borders->left_x + k < current_width; k++) {
                 char cur_pixel = pixels[j][k];
-                int inner_index = (object_y - borders.top_y + j) * 
-                    current_width + object_x - borders.left_x + k;
+                int inner_index = (object_y - borders->top_y + j) * 
+                    current_width + object_x - borders->left_x + k;
                 assert(inner_index >= 0);
-                if (inner_index >= current_frame->max_index) {
+                if (inner_index >= frame_buffer->max_index) {
                     break;
                 }
-                Pixel *current_pixel = &current_frame->pixels[inner_index];
+                Pixel *current_pixel = &frame_buffer->pixels[inner_index];
                 current_pixel->color = colors;
                 current_pixel->symbol = cur_pixel;
             }
         }
         attroff(COLOR_PAIR(colors));
     }
+}
+
+void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject *objects[], int num_elements) {
+    assert(map);
+
+    FrameBuffer *current_frame = frames[current_frame_index];
+    size_t current_height = current_frame->height;
+    size_t current_width = current_frame->width;
+    
+    /* Don't draw under the bottom menu */
+    current_height -= menu_bottom_height;
+    center_y += menu_bottom_height / 2;
+
+    /* Used for the terrain part of the window */
+    RenderCoordinateBorders borders = {0};
+    Rendering_convert_coordinates(map, current_width / 2, current_height / 2, center_x, center_y, 
+        &borders);
+
+    /* Used for the bottom menu part of the window */
+    RenderCoordinateBorders borders_menu_bottom = {0};
+    Rendering_convert_coordinates(map, menu_bottom_width / 2, menu_bottom_height / 2, center_x, 
+        borders.bottom_y + menu_bottom_height / 2, &borders_menu_bottom);
+    
+    /* Clear and then fill the frame buffer */
+    clear_framebuffer(current_frame, terrain_default);
+    paint_terrain(current_frame, &borders, map);
+    paint_objects(current_frame, &borders, map, objects, num_elements);
 } 
 
 void Rendering_render_frame() {
