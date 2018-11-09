@@ -6,11 +6,13 @@ LD = ld
 WARNINGS = -pedantic -Wall -Wextra
 DEBUG = -g
 
-TESTS = tests.c
-APP = app.c
-OBJS = curses.c utils.c surface.c rect.c image.c unit_images.c unit_surfaces.c gameobject.c units.c player_controls.c \
-	player.c gameobject_controller.c orders.c terrain.c resources.c resources_units.c rendering.c unit_controllers.c \
-	terrain_generator.c
+TESTS = src/tests.c
+APP = src/app.c
+OBJS = src/curses.c src/utils.c src/surface.c src/rect.c src/image.c \
+	src/unit_images.c src/unit_surfaces.c src/gameobject.c src/units.c \
+	src/player_controls.c src/player.c src/gameobject_controller.c src/orders.c \
+	src/terrain.c src/resources.c src/resources_units.c src/rendering.c  \
+	src/unit_controllers.c src/terrain_generator.c
 
 INCS = -I/usr/include/cmocka
 LIB_PATH = -L/usr/lib/

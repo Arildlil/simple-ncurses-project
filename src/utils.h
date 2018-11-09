@@ -29,4 +29,6 @@ typedef struct Coordinates {
     int y;
 } Coordinates;
 
+#define MOVEMENT_PER_UPDATE 3
+
 #endif
