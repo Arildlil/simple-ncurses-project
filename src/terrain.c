@@ -22,13 +22,6 @@ static int Square_get_x(struct Square *square);
 static int Square_get_y(struct Square *square);
 static void Square_set_terrain(struct Square *square, TerrainType_Tag tag);
 
-static TerrainType_Tag TerrainType_get_tag(struct TerrainType *type);
-static char *TerrainType_get_name(struct TerrainType *type);
-static Image *TerrainType_get_image(struct TerrainType *type);
-static Color_Pair TerrainType_get_colors(struct TerrainType *type);
-static int TerrainType_get_width(struct TerrainType *type);
-static int TerrainType_get_height(struct TerrainType *type);
-
 
 
 /* ----- | Static Variables | ------ */
@@ -52,101 +45,6 @@ static Square_Methods square_methods = {
     .set_terrain = Square_set_terrain,
 };
 
-static TerrainType_Methods terrain_methods = {
-    .get_tag = TerrainType_get_tag,
-    .get_name = TerrainType_get_name,
-    .get_image = TerrainType_get_image,
-    .get_colors = TerrainType_get_colors,
-    .get_width = TerrainType_get_width,
-    .get_height = TerrainType_get_height
-};
-
-static const char *TERRAIN_STRINGS[TERRAIN_ENUM_SIZE][5] = {
-    {
-        ""
-    },
-    {
-        "v"
-    },
-    {
-        "v"
-    },
-    {
-        "~"
-    },
-    {
-        " OOO ",
-        "OOOOO",
-    },
-    {
-        "  A  ",
-        " AAA ",
-        "AAAAA",
-        "AAAAA",
-        " ||| ",
-    },
-};
-
-static Image TERRAIN_IMAGES[TERRAIN_ENUM_SIZE] = {0};
-
-static TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
-    {
-        .tag = TERRAIN_NONE,
-        .name = "none",
-        .image = &TERRAIN_IMAGES[TERRAIN_NONE],
-        .colors = COLOR_PAIR_NONE,
-        .width = 1,
-        .height = 1,
-        .m = &terrain_methods,
-    },
-    {
-        .tag = TERRAIN_GRASS,
-        .name = "grass",
-        .image = &TERRAIN_IMAGES[TERRAIN_GRASS],
-        .colors = COLOR_PAIR_GRASS,
-        .width = 1,
-        .height = 1,
-        .m = &terrain_methods,
-    },
-    {
-        .tag = TERRAIN_WHEAT,
-        .name = "wheat",
-        .image = &TERRAIN_IMAGES[TERRAIN_WHEAT],
-        .colors = COLOR_PAIR_WHEAT,
-        .width = 1,
-        .height = 1,
-        .m = &terrain_methods,
-    },
-    {
-        .tag = TERRAIN_WATER,
-        .name = "water",
-        .image = &TERRAIN_IMAGES[TERRAIN_WATER],
-        .colors = COLOR_PAIR_WATER,
-        .width = 1,
-        .height = 1,
-        .m = &terrain_methods,
-    },
-    {
-        .tag = TERRAIN_STONE,
-        .name = "stone",
-        .image = &TERRAIN_IMAGES[TERRAIN_STONE],
-        .colors = COLOR_PAIR_STONE,
-        .width = 5,
-        .height = 2,
-        .m = &terrain_methods,
-    },
-    {
-        .tag = TERRAIN_TREE,
-        .name = "tree",
-        .image = &TERRAIN_IMAGES[TERRAIN_TREE],
-        .colors = COLOR_PAIR_TREE,
-        .width = 5,
-        .height = 5,
-        .m = &terrain_methods,
-    }
-};
-
-const TerrainType *terrain_default = &terrain_types[TERRAIN_NONE];
 Map *global_map = NULL;
 
 
@@ -166,6 +64,7 @@ boolean Map_init(Map *map, int max_x, int max_y) {
         TerrainType *current_type = &terrain_types[i];
         Image_init_2D(current_type->image, current_type->width, current_type->height, 
             TERRAIN_STRINGS[current_type->tag]);
+        
     }
 
     map->inited = TRUE;
@@ -297,29 +196,4 @@ static int Square_get_y(struct Square *square) {
 static void Square_set_terrain(struct Square *square, TerrainType_Tag tag) {
     //assert(tag < TERRAIN_ENUM_SIZE && tag >= 0);
     square->terrain = &terrain_types[tag];
-}
-
-/* TerrainType */
-static TerrainType_Tag TerrainType_get_tag(struct TerrainType *type) {
-    return type->tag;
-}
-
-static char *TerrainType_get_name(struct TerrainType *type) {
-    return type->name;
-}
-
-static Image *TerrainType_get_image(struct TerrainType *type) {
-    return type->image;
-}
-
-static Color_Pair TerrainType_get_colors(struct TerrainType *type) {
-    return type->colors;
-}
-
-static int TerrainType_get_width(struct TerrainType *type) {
-    return type->width;
-}
-
-static int TerrainType_get_height(struct TerrainType *type) {
-    return type->height;
 }

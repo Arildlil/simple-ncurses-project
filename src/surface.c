@@ -11,7 +11,7 @@
 
 
 
-static const Surface_Options default_options = {
+static Surface_Options default_options = {
     .bounce = FALSE,
     .screen_only = TRUE,
 };
