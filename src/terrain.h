@@ -1,9 +1,9 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
-#include "utils.h"
-#include "curses.h"
-#include "image.h"
+#include "include/utils.h"
+#include "include/image.h"
+#include "include/colors.h"
 
 typedef struct Square Square;
 typedef struct Square_Methods Square_Methods;

@@ -2,7 +2,7 @@
 #define ENGINE_INCLUDES_H
 
 #include "curses.h"
-#include "image.h"
-#include "rect.h"
+#include "include/image.h"
+#include "include/rect.h"
 
 #endif

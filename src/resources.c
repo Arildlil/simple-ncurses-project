@@ -1,5 +1,5 @@
 #include "resources.h"
-#include "utils.h"
+#include "include/utils.h"
 
 #include <stdlib.h>
 #include <string.h>

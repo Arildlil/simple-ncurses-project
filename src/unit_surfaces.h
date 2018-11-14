@@ -2,6 +2,7 @@
 #define UNIT_SURFACES_H
 
 #include "unit_images.h"
+#include "include/surface.h"
 
 /* (All functions above)
  *

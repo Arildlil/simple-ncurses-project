@@ -1,7 +1,7 @@
 #ifndef ORDERS_UTILS_H
 #define ORDERS_UTILS_H
 
-#include "utils.h"
+#include "include/utils.h"
 #include "gameobject.h"
 
 void clear_order_queue(struct GameObject *object);

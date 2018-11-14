@@ -1,8 +1,7 @@
 #include "rendering.h"
-#include "utils.h"
+#include "include/utils.h"
 #include "curses.h"
 #include "player.h"
-#include "curses.h"
 
 #include <stdlib.h>
 #include <string.h>

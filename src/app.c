@@ -1,6 +1,6 @@
 #include "test_headers.h"
 #include "curses.h"
-#include "utils.h"
+#include "include/utils.h"
 #include "unit_images.h"
 #include "units.h"
 #include "gameobject.h"

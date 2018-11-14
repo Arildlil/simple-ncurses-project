@@ -1,4 +1,4 @@
-#include "rect.h"
+#include "include/rect.h"
 
 #include <stdlib.h>
 #include <assert.h>

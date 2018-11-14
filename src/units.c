@@ -1,6 +1,5 @@
 #include "units.h"
 #include "unit_images.h"
-#include "curses.h"
 
 
 

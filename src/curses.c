@@ -1,6 +1,6 @@
-#include "utils.h"
-#include "image.h"
-#include "rect.h"
+#include "include/utils.h"
+#include "include/image.h"
+#include "include/rect.h"
 #include "curses.h"
 
 #include <curses.h>

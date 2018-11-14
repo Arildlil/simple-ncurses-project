@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "image.h"
-#include "surface.h"
-#include "curses.h"
+#include "include/image.h"
+#include "include/surface.h"
+
 
 
 

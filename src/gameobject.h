@@ -2,7 +2,7 @@
 #define GAMEOBJECT_H
 
 #include "curses.h"
-#include "utils.h"
+#include "include/utils.h"
 #include "gameobject.h"
 #include "player.h"
 
