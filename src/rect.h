@@ -1,8 +1,6 @@
 #ifndef RECT_H
 #define RECT_H
 
-#include "utils.h"
-
 typedef struct Rect {
     int x;
     int y;

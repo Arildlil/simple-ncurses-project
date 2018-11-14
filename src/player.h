@@ -1,7 +1,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "curses.h"
+#include "utils.h"
+#include "colors.h"
 
 /* Forward declaration */
 typedef struct Player_Methods Player_Methods;
