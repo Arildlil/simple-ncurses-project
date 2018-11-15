@@ -1,4 +1,4 @@
-#include "test_headers.h"
+#include "tests/test_headers.h"
 #include "curses.h"
 #include "include/utils.h"
 #include "unit_images.h"

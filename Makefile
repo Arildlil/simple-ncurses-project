@@ -6,7 +6,7 @@ LD = ld
 WARNINGS = -pedantic -Wall -Wextra
 DEBUG = -g
 
-TESTS = src/tests.c
+TESTS = src/tests/tests.c
 APP = src/app.c
 OBJS = src/utils.c \
 	src/unit_images.c src/unit_surfaces.c src/gameobject.c src/units.c \
@@ -31,7 +31,7 @@ all: app
 #	@echo "Compiling" $< "..."
 #	$(CC) $(CFLAGS) -c $<
 
-tests: $(TESTS) $(OBJS) 
+test: $(TESTS) $(OBJS) 
 	@echo "Building target" $@ "..."
 	$(CC) $(FLAGS) $(TESTS) $(OBJS) $(LDLIBS) -o $@ 
 
@@ -43,7 +43,7 @@ app: $(APP) $(OBJS)
 	@echo "Building target" $@ "..." 
 	$(CC) $(FLAGS) $(APP) $(OBJS) $(LDLIBS) -o $@
 
-test: tests
+rtest: test
 	@echo "Running test suite with all tests..."
 	./tests
 
