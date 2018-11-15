@@ -1,7 +1,7 @@
 #ifndef TERRAIN_GENERATOR_H
 #define TERRAIN_GENERATOR_H
 
-#include "terrain.h"
+#include "include/map.h"
 
 void TerrainGenerator_generate_default_map(Map *map);
 

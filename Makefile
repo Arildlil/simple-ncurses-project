@@ -10,10 +10,11 @@ TESTS = src/tests/tests.c
 APP = src/app.c
 OBJS = src/utils.c \
 	src/unit_images.c src/unit_surfaces.c src/units.c \
-	src/player_controls.c src/player.c src/gameobject_controller.c src/orders.c \
-	src/terrain.c src/resources.c src/resources_units.c src/rendering.c  \
+	src/player_controls.c src/player.c src/orders.c \
+	src/resources.c src/resources_units.c src/rendering.c  \
 	src/unit_controllers.c src/terrain_generator.c \
-	src/core/graphics/*.c src/core/gameobject/*.c
+	src/core/graphics/*.c src/core/gameobject/*.c \
+	src/core/world/*.c 
 
 INCS = -I/usr/include/cmocka
 LIB_PATH = -L/usr/lib/

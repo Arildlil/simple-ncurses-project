@@ -1,6 +1,5 @@
 #include "../../include/image.h"
 #include "../../include/square.h"
-#include "../../include/terrain_types.h"
 
 
 /* ----- | Prototypes | ------ */

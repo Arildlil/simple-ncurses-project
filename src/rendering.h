@@ -2,7 +2,7 @@
 #define RENDERING_H
 
 #include "include/gameobject.h"
-#include "terrain.h"
+#include "include/map.h"
 
 
 

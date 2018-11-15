@@ -7,7 +7,7 @@
 #include "units.h"
 #include "player_controls.h"
 #include "player.h"
-#include "terrain.h"
+#include "include/map.h"
 #include "resources.h"
 #include "resources_units.h"
 #include "rendering.h"
