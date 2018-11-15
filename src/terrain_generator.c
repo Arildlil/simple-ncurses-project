@@ -44,7 +44,8 @@ void TerrainGenerator_generate_default_map(Map *map) {
     for (s = 0; s < NUM_WATER_SEGMENTS; s++) {
         for (y = water_start[s].y; y <= water_end[s].y; y++) {
             for (x = water_start[s].x; x <= water_end[s].x; x++) {
-                Square_init(map, x, y, TERRAIN_WATER);
+                //Square_init(map, x, y, TERRAIN_WATER);
+                Map_set_square(map, x, y, TERRAIN_WATER);
             }
         }
     }
@@ -55,7 +56,8 @@ void TerrainGenerator_generate_default_map(Map *map) {
     int j, k;
     for (k = start_y; k < patch_size_y + start_y; k++) {
         for (j = start_x; j < patch_size_x + start_x; j++) {
-            Square_init(map, j, k, TERRAIN_GRASS);
+            //Square_init(map, j, k, TERRAIN_GRASS);
+            Map_set_square(map, j, k, TERRAIN_GRASS);
         }
     }
 
@@ -69,23 +71,28 @@ void TerrainGenerator_generate_default_map(Map *map) {
 
     int i;
     for (i = 0; i < NUM_TERRAIN_PIECES; i++) {
-        Square_init(map, x_coords[i], y_coords[i], tags[i]);
+        //Square_init(map, x_coords[i], y_coords[i], tags[i]);
+        Map_set_square(map, x_coords[i], y_coords[i], tags[i]);
     }
 
     /* Add water to the borders around the map */
     for (i = map_min_x; i < map_max_x; i++) {
-        Square_init(map, i, map_min_y, TERRAIN_WATER);
+        //Square_init(map, i, map_min_y, TERRAIN_WATER);
+        Map_set_square(map, i, map_min_y, TERRAIN_WATER);
     }
 
     for (i = map_min_x; i < map_max_x; i++) {
-        Square_init(map, i, map_max_y, TERRAIN_WATER);
+        //Square_init(map, i, map_max_y, TERRAIN_WATER);
+        Map_set_square(map, i, map_max_y, TERRAIN_WATER);
     }
 
     for (j = map_min_y; j < map_max_y; j++) {
-        Square_init(map, map_min_x, j, TERRAIN_WATER);
+        //Square_init(map, map_min_x, j, TERRAIN_WATER);
+        Map_set_square(map, map_min_x, j, TERRAIN_WATER);
     }
 
     for (j = map_min_y; j < map_max_y; j++) {
-        Square_init(map, map_max_x, j, TERRAIN_WATER);
+        //Square_init(map, map_max_x, j, TERRAIN_WATER);
+        Map_set_square(map, map_max_x, j, TERRAIN_WATER);
     }
 }

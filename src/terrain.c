@@ -17,11 +17,6 @@ static int Map_get_height(struct Map *map);
 static Square *Map_get_square(struct Map *map, int x, int y);
 static void Map_free(struct Map *map);
 
-static TerrainType *Square_get_terrain_type(struct Square *square);
-static int Square_get_x(struct Square *square);
-static int Square_get_y(struct Square *square);
-static void Square_set_terrain(struct Square *square, TerrainType_Tag tag);
-
 
 
 /* ----- | Static Variables | ------ */
@@ -36,13 +31,6 @@ static Map_Methods map_methods = {
     .get_height = Map_get_height,
     .get_square = Map_get_square,
     .free = Map_free
-};
-
-static Square_Methods square_methods = {
-    .get_terrain_type = Square_get_terrain_type,
-    .get_x = Square_get_x,
-    .get_y = Square_get_y,
-    .set_terrain = Square_set_terrain,
 };
 
 Map *global_map = NULL;
@@ -86,7 +74,7 @@ boolean Map_init(Map *map, int max_x, int max_y) {
     for (h = 0; h < height; h++) {
         map->squares[h] = calloc(width, sizeof(Square));
         for (w = 0; w < width; w++) {
-            Square_init(map, w - max_x, h - max_y, TERRAIN_NONE);
+            Map_set_square(map, w - max_x, h - max_y, TERRAIN_NONE);
         }
     }
 
@@ -95,30 +83,14 @@ boolean Map_init(Map *map, int max_x, int max_y) {
     return TRUE;   
 }
 
-/*
- * Constructor for Square.
- */
-boolean Square_init(Map *map, int x, int y, TerrainType_Tag type) {
+boolean Map_set_square(Map *map, int x, int y, TerrainType_Tag type) {
     if (map == NULL) {
         return FALSE;
     }
-    if (map->inited != TRUE) {
-        return FALSE;
-    }
-    
     Square *square = map->m->get_square(map, x, y);
-    if (square == NULL) {
-        /*fprintf(stderr, "Square_init: Error - 'square' is NULL (x = %d, y = %d)!\n", x, y);*/
-        return FALSE;
-    }
-
-    square->m = &square_methods;
-    square->terrain = &terrain_types[type];
-    square->x = x;
-    square->y = y;
-
-    return TRUE;
+    return Square_init(square, x, y, type);
 }
+
 
 /* Map */
 static boolean Map_is_inited(struct Map *map) {
@@ -178,22 +150,4 @@ static void Map_free(struct Map *map) {
     map->max_y = 0;
     map->width = 0;
     map->height = 0;
-}
-
-/* Square */
-static TerrainType *Square_get_terrain_type(struct Square *square) {
-    return square->terrain;
-}
-
-static int Square_get_x(struct Square *square) {
-    return square->x;
-}
-
-static int Square_get_y(struct Square *square) {
-    return square->y;
-}
-
-static void Square_set_terrain(struct Square *square, TerrainType_Tag tag) {
-    //assert(tag < TERRAIN_ENUM_SIZE && tag >= 0);
-    square->terrain = &terrain_types[tag];
 }

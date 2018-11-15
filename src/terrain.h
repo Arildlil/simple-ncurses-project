@@ -5,26 +5,10 @@
 #include "include/image.h"
 #include "include/colors.h"
 #include "include/terrain_types.h"
+#include "include/square.h"
 
-typedef struct Square Square;
-typedef struct Square_Methods Square_Methods;
 typedef struct Map Map;
 typedef struct Map_Methods Map_Methods;
-
-struct Square {
-    TerrainType *terrain;
-    int x;
-    int y;
-
-    Square_Methods *m;
-};
-
-struct Square_Methods {
-    TerrainType *(*get_terrain_type)(struct Square *square);
-    int (*get_x)(struct Square *square);
-    int (*get_y)(struct Square *square);
-    void (*set_terrain)(struct Square *square, TerrainType_Tag tag);
-};
 
 struct Map {
     boolean inited;
@@ -64,14 +48,13 @@ extern Map *global_map;
 boolean Map_init(Map *map, int max_x, int max_y);
 
 /*
- * Initialize the given square.
- * .
- * @arg map: The map containing the square.
- * @arg x: The x-coordinate of the square.
- * @arg y: The y-coordinate of the square.
- * @arg type: The terrain type to use.
- * @return: TRUE of success, FALSE otherwise.
+ * Initialize the Square object at the given coordinates.
+ * 
+ * @arg map: The Map object where the square is located.
+ * @arg x: X coordinate
+ * @arg y: Y coordinate
+ * @return: TRUE on success, FALSE otherwise.
  */
-boolean Square_init(Map *map, int x, int y, TerrainType_Tag type);
+boolean Map_set_square(Map *map, int x, int y, TerrainType_Tag type);
 
 #endif

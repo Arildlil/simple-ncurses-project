@@ -436,20 +436,21 @@ static void test_GameObject_direction(void **state) {
 static void test_Square_and_Map(void **state) {
     (void)state;
 
-    Square_init(NULL, 0, 0, TERRAIN_GRASS);
+    Map_set_square(NULL, 0, 0, TERRAIN_GRASS);
 
     Map map;
     Map_init(&map, 2, 2);
-    assert_int_equal(Square_init(&map, 0, 0, TERRAIN_GRASS), TRUE);
-    assert_int_equal(Square_init(&map, 1, 0, TERRAIN_STONE), TRUE);
-    assert_int_equal(Square_init(&map, -1, 0, TERRAIN_TREE), TRUE);
-    assert_int_equal(Square_init(&map, 0, -1, TERRAIN_WATER), TRUE);
-    assert_int_equal(Square_init(&map, 2, 2, TERRAIN_GRASS), TRUE);
-    assert_int_equal(Square_init(&map, -2, -2, TERRAIN_GRASS), TRUE);
-    assert_int_equal(Square_init(&map, 3, 3, TERRAIN_GRASS), FALSE);
-    assert_int_equal(Square_init(&map, -3, -3, TERRAIN_GRASS), FALSE);
-    assert_int_equal(Square_init(&map, 2, 3, TERRAIN_GRASS), FALSE);
-    assert_int_equal(Square_init(&map, -3, 2, TERRAIN_GRASS), FALSE);
+
+    assert_int_equal(Map_set_square(&map, 0, 0, TERRAIN_GRASS), TRUE);
+    assert_int_equal(Map_set_square(&map, 1, 0, TERRAIN_STONE), TRUE);
+    assert_int_equal(Map_set_square(&map, -1, 0, TERRAIN_TREE), TRUE);
+    assert_int_equal(Map_set_square(&map, 0, -1, TERRAIN_WATER), TRUE);
+    assert_int_equal(Map_set_square(&map, 2, 2, TERRAIN_GRASS), TRUE);
+    assert_int_equal(Map_set_square(&map, -2, -2, TERRAIN_GRASS), TRUE);
+    assert_int_equal(Map_set_square(&map, 3, 3, TERRAIN_GRASS), FALSE);
+    assert_int_equal(Map_set_square(&map, -3, -3, TERRAIN_GRASS), FALSE);
+    assert_int_equal(Map_set_square(&map, 2, 3, TERRAIN_GRASS), FALSE);
+    assert_int_equal(Map_set_square(&map, -3, 2, TERRAIN_GRASS), FALSE);
 
     assert_int_equal(map.m->is_inited(&map), TRUE);
     assert_int_equal(map.m->get_max_x(&map), 2);
@@ -477,7 +478,8 @@ static void test_TerrainType(void **state) {
 
     Map map;
     Map_init(&map, 5, 5);
-    Square_init(&map, 0, 0, TERRAIN_TREE);
+
+    Map_set_square(&map, 0, 0, TERRAIN_TREE);
     Square *square = map.m->get_square(&map, 0, 0);
     TerrainType *terrain = square->m->get_terrain_type(square);
     assert_int_equal(terrain->m->get_tag(terrain), TERRAIN_TREE);
@@ -576,8 +578,8 @@ static void test_Peasant_shoot(void **state) {
 
     Map map;
     Map_init(&map, 1, 1);
-    Square_init(&map, 0, 0, TERRAIN_NONE);
-    Square_init(&map, 1, 0, TERRAIN_WHEAT);
+    Map_set_square(&map, 0, 0, TERRAIN_NONE);
+    Map_set_square(&map, 1, 0, TERRAIN_WHEAT);
     assert_int_equal(Resources_init(4), TRUE);
     GameObject *object = new_Peasant(&dummy_player, 0, 0);
     assert_non_null(object);

@@ -8,11 +8,12 @@ DEBUG = -g
 
 TESTS = src/tests.c
 APP = src/app.c
-OBJS = src/curses.c src/utils.c src/surface.c src/rect.c src/image.c \
+OBJS = src/utils.c \
 	src/unit_images.c src/unit_surfaces.c src/gameobject.c src/units.c \
 	src/player_controls.c src/player.c src/gameobject_controller.c src/orders.c \
 	src/terrain.c src/resources.c src/resources_units.c src/rendering.c  \
-	src/unit_controllers.c src/terrain_generator.c src/terrain_types.c
+	src/unit_controllers.c src/terrain_generator.c \
+	src/core/graphics/*.c
 
 INCS = -I/usr/include/cmocka
 LIB_PATH = -L/usr/lib/
