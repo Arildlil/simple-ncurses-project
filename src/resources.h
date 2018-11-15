@@ -1,7 +1,7 @@
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
-#include "gameobject.h"
+#include "include/gameobject.h"
 
 
 

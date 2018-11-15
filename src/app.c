@@ -3,7 +3,7 @@
 #include "include/utils.h"
 #include "unit_images.h"
 #include "units.h"
-#include "gameobject.h"
+#include "include/gameobject.h"
 #include "units.h"
 #include "player_controls.h"
 #include "player.h"

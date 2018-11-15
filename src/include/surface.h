@@ -3,8 +3,7 @@
 
 #include "utils.h"
 #include "rect.h"
-
-struct Image;
+#include "image.h"
 
 typedef enum {
     DEAD, ALIVE

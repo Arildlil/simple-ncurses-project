@@ -5,7 +5,7 @@
 #include "../curses.h"
 #include "../unit_images.h"
 #include "../unit_surfaces.h"
-#include "../gameobject.h"
+#include "../include/gameobject.h"
 #include "../units.h"
 #include "../player_controls.h"
 #include "../player.h"

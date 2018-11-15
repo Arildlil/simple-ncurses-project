@@ -1,7 +1,7 @@
 #ifndef UNITS_H
 #define UNITS_H
 
-#include "gameobject.h"
+#include "include/gameobject.h"
 
 /*
  * Creates and returns a new unit.

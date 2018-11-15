@@ -1,7 +1,7 @@
 #ifndef PLAYER_CONTROLS_H
 #define PLAYER_CONTROLS_H
 
-#include "gameobject.h"
+#include "include/gameobject.h"
 
 
 

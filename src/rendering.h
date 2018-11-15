@@ -1,7 +1,7 @@
 #ifndef RENDERING_H
 #define RENDERING_H
 
-#include "gameobject.h"
+#include "include/gameobject.h"
 #include "terrain.h"
 
 
