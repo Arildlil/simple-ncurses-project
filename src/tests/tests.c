@@ -9,11 +9,11 @@
 #include "../units.h"
 #include "../player_controls.h"
 #include "../player.h"
-#include "../orders_utils.h"
+#include "../core/gameobject/orders_utils.h"
 #include "../include/map.h"
 #include "../resources.h"
 #include "../resources_units.h"
-#include "../rendering.h"
+#include "../include/rendering.h"
 
 #include <string.h>
 #include <curses.h>

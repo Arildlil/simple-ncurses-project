@@ -10,9 +10,9 @@
 #include "include/map.h"
 #include "resources.h"
 #include "resources_units.h"
-#include "rendering.h"
+#include "include/rendering.h"
 #include "unit_controllers.h"
-#include "terrain_generator.h"
+#include "include/terrain_generator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
