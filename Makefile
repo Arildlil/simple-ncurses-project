@@ -9,9 +9,7 @@ DEBUG = -g
 TESTS = src/tests/tests.c
 APP = src/app.c
 OBJS = src/utils.c \
-	src/unit_images.c src/unit_surfaces.c src/units.c \
 	src/player_controls.c src/player.c \
-	src/resources.c src/resources_units.c \
 	src/core/graphics/*.c src/core/gameobject/*.c \
 	src/core/world/*.c src/definitions/*.c
 

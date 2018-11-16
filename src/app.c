@@ -1,13 +1,13 @@
 #include "tests/test_headers.h"
 #include "curses.h"
 #include "include/utils.h"
-#include "unit_images.h"
+//#include "unit_images.h"
 //#include "units.h"
 #include "include/gameobject.h"
 #include "player_controls.h"
 #include "player.h"
 #include "include/map.h"
-#include "resources.h"
+//#include "resources.h"
 #include "include/rendering.h"
 #include "include/unit_controllers.h"
 #include "include/terrain_generator.h"
@@ -186,9 +186,7 @@ static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_eleme
  * Initialization code.
  */
 static int init() {
-    UnitImages_init();
     srand(clock());
-    Resources_init(DEFAULT_MAX_GAMEOBJECT_COUNT);
     //Rendering_init(40, 30);
 
     signal(SIGINT, cleanup);
@@ -210,7 +208,6 @@ static int init() {
 static void cleanup(int sig) {
     (void)sig;
     Curses_exit();
-    Resources_exit();
     dprintf("Cleaning up and exiting with sig %d...\n", sig);
     exit(0);
 }

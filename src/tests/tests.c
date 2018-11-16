@@ -3,16 +3,16 @@
 #include "../include/image.h"
 #include "../include/rect.h"
 #include "../curses.h"
-#include "../unit_images.h"
-#include "../unit_surfaces.h"
+//#include "../unit_images.h"
+//#include "../unit_surfaces.h"
 #include "../include/gameobject.h"
-#include "../units.h"
+//#include "../units.h"
 #include "../player_controls.h"
 #include "../player.h"
 #include "../core/gameobject/orders_utils.h"
 #include "../include/map.h"
-#include "../resources.h"
-#include "../resources_units.h"
+//#include "../resources.h"
+//#include "../resources_units.h"
 #include "../include/rendering.h"
 #include "../include/unit_defs.h"
 
@@ -173,7 +173,7 @@ static void test_Rect_move(void **state) {
     assert_int_equal(rect.width, 1);
     assert_int_equal(rect.height, 1);
 }
-
+/*
 static void test_Image_units(void **state) {
     (void)state;
 
@@ -223,6 +223,7 @@ static void test_unit_surfaces(void **state) {
     assert_memory_equal(pixels[1], pixels_original[1], sizeof(char) * image_width);
     assert_memory_equal(pixels[2], pixels_original[2], sizeof(char) * image_width);
 }
+*/
 
 static void test_Units_constructors(void **state) {
     (void)state;
@@ -234,36 +235,26 @@ static void test_Units_constructors(void **state) {
 static void test_Gameobject(void **state) {
     (void)state;
 
-    GameObject object;
-    GameObject_init(&object, &dummy_player, 3, 5, &UNIT_IMAGE_ARCHER, NULL);
-    assert_int_equal(object.m->is_active(&object), TRUE);
+    //GameObject_init(&object, &dummy_player, 3, 5, &UNIT_IMAGE_ARCHER, NULL);
+    GameObject *object = Unit_new(&dummy_player, "archer", 3, 5);
+    assert_int_equal(object->m->is_active(object), TRUE);
 
-    assert_ptr_equal(object.m->get_owner(&object), &dummy_player);
-    assert_int_equal(object.m->get_x(&object), 3);
-    assert_int_equal(object.m->get_y(&object), 5);
-    object.m->movement(&object, 2, 3);
-    assert_int_equal(object.m->get_x(&object), 5);
-    assert_int_equal(object.m->get_y(&object), 8);
-    object.m->set_x(&object, 2);
-    object.m->set_y(&object, 1);
-    assert_int_equal(object.m->get_x(&object), 2);
-    assert_int_equal(object.m->get_y(&object), 1);
-    object.m->set_xy(&object, 3, 4);
-    assert_int_equal(object.m->get_x(&object), 3);
-    assert_int_equal(object.m->get_y(&object), 4);
+    assert_ptr_equal(object->m->get_owner(object), &dummy_player);
+    assert_int_equal(object->m->get_x(object), 3);
+    assert_int_equal(object->m->get_y(object), 5);
+    object->m->movement(object, 2, 3);
+    assert_int_equal(object->m->get_x(object), 5);
+    assert_int_equal(object->m->get_y(object), 8);
+    object->m->set_x(object, 2);
+    object->m->set_y(object, 1);
+    assert_int_equal(object->m->get_x(object), 2);
+    assert_int_equal(object->m->get_y(object), 1);
+    object->m->set_xy(object, 3, 4);
+    assert_int_equal(object->m->get_x(object), 3);
+    assert_int_equal(object->m->get_y(object), 4);
 
-    assert_memory_equal(object.m->get_image(&object), &UNIT_IMAGE_ARCHER, sizeof(Image));
-    assert_int_equal(object.m->get_width(&object), UNIT_IMAGE_ARCHER.get_width(&UNIT_IMAGE_ARCHER));
-    assert_int_equal(object.m->get_height(&object), UNIT_IMAGE_ARCHER.get_height(&UNIT_IMAGE_ARCHER));
-    int image_width = object.m->get_width(&object);
-    char **pixels = object.m->get_pixels(&object);
-    char **pixels_original = UNIT_IMAGE_ARCHER.get_pixels(&UNIT_IMAGE_ARCHER);
-    assert_memory_equal(pixels[0], pixels_original[0], sizeof(char) * image_width);
-
-    object.m->free(&object);
-    assert_int_equal(object.m->is_active(&object), FALSE);
-
-    GameObject_init(NULL, &dummy_player, 2, 4, &UNIT_IMAGE_ARCHER, NULL);
+    object->m->free(object);
+    assert_int_equal(object->m->is_active(object), FALSE);
 }
 
 static void test_Player_controls(void **state) {
@@ -493,6 +484,7 @@ static void test_TerrainType(void **state) {
     assert_memory_equal(terrain->m->get_name(terrain), "grass", 5);
 }
 
+/*
 static void test_Resources(void **state) {
     (void)state;
     
@@ -521,7 +513,9 @@ static void test_Resources(void **state) {
     assert_int_equal(Resources_max_objects(), 4);
     Resources_exit();
 }
+*/
 
+/*
 static void test_Resources_Units(void **state) {
     (void)state;
 
@@ -544,6 +538,7 @@ static void test_Resources_Units(void **state) {
 
     Resources_exit();
 }
+*/
 
 static void test_Rendering_convert_coordinates(void **state) {
     (void)state;
@@ -575,8 +570,7 @@ static void test_Peasant_shoot(void **state) {
     Map_init(&map, 1, 1);
     Map_set_square(&map, 0, 0, TERRAIN_NONE);
     Map_set_square(&map, 1, 0, TERRAIN_WHEAT);
-    assert_int_equal(Resources_init(4), TRUE);
-    GameObject *object = new_Peasant(&dummy_player, 0, 0);
+    GameObject *object = Unit_new(&dummy_player, "archer", 0, 0);
     assert_non_null(object);
     assert_non_null(object->m->get_controller);
     assert_non_null(object->m->shoot);
@@ -607,7 +601,6 @@ static void test_UnitDefs(void **state) {
 
 
 int main(void) {
-    UnitImages_init();
 
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_Image_1D),
@@ -619,10 +612,11 @@ int main(void) {
 
         cmocka_unit_test(test_Rect_init),
         cmocka_unit_test(test_Rect_move),
-
+        /*
         cmocka_unit_test(test_Image_units),
         cmocka_unit_test(test_unit_images),
         cmocka_unit_test(test_unit_surfaces),
+        */
         cmocka_unit_test(test_Units_constructors),
 
         cmocka_unit_test(test_Gameobject),
@@ -637,9 +631,6 @@ int main(void) {
         
         cmocka_unit_test(test_Square_and_Map),
         cmocka_unit_test(test_TerrainType),
-
-        cmocka_unit_test(test_Resources),
-        cmocka_unit_test(test_Resources_Units),
 
         cmocka_unit_test(test_Rendering_convert_coordinates),
 
