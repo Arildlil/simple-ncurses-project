@@ -269,8 +269,7 @@ static void test_Gameobject(void **state) {
 static void test_Player_controls(void **state) {
     (void)state;
 
-    GameObject object;
-    Units_init_archer(&object, &dummy_player, 5, 6);
+    GameObject *object = Unit_new(&dummy_player, "archer", 5, 6);
     #define NUM_TO_CHECK 8
     char chars_to_check[NUM_TO_CHECK] = {'a', 'A', 'w', 'W', 's', 'S', 'd', 'D'};
     int i;
@@ -278,7 +277,7 @@ static void test_Player_controls(void **state) {
     assert_int_equal(PlayerControls_handle_input_char('a', NULL), FALSE);
     
     for (i = 0; i < NUM_TO_CHECK; i++) { 
-        assert_int_equal(PlayerControls_handle_input_char(chars_to_check[i], &object), TRUE);
+        assert_int_equal(PlayerControls_handle_input_char(chars_to_check[i], object), TRUE);
     }
 }
 
@@ -301,8 +300,7 @@ static void dummy_on_tick(GameObject_Controller *controller, GameObject *object)
 static void test_GameObject_Controller(void **state) {
     (void)state;
 
-    GameObject object;
-    Units_init_archer(&object, &dummy_player, 0, 0);
+    GameObject *object = Unit_new(&dummy_player, "archer", 0, 0);
     GameObject_Controller controller;
     GameObject_Controller_init(&controller, NULL);
     assert_non_null(controller.m);
@@ -311,20 +309,20 @@ static void test_GameObject_Controller(void **state) {
     GameObject_Controller_Methods methods = {.on_tick = dummy_on_tick};
     GameObject_Controller_init(&controller, &methods);
     assert_non_null(controller.m);
-    object.m->set_controller(&object, &controller);
-    int old_x = object.m->get_x(&object);
-    int old_y = object.m->get_y(&object);
-    GameObject_Controller *retrieved_controller = object.m->get_controller(&object);
-    retrieved_controller->m->on_tick(retrieved_controller, &object);
-    assert_int_equal(object.m->get_x(&object), old_x + 1);
-    assert_int_equal(object.m->get_y(&object), old_y + 1);
+    object->m->set_controller(object, &controller);
+    int old_x = object->m->get_x(object);
+    int old_y = object->m->get_y(object);
+    GameObject_Controller *retrieved_controller = object->m->get_controller(object);
+    retrieved_controller->m->on_tick(retrieved_controller, object);
+    assert_int_equal(object->m->get_x(object), old_x + 1);
+    assert_int_equal(object->m->get_y(object), old_y + 1);
 }
 
 static void test_Order(void **state) {
     (void)state;
 
-    GameObject object;
-    Units_init_archer(&object, &dummy_player, 0, 0);
+    GameObject *object;
+    Unit_new(&dummy_player, "archer", 0, 0);
 
     Order order;
     Orders_move(&order, 4, 6);
@@ -335,37 +333,35 @@ static void test_Order(void **state) {
     assert_int_equal(order.destination.coordinates.y, 6);
 
     memset(&order, 0, sizeof(Order));
-    Orders_attack(&order, &object);
+    Orders_attack(&order, object);
     assert_int_equal(order.is_active, TRUE);
     assert_int_equal(order.type, ORDER_TYPE_ATTACK);
     assert_int_equal(order.destination.desttype, DEST_TYPE_GAMEOBJECT);
-    assert_ptr_equal(order.destination.object, &object);
+    assert_ptr_equal(order.destination.object, object);
 }
 
 static void test_GameObject_Order(void **state) {
     (void)state;
 
-    GameObject object;
-    GameObject object2;
-    Units_init_archer(&object, &dummy_player, 5, 10);
-    Units_init_archer(&object2, &dummy_player, 10, 5);
-    assert_non_null(object.m->get_current_order(&object));
-    assert_int_equal(object.m->get_current_order(&object)->type, ORDER_TYPE_NONE);
-    assert_int_equal(object.m->get_order_count(&object), 0);
-    object.m->move_to(&object, 10, 5, FALSE);
-    assert_int_equal(object.m->get_order_count(&object), 1);
-    object.m->attack(&object, &object2, FALSE);
-    assert_int_equal(object.m->get_order_count(&object), 1);
-    object.m->move_to(&object, 15, 2, TRUE);
-    assert_int_equal(object.m->get_order_count(&object), 2);
-    object.m->attack(&object, &object2, TRUE);
-    assert_int_equal(object.m->get_order_count(&object), 3);
-    Order *current_order = object.m->get_current_order(&object);
+    GameObject *object = Unit_new(&dummy_player, "archer", 5, 10);
+    GameObject *object2 = Unit_new(&dummy_player, "archer", 10, 5);
+    assert_non_null(object->m->get_current_order(object));
+    assert_int_equal(object->m->get_current_order(object)->type, ORDER_TYPE_NONE);
+    assert_int_equal(object->m->get_order_count(object), 0);
+    object->m->move_to(object, 10, 5, FALSE);
+    assert_int_equal(object->m->get_order_count(object), 1);
+    object->m->attack(object, object2, FALSE);
+    assert_int_equal(object->m->get_order_count(object), 1);
+    object->m->move_to(object, 15, 2, TRUE);
+    assert_int_equal(object->m->get_order_count(object), 2);
+    object->m->attack(object, object2, TRUE);
+    assert_int_equal(object->m->get_order_count(object), 3);
+    Order *current_order = object->m->get_current_order(object);
     assert_non_null(current_order);
     assert_int_equal(current_order->type, ORDER_TYPE_ATTACK);
-    object.m->move_to(&object, 15, 2, FALSE);
-    assert_int_equal(object.m->get_order_count(&object), 1);
-    current_order = object.m->get_current_order(&object);
+    object->m->move_to(object, 15, 2, FALSE);
+    assert_int_equal(object->m->get_order_count(object), 1);
+    current_order = object->m->get_current_order(object);
     assert_non_null(current_order);
     assert_int_equal(current_order->type, ORDER_TYPE_MOVE);
     assert_int_equal(current_order->destination.coordinates.x, 15);
@@ -375,34 +371,33 @@ static void test_GameObject_Order(void **state) {
 static void test_GameObject_Order_queue(void **state) {
     (void)state;
     
-    GameObject object;
-    Units_init_archer(&object, &dummy_player, 5, 5);
+    GameObject *object = Unit_new(&dummy_player, "archer", 5, 5);
     
     Order order1, order2, order3;
     Orders_move(&order1, 10, 15);
     Orders_move(&order2, 7, 8);
     Orders_move(&order3, 2, 2);
-    assert_int_equal(insert_order(&object, &order3, FALSE), TRUE);
-    assert_int_equal(object.m->get_order_count(&object), 1);
+    assert_int_equal(insert_order(object, &order3, FALSE), TRUE);
+    assert_int_equal(object->m->get_order_count(object), 1);
 
-    assert_int_equal(insert_order(&object, &order1, FALSE), TRUE);
-    assert_int_equal(object.m->get_order_count(&object), 1);
-    assert_int_equal(insert_order(&object, &order2, TRUE), TRUE);
-    assert_int_equal(object.m->get_order_count(&object), 2);
-    assert_int_equal(insert_order(&object, &order3, TRUE), TRUE);
-    assert_int_equal(object.current_order_index, 0);
-    assert_int_equal(object.m->get_order_count(&object), 3);
-    remove_current_order(&object);
-    assert_int_equal(object.current_order_index, 1);
-    assert_int_equal(object.m->get_order_count(&object), 2);
+    assert_int_equal(insert_order(object, &order1, FALSE), TRUE);
+    assert_int_equal(object->m->get_order_count(object), 1);
+    assert_int_equal(insert_order(object, &order2, TRUE), TRUE);
+    assert_int_equal(object->m->get_order_count(object), 2);
+    assert_int_equal(insert_order(object, &order3, TRUE), TRUE);
+    assert_int_equal(object->current_order_index, 0);
+    assert_int_equal(object->m->get_order_count(object), 3);
+    remove_current_order(object);
+    assert_int_equal(object->current_order_index, 1);
+    assert_int_equal(object->m->get_order_count(object), 2);
 
-    Order *current_order = object.m->get_current_order(&object);
+    Order *current_order = object->m->get_current_order(object);
     assert_int_equal(current_order->destination.coordinates.x, order2.destination.coordinates.x);
     assert_int_equal(current_order->destination.coordinates.y, order2.destination.coordinates.y);
 
-    clear_order_queue(&object);
-    assert_int_equal(object.m->get_order_count(&object), 0);
-    assert_int_equal(object.current_order_index, 0);
+    clear_order_queue(object);
+    assert_int_equal(object->m->get_order_count(object), 0);
+    assert_int_equal(object->current_order_index, 0);
 }
 
 static void test_GameObject_direction(void **state) {
@@ -424,13 +419,12 @@ static void test_GameObject_direction(void **state) {
         {1, -1, NORTH_EAST},
         {0, -1, NORTH},
     };
-    GameObject object;
     int i;
     for (i = 0; i < ORDER_COUNT; i++) {
-        Units_init_archer(&object, &dummy_player, 0, 0);
-        object.m->move_to(&object, commands[i].x, commands[i].y, FALSE);
-        object.m->on_tick(&object);
-        assert_int_equal(object.m->get_direction(&object), commands[i].direction);
+        GameObject *object = Unit_new(&dummy_player, "archer", 0, 0);
+        object->m->move_to(object, commands[i].x, commands[i].y, FALSE);
+        object->m->on_tick(object);
+        assert_int_equal(object->m->get_direction(object), commands[i].direction);
     }
 }
 
