@@ -9,10 +9,11 @@
 #include "player.h"
 #include "include/map.h"
 #include "resources.h"
-#include "resources_units.h"
 #include "include/rendering.h"
-#include "unit_controllers.h"
+#include "include/unit_controllers.h"
 #include "include/terrain_generator.h"
+
+#include "include/unit_defs.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,7 +80,7 @@ int main(int argc, char *argv[]) {
     GameObject_Controller player_controller;
     GameObject_Controller_Methods player_methods = {
         .on_tick = NULL,
-        .shoot = get_controller_peasant()->m->shoot,
+        .shoot = get_controller("peasant")->m->shoot,
     };
     GameObject_Controller_init(&player_controller, &player_methods);
 
@@ -89,18 +90,33 @@ int main(int argc, char *argv[]) {
 
     GameObject *all_objects[NUM_OBJECTS];
     
+    /*
     int i;
     for (i = 0; i < NUM_TROOPS; i++) {
         all_objects[i] = new_Unit(&neutrals, MIDDLE_X, 10+5*i, units_to_spawn[i]);
     }
+    */
+    int i;
+    for (i = 0; i < NUM_TROOPS; i++) {
+        all_objects[i] = Unit_new(&neutrals, units_to_spawn[i], MIDDLE_X, 10+5*i);
+    }
 
-    hero = new_Unit(&player, 0, 0, "peasant");
+    hero = Unit_new(&player, "peasant", 0, 0);
     all_objects[NUM_OBJECTS-1] = hero;
     hero->m->set_controller(hero, &player_controller);
 
     int counter = 0;
     while (1) {
-        Resources_on_tick();
+
+        int i;
+        for (i = 0; i < NUM_TROOPS; i++) {
+            GameObject *cur_object = all_objects[i];
+            GameObject_Controller *cur_controller = cur_object->m->get_controller(cur_object);
+            if (cur_controller != NULL) {
+                cur_controller->m->on_tick(cur_controller, cur_object);
+            }
+        }
+
         render_objects(&default_map, all_objects, NUM_OBJECTS);
 
         process_input();

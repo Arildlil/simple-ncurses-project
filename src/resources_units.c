@@ -2,7 +2,7 @@
 #include "resources.h"
 #include "unit_images.h"
 #include "include/utils.h"
-#include "unit_controllers.h"
+#include "include/unit_controllers.h"
 
 
 
@@ -37,19 +37,19 @@ GameObject *new_Unit(Player *owner, int x, int y, char *name) {
 
     if (StrRel(name, ==, "archer")) {
         image = &UNIT_IMAGE_ARCHER;
-        controller = get_controller_archer();
+        controller = get_controller("archer");
     }
     else if (StrRel(name, ==, "swordman")) {
         image = &UNIT_IMAGE_SWORDMAN;
-        controller = get_controller_swordman();
+        controller = get_controller("swordman");
     }
     else if (StrRel(name, ==, "spearman")) {
         image = &UNIT_IMAGE_SPEARMAN;
-        controller = get_controller_spearman();
+        controller = get_controller("spearman");
     }
     else if (StrRel(name, ==, "peasant")) {
         image = &UNIT_IMAGE_PEASANT;
-        controller = get_controller_peasant();
+        controller = get_controller("peasant");
     }
 
     if (image == NULL) {

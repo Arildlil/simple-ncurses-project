@@ -14,6 +14,7 @@
 #include "../resources.h"
 #include "../resources_units.h"
 #include "../include/rendering.h"
+#include "../include/unit_defs.h"
 
 #include <string.h>
 #include <curses.h>
@@ -590,6 +591,21 @@ static void test_Peasant_shoot(void **state) {
     assert_int_equal(object->m->shoot(object), TRUE);
 }
 
+static void test_UnitDefs(void **state) {
+    (void)state;
+
+    GameObject *archer;
+    UnitDefs_init();
+    assert_null(Unit_new(NULL, "archer", 1, 1));
+    assert_null(Unit_new(&dummy_player, NULL, 1, 1));
+    assert_null(Unit_new(&dummy_player, "unknown_name", 1, 1));
+    archer = Unit_new(&dummy_player, "archer", 2, 3);
+    assert_non_null(archer);
+    assert_int_equal(archer->m->get_x(archer), 2);
+    assert_int_equal(archer->m->get_y(archer), 3);
+    assert_true(archer->m->get_owner(archer) == &dummy_player);
+}
+
 
 
 /* ----- | Other | ------ */
@@ -634,6 +650,8 @@ int main(void) {
         cmocka_unit_test(test_Rendering_convert_coordinates),
 
         cmocka_unit_test(test_Peasant_shoot),
+
+        cmocka_unit_test(test_UnitDefs),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
