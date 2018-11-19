@@ -5,7 +5,7 @@
 #define UNIT_IMAGE_HEIGHT 3
 
 #include "../include/gameobject.h"
-#include "../player.h"
+#include "../include/player.h"
 
 
 /*

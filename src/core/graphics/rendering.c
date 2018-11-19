@@ -1,7 +1,7 @@
 #include "../../include/rendering.h"
 #include "../../include/utils.h"
-#include "../../curses.h"
-#include "../../player.h"
+#include "../../include/curses.h"
+#include "../../include/player.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -1,10 +1,10 @@
 #ifndef CURSES_H
 #define CURSES_H
 
-#include "include/colors.h"
-#include "include/utils.h"
-#include "include/image.h"
-#include "include/surface.h"
+#include "colors.h"
+#include "utils.h"
+#include "image.h"
+#include "surface.h"
 
 struct Surface;
 struct Image;

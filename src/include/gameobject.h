@@ -2,7 +2,7 @@
 #define GAMEOBJECT_H
 
 #include "utils.h"
-#include "../player.h"
+#include "player.h"
 #include "surface.h"
 #include "image.h"
 

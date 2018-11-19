@@ -1,7 +1,7 @@
 #include "../../include/utils.h"
 #include "../../include/image.h"
 #include "../../include/rect.h"
-#include "../../curses.h"
+#include "../../include/curses.h"
 
 #include <curses.h>
 #include <unistd.h>
