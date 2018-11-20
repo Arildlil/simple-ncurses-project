@@ -32,7 +32,8 @@ static void clear_framebuffer(FrameBuffer *frame_buffer, TerrainType *default_te
 static void paint_terrain(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map);
 static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map, 
     GameObject *objects[], int num_elements);
-static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map);
+static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, 
+    Map *map, int start_y, int end_y, int start_x, int end_x);
 
 
 
@@ -227,16 +228,17 @@ static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *bo
 /*
  * Paint the bottom menu.
  */
-static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map) {
+static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, 
+    Map *map, int start_y, int end_y, int start_x, int end_x) {
+    
     (void)map;
 
-    size_t to_x, to_y, i, j;
+    size_t to_x, to_y, i, j, left_x, top_y;
 
     size_t current_height = borders->bottom_y - borders->top_y + 1;
     size_t current_width = borders->right_x - borders->left_x + 1;
 
     size_t first_inner_index = borders->top_y;
-    fprintf(stderr, "top_y: %d, bottom_y: %d\n", borders->index_top_y, borders->index_bottom_y);
 
     /* MÅ FINNE RIKTIGE KOORDINATER */
     /*
@@ -251,6 +253,44 @@ static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders
                 }
         }
     }*/
+
+    char menu_border_pixel = '=';
+    Color_Pair menu_border_color = COLOR_PAIR_WHEAT;
+
+    /* Paint top border */
+    attron(COLOR_PAIR(menu_border_color));
+    left_x = start_y;
+    to_y = start_y;
+    for (to_x = start_x; to_x < end_x; to_x++) {
+        int inner_index = to_y * current_width + to_x;
+        assert(inner_index >= 0);
+
+        char cur_pixel = menu_border_pixel;
+        Color_Pair color = menu_border_color;
+
+        Pixel *current_pixel = &frame_buffer->pixels[inner_index];
+        current_pixel->color = color;
+        current_pixel->symbol = cur_pixel;
+    }
+    attroff(COLOR_PAIR(menu_border_color));
+
+    //fprintf(stderr, "\n");
+
+/* TEMP
+    for (i = borders->top_y; i < borders->bottom_y; i++) {
+        for (j = borders->left_x; j < borders->right_x; j++) {
+            char cur_pixel = 
+            int inner_index = (object_y - borders->top_y + j) * 
+                current_width + object_x - borders->left_x + k;
+                assert(inner_index >= 0);
+                if (inner_index >= frame_buffer->max_index) {
+                    break;
+                }
+        }
+    }
+*/
+
+
 
     /*
     for (from_y = borders->top_y, to_y = 0; from_y < borders->bottom_y && to_y < current_height; from_y++, to_y++) {
@@ -294,6 +334,11 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
     size_t current_height = current_frame->height;
     size_t current_width = current_frame->width;
 
+    size_t menu_bottom_top_y = current_height - menu_bottom_height;
+    size_t menu_bottom_bot_y = current_height;
+    fprintf(stderr, "curH: %d, curW: %d, topY: %d, botY: %d\n", 
+        current_height, current_width, menu_bottom_top_y, menu_bottom_bot_y);
+
     /* Don't draw under the bottom menu */
     current_height -= menu_bottom_height;
     center_y += menu_bottom_height / 2;
@@ -303,18 +348,22 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
     Rendering_convert_coordinates(map, current_width / 2, current_height / 2, center_x, center_y, 
         &borders);
 
-    fprintf(stderr, "(borders) bottom_y: %d, left_x: %d\n", borders.bottom_y, borders.left_x);
+    fprintf(stderr, "(borders) bottom_y: %d, left_x: %d\t", borders.bottom_y, borders.left_x);
 
     /* Used for the bottom menu part of the window */
     RenderCoordinateBorders borders_menu_bottom = {0};
     Rendering_convert_coordinates(map, menu_bottom_width / 2, menu_bottom_height / 2, center_x, 
         borders.bottom_y + menu_bottom_height / 2, &borders_menu_bottom);
+
+    fprintf(stderr, "(MENUborders) top_y: %d, bottom_y: %d, right_x: %d, left_x: %d\n", borders_menu_bottom.top_y, 
+        borders_menu_bottom.bottom_y, borders_menu_bottom.right_x, borders_menu_bottom.left_x);
     
     /* Clear and then fill the frame buffer */
     clear_framebuffer(current_frame, terrain_default);
     paint_terrain(current_frame, &borders, map);
     paint_objects(current_frame, &borders, map, objects, num_elements);
-    paint_bottom_menu(current_frame, &borders_menu_bottom, map);
+    paint_bottom_menu(current_frame, &borders_menu_bottom, map, 
+        menu_bottom_top_y, menu_bottom_bot_y, 0, current_width);
 } 
 
 void Rendering_render_frame() {
