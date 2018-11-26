@@ -35,8 +35,17 @@ static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *bo
 static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, 
     Map *map, int start_x, int end_x, int start_y, int end_y);
 
+
+static void render_char(int fb_x, int fb_y, char pixel, Color_Pair color,
+    FrameBuffer *frame_buffer, int current_width);
+static void render_line_char(int fb_x, int fb_y, char pixel, int repeats, Color_Pair color,
+    FrameBuffer *frame_buffer, int current_width);
 static void render_line(int fb_x, int fb_y, char *pixels, int width, Color_Pair color,
     FrameBuffer *frame_buffer, int current_width);
+static void render_line_vert_char(int fb_x, int fb_y, char pixel, int repeats, 
+    Color_Pair color, FrameBuffer *frame_buffer, int current_width);
+static void render_line_vert(int fb_x, int fb_y, char *pixels, int width, 
+    Color_Pair color, FrameBuffer *frame_buffer, int current_width);
 
 
 
@@ -242,6 +251,32 @@ static inline int inner_i(int fb_x, int fb_y, int width) {
 }
 
 /*
+ * Renders a single character in the frame buffer at the specified 2D coordinates.
+ * 
+ * @arg fb_x: The x index in the frame buffer.
+ * @arg fb_y: The y index in the frame buffer.
+ * @arg pixel: The pixel to draw.
+ * @arg color: The color of the character to be rendered.
+ * @arg frame_buffer: The frame buffer to draw to.
+ * @arg current_width: The current width of a line in the frame buffer.
+ */
+static void render_char(int fb_x, int fb_y, char pixel, Color_Pair color,
+    FrameBuffer *frame_buffer, int current_width) {
+
+    if (fb_x < 0 || fb_y < 0) return;
+    assert(frame_buffer);
+
+    attron(COLOR_PAIR(color));
+    int inner_index = inner_i(fb_x, fb_y, current_width);
+    assert(inner_index >= 0);
+        
+    Pixel *current_pixel = &frame_buffer->pixels[inner_index];
+    current_pixel->color = color;
+    current_pixel->symbol = pixel;
+    attroff(COLOR_PAIR(color));
+}
+
+/*
  * Wrapper for 'render_line', where one specific character will be repeated 
  * several times.
  * 
@@ -270,13 +305,16 @@ static void render_line_char(int fb_x, int fb_y, char pixel, int repeats, Color_
  * @arg pixels: The pixels (chars) on the line to be drawn.
  * @arg width: The length of the line to be rendered.
  * @arg color: The color of all the characters to be rendered.
+ * @arg frame_buffer: The frame buffer to draw to.
+ * @arg current_width: The current width of a line in the frame buffer.
  */
 static void render_line(int fb_x, int fb_y, char *pixels, int width, Color_Pair color,
     FrameBuffer *frame_buffer, int current_width) {
     
-    if (fb_x < 0 || fb_y < 0) return -1;
+    if (fb_x < 0 || fb_y < 0) return;
     assert(pixels);
     assert(width >= 0);
+    assert(frame_buffer);
 
     attron(COLOR_PAIR(color));
     int i, to_x;
@@ -292,111 +330,77 @@ static void render_line(int fb_x, int fb_y, char *pixels, int width, Color_Pair 
 }
 
 /*
+ * Renders a vertical line in the frame buffer at the specified 2D coordinates.
+ * All pixels in the pixel array will be drawn in the same color and with the
+ * same pixel value.
+ * 
+ * @arg fb_x: The x index in the frame buffer.
+ * @arg fb_y: The y index in the frame buffer.
+ * @arg pixels: The pixel on the line to be repeatedly drawn.
+ * @arg width: The length of the line to be rendered.
+ * @arg color: The color of all the characters to be rendered.
+ * @arg frame_buffer: The frame buffer to draw to.
+ * @arg current_width: The current width of a line in the frame buffer.
+ */
+static void render_line_vert_char(int fb_x, int fb_y, char pixel, int repeats, 
+    Color_Pair color, FrameBuffer *frame_buffer, int current_width) {
+
+    int j;
+    for (j = 0; j < repeats; j++) {
+        render_char(fb_x, fb_y + j, pixel, color, frame_buffer, current_width);
+    }
+}
+
+/*
+ * Renders a vertical line in the frame buffer at the specified 2D coordinates.
+ * All pixels in the pixel array will be drawn in the same color.
+ * 
+ * @arg fb_x: The x index in the frame buffer.
+ * @arg fb_y: The y index in the frame buffer.
+ * @arg pixels: The pixels (chars) on the line to be drawn.
+ * @arg width: The length of the line to be rendered.
+ * @arg color: The color of all the characters to be rendered.
+ * @arg frame_buffer: The frame buffer to draw to.
+ * @arg current_width: The current width of a line in the frame buffer.
+ */
+static void render_line_vert(int fb_x, int fb_y, char *pixels, int width, 
+    Color_Pair color, FrameBuffer *frame_buffer, int current_width) {
+
+    int j;
+    for (j = 0; j < width; j++) {
+        render_char(fb_x, fb_y + j, pixels[j], color, frame_buffer, current_width);
+    }
+}
+
+/*
  * Paint the bottom menu.
  */
 static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, 
     Map *map, int start_x, int end_x, int start_y, int end_y) {
     
     (void)map;
+    assert(frame_buffer);
 
-    size_t to_x, to_y, i, j, left_x, top_y;
+    size_t to_x, to_y, left_x, top_y;
 
-    //size_t current_height = borders->bottom_y - borders->top_y + 1;
     size_t current_height = end_y - start_y;
-    //size_t current_width = borders->right_x - borders->left_x + 1;
     size_t current_width = end_x - start_x;
-
-
-    /* MÅ FINNE RIKTIGE KOORDINATER */
-    /*
-    for (i = borders->top_y; i < borders->bottom_y; i++) {
-        for (j = borders->left_x; j < borders->right_x; j++) {
-            char cur_pixel = pixels[i][j];
-            int inner_index = (object_y - borders->top_y + j) * 
-                current_width + object_x - borders->left_x + k;
-                assert(inner_index >= 0);
-                if (inner_index >= frame_buffer->max_index) {
-                    break;
-                }
-        }
-    }*/
 
     char menu_border_pixel = '=';
     Color_Pair menu_border_color = COLOR_PAIR_WHEAT;
+    char menu_vert_border_pixel = '|';
+    Color_Pair menu_vert_border_color = COLOR_PAIR_WHEAT;
 
+    /* Render top border line */
     render_line_char(start_x, start_y, menu_border_pixel, current_width, 
         menu_border_color, frame_buffer, current_width);
-    fprintf(stderr, "menu_B: start_x: %d, start_y: %d, cur_w: %d\n", start_x, start_y, current_width);
+    
+    /* Render right and left vertical border lines */
+    render_line_vert_char(start_x, start_y, menu_vert_border_pixel, current_height,
+        menu_vert_border_color, frame_buffer, current_width);
 
-
-/*
-    attron(COLOR_PAIR(menu_border_color));
-
-    for (to_x = start_x; to_x < end_x; to_x++) {
-        //int inner_index = to_y * current_width + to_x;
-        int inner_index = inner_i(to_x, to_y, current_width, current_height);
-        assert(inner_index >= 0);
-
-        char cur_pixel = menu_border_pixel;
-        Color_Pair color = menu_border_color;
-
-        Pixel *current_pixel = &frame_buffer->pixels[inner_index];
-        current_pixel->color = color;
-        current_pixel->symbol = cur_pixel;
-    }
-    attroff(COLOR_PAIR(menu_border_color));
-*/
-    //fprintf(stderr, "\n");
-
-/* TEMP
-    for (i = borders->top_y; i < borders->bottom_y; i++) {
-        for (j = borders->left_x; j < borders->right_x; j++) {
-            char cur_pixel = 
-            int inner_index = (object_y - borders->top_y + j) * 
-                current_width + object_x - borders->left_x + k;
-                assert(inner_index >= 0);
-                if (inner_index >= frame_buffer->max_index) {
-                    break;
-                }
-        }
-    }
-*/
-
-
-
-    /*
-    for (from_y = borders->top_y, to_y = 0; from_y < borders->bottom_y && to_y < current_height; from_y++, to_y++) {
-        for (from_x = borders->left_x, to_x = 0; from_x < borders->right_x && to_x < current_width; from_x++, to_x++) {
-            
-            Square *current_square = map->m->get_square(map, from_x, from_y);
-            if (current_square == NULL) {
-                continue;
-            }
-
-            TerrainType *terrain = current_square->m->get_terrain_type(current_square);
-            if (terrain->m->get_tag(terrain) == TERRAIN_NONE) {
-                continue;
-            }
-
-            Color_Pair color = terrain->m->get_colors(terrain);
-            Image *image = terrain->m->get_image(terrain);
-            char **pixels = image->get_pixels(image);
-
-            for (j = 0; j < (size_t)image->get_height(image) && to_y + j < current_height; j++) {
-                for (k = 0; k < (size_t)image->get_width(image) && to_x + k < current_width; k++) {
-                    char cur_pixel = pixels[j][k];
-                    int inner_index = (to_y + j) * current_width + to_x + k;
-                    assert(inner_index >= 0);
-                    if (inner_index >= frame_buffer->max_index) {
-                        break;
-                    }
-                    Pixel *current_pixel = &frame_buffer->pixels[inner_index];
-                    current_pixel->color = color;
-                    current_pixel->symbol = cur_pixel;
-                }
-            }
-        }
-    }*/
+    render_line_vert_char(end_x-1, start_y, menu_vert_border_pixel, current_height,
+        menu_vert_border_color, frame_buffer, current_width);
 }
 
 void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject *objects[], int num_elements) {
