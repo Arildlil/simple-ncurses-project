@@ -1,4 +1,6 @@
 #include "../../include/rendering.h"
+#include "rendering_internals.h"
+#include "../../include/game_log.h"
 #include "../../include/utils.h"
 #include "../../include/curses.h"
 #include "../../include/player.h"
@@ -10,22 +12,6 @@
 
 
 
-/* ----- | Type Declarations | ------ */
-
-typedef struct Pixel {
-    Color_Pair color;
-    char symbol;
-} Pixel;
-
-typedef struct FrameBuffer {
-    size_t width;
-    size_t height;
-    int max_index;
-    Pixel *pixels;
-} FrameBuffer;
-
-
-
 /* ----- | Function Prototypes | ----- */
 
 static void clear_framebuffer(FrameBuffer *frame_buffer, TerrainType *default_terrain);
@@ -34,18 +20,6 @@ static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *bo
     GameObject *objects[], int num_elements);
 static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, 
     Map *map, int start_x, int end_x, int start_y, int end_y);
-
-
-static void render_char(int fb_x, int fb_y, char pixel, Color_Pair color,
-    FrameBuffer *frame_buffer, int current_width);
-static void render_line_char(int fb_x, int fb_y, char pixel, int repeats, Color_Pair color,
-    FrameBuffer *frame_buffer, int current_width);
-static void render_line(int fb_x, int fb_y, char *pixels, int width, Color_Pair color,
-    FrameBuffer *frame_buffer, int current_width);
-static void render_line_vert_char(int fb_x, int fb_y, char pixel, int repeats, 
-    Color_Pair color, FrameBuffer *frame_buffer, int current_width);
-static void render_line_vert(int fb_x, int fb_y, char *pixels, int width, 
-    Color_Pair color, FrameBuffer *frame_buffer, int current_width);
 
 
 
@@ -107,6 +81,26 @@ boolean Rendering_init(size_t width, size_t height) {
     }
 
     return TRUE;
+}
+
+FrameBuffer *get_frame_buffer() {
+    return frames[current_frame_index];
+}
+
+int Rendering_get_screen_height() {
+    return screen_height;
+}
+
+int Rendering_get_screen_width() {
+    return screen_width;
+}
+
+int Rendering_get_menu_bottom_height() {
+    return menu_bottom_height;
+}
+
+int Rendering_get_menu_bottom_width() {
+    return menu_bottom_width;
 }
 
 void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_screen_height, 
@@ -250,20 +244,11 @@ static inline int inner_i(int fb_x, int fb_y, int width) {
     return (fb_y * width + fb_x);
 }
 
-/*
- * Renders a single character in the frame buffer at the specified 2D coordinates.
- * 
- * @arg fb_x: The x index in the frame buffer.
- * @arg fb_y: The y index in the frame buffer.
- * @arg pixel: The pixel to draw.
- * @arg color: The color of the character to be rendered.
- * @arg frame_buffer: The frame buffer to draw to.
- * @arg current_width: The current width of a line in the frame buffer.
- */
-static void render_char(int fb_x, int fb_y, char pixel, Color_Pair color,
+void render_char(int fb_x, int fb_y, char pixel, Color_Pair color,
     FrameBuffer *frame_buffer, int current_width) {
 
     if (fb_x < 0 || fb_y < 0) return;
+    if (fb_x >= current_width) return;
     assert(frame_buffer);
 
     attron(COLOR_PAIR(color));
@@ -276,16 +261,7 @@ static void render_char(int fb_x, int fb_y, char pixel, Color_Pair color,
     attroff(COLOR_PAIR(color));
 }
 
-/*
- * Wrapper for 'render_line', where one specific character will be repeated 
- * several times.
- * 
- * @arg pixel: The pixel/character to repeat.
- * @ag repeats: The number of times the pixel/character will be repeated.
- * 
- * See 'render_line' for more argument info.
- */
-static void render_line_char(int fb_x, int fb_y, char pixel, int repeats, Color_Pair color,
+void render_line_char(int fb_x, int fb_y, char pixel, int repeats, Color_Pair color,
     FrameBuffer *frame_buffer, int current_width) {
     
     assert(repeats >= 0);
@@ -296,19 +272,7 @@ static void render_line_char(int fb_x, int fb_y, char pixel, int repeats, Color_
     render_line(fb_x, fb_y, pixels, repeats, color, frame_buffer, current_width);
 }
 
-/*
- * Renders a line in the frame buffer at the specified 2D coordinates.
- * All pixels in the pixel array will be drawn in the same color.
- * 
- * @arg fb_x: The x index in the frame buffer.
- * @arg fb_y: The y index in the frame buffer.
- * @arg pixels: The pixels (chars) on the line to be drawn.
- * @arg width: The length of the line to be rendered.
- * @arg color: The color of all the characters to be rendered.
- * @arg frame_buffer: The frame buffer to draw to.
- * @arg current_width: The current width of a line in the frame buffer.
- */
-static void render_line(int fb_x, int fb_y, char *pixels, int width, Color_Pair color,
+void render_line(int fb_x, int fb_y, char *pixels, int width, Color_Pair color,
     FrameBuffer *frame_buffer, int current_width) {
     
     if (fb_x < 0 || fb_y < 0) return;
@@ -329,20 +293,7 @@ static void render_line(int fb_x, int fb_y, char *pixels, int width, Color_Pair 
     attroff(COLOR_PAIR(color));
 }
 
-/*
- * Renders a vertical line in the frame buffer at the specified 2D coordinates.
- * All pixels in the pixel array will be drawn in the same color and with the
- * same pixel value.
- * 
- * @arg fb_x: The x index in the frame buffer.
- * @arg fb_y: The y index in the frame buffer.
- * @arg pixels: The pixel on the line to be repeatedly drawn.
- * @arg width: The length of the line to be rendered.
- * @arg color: The color of all the characters to be rendered.
- * @arg frame_buffer: The frame buffer to draw to.
- * @arg current_width: The current width of a line in the frame buffer.
- */
-static void render_line_vert_char(int fb_x, int fb_y, char pixel, int repeats, 
+void render_line_vert_char(int fb_x, int fb_y, char pixel, int repeats, 
     Color_Pair color, FrameBuffer *frame_buffer, int current_width) {
 
     int j;
@@ -351,19 +302,7 @@ static void render_line_vert_char(int fb_x, int fb_y, char pixel, int repeats,
     }
 }
 
-/*
- * Renders a vertical line in the frame buffer at the specified 2D coordinates.
- * All pixels in the pixel array will be drawn in the same color.
- * 
- * @arg fb_x: The x index in the frame buffer.
- * @arg fb_y: The y index in the frame buffer.
- * @arg pixels: The pixels (chars) on the line to be drawn.
- * @arg width: The length of the line to be rendered.
- * @arg color: The color of all the characters to be rendered.
- * @arg frame_buffer: The frame buffer to draw to.
- * @arg current_width: The current width of a line in the frame buffer.
- */
-static void render_line_vert(int fb_x, int fb_y, char *pixels, int width, 
+void render_line_vert(int fb_x, int fb_y, char *pixels, int width, 
     Color_Pair color, FrameBuffer *frame_buffer, int current_width) {
 
     int j;
@@ -440,6 +379,9 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
     paint_objects(current_frame, &borders, map, objects, num_elements);
     paint_bottom_menu(current_frame, &borders_menu_bottom, map, 
         0, menu_bottom_width, menu_bottom_top_y, menu_bottom_bot_y);
+
+    /* Draw the GameLog */
+    GameLog_draw();
 } 
 
 void Rendering_render_frame() {

@@ -1,6 +1,7 @@
 #include "../include/unit_controllers.h"
 #include "../include/map.h"
 #include "../include/utils.h"
+#include "../include/game_log.h"
 
 #include <stdlib.h>
 
@@ -149,7 +150,7 @@ static boolean farm_square(GameObject *object) {
     size_t y = object->m->get_y(object);
     Square *current_square = global_map->m->get_square(global_map, x, y);
     if (current_square == NULL) {
-        fprintf(stderr, "Nothing here...\n");
+        GameLog_println("Nothing here...");
         return FALSE;
     }
     TerrainType *type = current_square->m->get_terrain_type(current_square);
@@ -157,13 +158,13 @@ static boolean farm_square(GameObject *object) {
     
     switch (type->m->get_tag(type)) {
         case TERRAIN_STONE:
-            fprintf(stderr, "*You picked up some rocks*\n");
+            GameLog_println("*You picked up some rocks*");
             break;
         case TERRAIN_WHEAT:
-            fprintf(stderr, "WHEAT?!\n");
+            GameLog_println("WHEAT?!");
             break;
         default:
-            fprintf(stderr, "Get the hell off my lawn!\n");
+            GameLog_println("Get the hell off my lawn!");
     }
 
     return TRUE;
