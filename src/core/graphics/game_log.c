@@ -20,12 +20,13 @@ static void add_line(char *string);
 
 /* ----- | Static Variables | ------ */
 
-static char lines[MAX_LINES][MAX_LINE_LENGTH] = {0};
+static char lines[MAX_LINES][MAX_LINE_LENGTH+1] = {0};
 static int line_index = 0;
 
 static const char pixel_horizontal = '=';
 static const char pixel_vertical = '|';
 static const Color_Pair border_color = COLOR_PAIR_GREEN;
+static const Color_Pair text_color = COLOR_PAIR_BLUE;
 
 
 
@@ -55,14 +56,26 @@ void GameLog_draw() {
         frame_buffer, screen_width);
     render_line_vert_char(start_x, start_y, pixel_vertical, LOG_HEIGHT, border_color,
         frame_buffer, screen_width);
+
+    /* Write strings */
+    int i;
+    for (i = 0; i < MAX_LINES; i++) {
+        if (lines[i][0] != '\0') {
+            render_line(start_x + 1, start_y + 1 + i, lines[i], strlen(lines[i]), 
+                text_color, frame_buffer, screen_width);
+        }
+    }
 }
 
 void GameLog_println(char *string) {
     assert(string);
 
-
+    add_line(string);
 }
 
 static void add_line(char *string) {
-
+    int cur_index = line_index;
+    strncpy(lines[cur_index], string, MAX_LINE_LENGTH);
+    lines[cur_index][MAX_LINE_LENGTH] = '\0';
+    line_index = (line_index + 1) % MAX_LINES;
 }

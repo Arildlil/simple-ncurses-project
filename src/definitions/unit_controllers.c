@@ -160,8 +160,17 @@ static boolean farm_square(GameObject *object) {
         case TERRAIN_STONE:
             GameLog_println("*You picked up some rocks*");
             break;
+        case TERRAIN_GRASS:
+            GameLog_println("Grass");
+            break;
         case TERRAIN_WHEAT:
-            GameLog_println("WHEAT?!");
+            GameLog_println("Wheat");
+            break;
+        case TERRAIN_WATER:
+            GameLog_println("*You drank some water*");
+            break;
+        case TERRAIN_TREE:
+            GameLog_println("Tree");
             break;
         default:
             GameLog_println("Get the hell off my lawn!");
