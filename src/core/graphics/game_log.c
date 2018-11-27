@@ -58,10 +58,18 @@ void GameLog_draw() {
         frame_buffer, screen_width);
 
     /* Write strings */
-    int i;
+    /*
     for (i = 0; i < MAX_LINES; i++) {
         if (lines[i][0] != '\0') {
             render_line(start_x + 1, start_y + 1 + i, lines[i], strlen(lines[i]), 
+                text_color, frame_buffer, screen_width);
+        }
+    }
+    */
+    int i, count;
+    for (count = 0, i = line_index; count < MAX_LINES; count++, i = (i + 1) % MAX_LINES) {
+        if (lines[i][0] != '\0') {
+            render_line(start_x + 1, bottom_y - 1 - count, lines[i], strlen(lines[i]), 
                 text_color, frame_buffer, screen_width);
         }
     }
