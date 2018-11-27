@@ -26,7 +26,7 @@ static int line_index = 0;
 static const char pixel_horizontal = '=';
 static const char pixel_vertical = '|';
 static const Color_Pair border_color = COLOR_PAIR_GREEN;
-static const Color_Pair text_color = COLOR_PAIR_BLUE;
+static const Color_Pair text_color = COLOR_PAIR_TEXT_BW;
 
 
 
@@ -58,14 +58,6 @@ void GameLog_draw() {
         frame_buffer, screen_width);
 
     /* Write strings */
-    /*
-    for (i = 0; i < MAX_LINES; i++) {
-        if (lines[i][0] != '\0') {
-            render_line(start_x + 1, start_y + 1 + i, lines[i], strlen(lines[i]), 
-                text_color, frame_buffer, screen_width);
-        }
-    }
-    */
     int i, count;
     for (count = 0, i = line_index; count < MAX_LINES; count++, i = (i + 1) % MAX_LINES) {
         if (lines[i][0] != '\0') {

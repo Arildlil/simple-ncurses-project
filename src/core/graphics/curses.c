@@ -76,6 +76,8 @@ static void define_color_pairs() {
     init_pair(COLOR_PAIR_WATER, COLOR_WHITE, COLOR_BLUE);
     init_pair(COLOR_PAIR_STONE, COLOR_WHITE, COLOR_BLACK);
     init_pair(COLOR_PAIR_TREE, COLOR_GREEN, COLOR_BLACK);
+
+    init_pair(COLOR_PAIR_TEXT_BW, COLOR_WHITE, COLOR_BLACK);
 }
 
 /*

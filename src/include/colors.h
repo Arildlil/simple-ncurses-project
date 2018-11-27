@@ -12,7 +12,9 @@ typedef enum {
     COLOR_PAIR_WHEAT,
     COLOR_PAIR_WATER,
     COLOR_PAIR_STONE,
-    COLOR_PAIR_TREE
+    COLOR_PAIR_TREE,
+
+    COLOR_PAIR_TEXT_BW,
 } Color_Pair;
 
 #endif
