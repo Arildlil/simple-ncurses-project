@@ -15,6 +15,10 @@
 /* ----- | Function Prototypes | ----- */
 
 static void clear_framebuffer(FrameBuffer *frame_buffer, TerrainType *default_terrain);
+static void paint_object(GameObject *object, int x, int y, FrameBuffer *frame_buffer,
+    RenderCoordinateBorders *borders);
+static void paint_image(Image *image, int x, int y, Color_Pair color, FrameBuffer *frame_buffer,
+    RenderCoordinateBorders *borders);
 static void paint_terrain(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map);
 static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map, 
     GameObject *objects[], int num_elements);
@@ -141,6 +145,59 @@ static void clear_framebuffer(FrameBuffer *frame_buffer, TerrainType *default_te
 }
 
 /*
+ * Calculates a 1D index into a frame buffer from 2D coordinates.
+ * 
+ * @arg fb_x: The x index in the frame buffer.
+ * @arg fb_y: The y index in the frame buffer.
+ * @arg width: The width of a line in the frame buffer.
+ * @return: A 1D index on success, -1 otherwise.
+ */
+static inline int inner_i(int fb_x, int fb_y, int width) {
+    if (fb_x < 0 || fb_y < 0) return -1;
+    return (fb_y * width + fb_x);
+}
+
+static void paint_object(GameObject *object, int x, int y, FrameBuffer *frame_buffer,
+    RenderCoordinateBorders *borders) {
+
+    Player *owner = object->m->get_owner(object);
+    Color_Pair colors = owner->m->get_colors(owner);
+    Image *image = object->m->get_image(object);
+
+    paint_image(image, x, y, colors, frame_buffer, borders);
+}
+
+static void paint_image(Image *image, int x, int y, Color_Pair color, FrameBuffer *frame_buffer,
+    RenderCoordinateBorders *borders) {
+
+    size_t current_height = borders->bottom_y - borders->top_y + 1;
+    size_t current_width = borders->right_x - borders->left_x + 1;
+
+    char **pixels = image->get_pixels(image);
+    int image_height = image->get_height(image);
+    int image_width = image->get_width(image);
+    int half_image_height = image_height / 2;
+    int half_image_width = image_width / 2;
+    
+    int i, j;
+    attron(COLOR_PAIR(color));
+    for (i = 0; i < image_height && y - borders->top_y + i < current_height; i++) {
+        for (j = 0; j < image_width && x - borders->left_x + j < current_width; j++) {
+            char current_pixel_value = pixels[i][j];
+            int buffer_y_target = y - borders->top_y + i - half_image_height;
+            int buffer_x_target = x - borders->left_x + j - half_image_width;
+            int inner_index = inner_i(buffer_x_target, buffer_y_target, current_width);
+            if (inner_index < 0) break;
+            if (inner_index >= frame_buffer->max_index) break;
+            Pixel *current_pixel = &frame_buffer->pixels[inner_index];
+            current_pixel->color = color;
+            current_pixel->symbol = current_pixel_value;
+        }
+    }
+    attroff(COLOR_PAIR(color));
+}
+
+/*
  * Paint the terrain into the frame buffer.
  */
 static void paint_terrain(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map) {
@@ -194,9 +251,6 @@ static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *bo
 
     size_t j, k;
 
-    size_t current_height = borders->bottom_y - borders->top_y + 1;
-    size_t current_width = borders->right_x - borders->left_x + 1;
-
     int i;
     for (i = 0; i < num_elements; i++) {
         GameObject *object = objects[i];
@@ -208,40 +262,8 @@ static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *bo
             continue;
         }
 
-        char **pixels = object->m->get_pixels(object);
-        Player *owner = object->m->get_owner(object);
-        Color_Pair colors = owner->m->get_colors(owner);
-        
-        attron(COLOR_PAIR(colors));
-        for (j = 0; j < (size_t)object->m->get_height(object) && object_y - borders->top_y + j < current_height; j++) {
-            for (k = 0; k < (size_t)object->m->get_width(object) && object_x - borders->left_x + k < current_width; k++) {
-                char cur_pixel = pixels[j][k];
-                int inner_index = (object_y - borders->top_y + j) * 
-                    current_width + object_x - borders->left_x + k;
-                assert(inner_index >= 0);
-                if (inner_index >= frame_buffer->max_index) {
-                    break;
-                }
-                Pixel *current_pixel = &frame_buffer->pixels[inner_index];
-                current_pixel->color = colors;
-                current_pixel->symbol = cur_pixel;
-            }
-        }
-        attroff(COLOR_PAIR(colors));
+        paint_object(object, object_x, object_y, frame_buffer, borders);
     }
-}
-
-/*
- * Calculates a 1D index into a frame buffer from 2D coordinates.
- * 
- * @arg fb_x: The x index in the frame buffer.
- * @arg fb_y: The y index in the frame buffer.
- * @arg width: The width of a line in the frame buffer.
- * @return: A 1D index on success, -1 otherwise.
- */
-static inline int inner_i(int fb_x, int fb_y, int width) {
-    assert(fb_x >= 0 && fb_y >= 0);
-    return (fb_y * width + fb_x);
 }
 
 void render_char(int fb_x, int fb_y, char pixel, Color_Pair color,
