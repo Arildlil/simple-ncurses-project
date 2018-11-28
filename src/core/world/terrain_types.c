@@ -39,14 +39,19 @@ const char *TERRAIN_STRINGS[TERRAIN_ENUM_SIZE][5] = {
         "v v",
     },
     {
-        "v"
+        "YYY",
+        "YYY",
+        "YYY",
     },
     {
-        "~"
+        "~~~",
+        "~~~",
+        "~~~",
     },
     {
-        " OOO ",
-        "OOOOO",
+        " O",
+        "oOO",
+        "OOo",
     },
     {
         "  A  ",
@@ -81,8 +86,8 @@ TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
         .name = "wheat",
         .image = &TERRAIN_IMAGES[TERRAIN_WHEAT],
         .colors = COLOR_PAIR_WHEAT,
-        .width = 1,
-        .height = 1,
+        .width = 3,
+        .height = 3,
         .m = &terrain_methods,
     },
     {
@@ -90,8 +95,8 @@ TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
         .name = "water",
         .image = &TERRAIN_IMAGES[TERRAIN_WATER],
         .colors = COLOR_PAIR_WATER,
-        .width = 1,
-        .height = 1,
+        .width = 3,
+        .height = 3,
         .m = &terrain_methods,
     },
     {
@@ -99,8 +104,8 @@ TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
         .name = "stone",
         .image = &TERRAIN_IMAGES[TERRAIN_STONE],
         .colors = COLOR_PAIR_STONE,
-        .width = 5,
-        .height = 2,
+        .width = 3,
+        .height = 3,
         .m = &terrain_methods,
     },
     {

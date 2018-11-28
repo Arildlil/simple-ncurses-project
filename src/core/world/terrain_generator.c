@@ -2,18 +2,19 @@
 
 
 
+static void set_square(Map *map, int x, int y, TerrainType_Tag type) {
+    x -= x % SQUARE_SIZE;
+    y -= y % SQUARE_SIZE;
+    Map_set_square(map, x, y, type);
+}
+
+
+
 void TerrainGenerator_generate_default_map(Map *map) {
     int map_width = map->m->get_width(map);
     int map_height = map->m->get_height(map);
     (void)map_width;
     (void)map_height;
-    /*int w, h;*/
-    /*
-    for (h = 0; h < map_height; h++) {
-        for (w = 0; w < map_width; w++) {
-            Square_init(map, w, h, TERRAIN_GRASS);
-        }
-    }*/
 
     int map_min_x = global_map->m->get_min_x(global_map);
     int map_min_y = global_map->m->get_min_y(global_map);
@@ -44,8 +45,7 @@ void TerrainGenerator_generate_default_map(Map *map) {
     for (s = 0; s < NUM_WATER_SEGMENTS; s++) {
         for (y = water_start[s].y; y <= water_end[s].y; y++) {
             for (x = water_start[s].x; x <= water_end[s].x; x++) {
-                //Square_init(map, x, y, TERRAIN_WATER);
-                Map_set_square(map, x, y, TERRAIN_WATER);
+                set_square(map, x, y, TERRAIN_WATER);
             }
         }
     }
@@ -58,8 +58,7 @@ void TerrainGenerator_generate_default_map(Map *map) {
     int j, k;
     for (k = start_y; k < (patch_size_y * SQUARE_SIZE) + start_y; k += SQUARE_SIZE) {
         for (j = start_x; j < (patch_size_x * SQUARE_SIZE) + start_x; j += SQUARE_SIZE) {
-            //Square_init(map, j, k, TERRAIN_GRASS);
-            Map_set_square(map, j, k, TERRAIN_GRASS);
+            set_square(map, j, k, TERRAIN_GRASS);
         }
     }
 
@@ -73,28 +72,23 @@ void TerrainGenerator_generate_default_map(Map *map) {
 
     int i;
     for (i = 0; i < NUM_TERRAIN_PIECES; i++) {
-        //Square_init(map, x_coords[i], y_coords[i], tags[i]);
-        Map_set_square(map, x_coords[i], y_coords[i], tags[i]);
+        set_square(map, x_coords[i], y_coords[i], tags[i]);
     }
 
     /* Add water to the borders around the map */
     for (i = map_min_x; i < map_max_x; i++) {
-        //Square_init(map, i, map_min_y, TERRAIN_WATER);
-        Map_set_square(map, i, map_min_y, TERRAIN_WATER);
+        set_square(map, i, map_min_y, TERRAIN_WATER);
     }
 
     for (i = map_min_x; i < map_max_x; i++) {
-        //Square_init(map, i, map_max_y, TERRAIN_WATER);
-        Map_set_square(map, i, map_max_y, TERRAIN_WATER);
+        set_square(map, i, map_max_y, TERRAIN_WATER);
     }
 
     for (j = map_min_y; j < map_max_y; j++) {
-        //Square_init(map, map_min_x, j, TERRAIN_WATER);
-        Map_set_square(map, map_min_x, j, TERRAIN_WATER);
+        set_square(map, map_min_x, j, TERRAIN_WATER);
     }
 
     for (j = map_min_y; j < map_max_y; j++) {
-        //Square_init(map, map_max_x, j, TERRAIN_WATER);
-        Map_set_square(map, map_max_x, j, TERRAIN_WATER);
+        set_square(map, map_max_x, j, TERRAIN_WATER);
     }
 }
