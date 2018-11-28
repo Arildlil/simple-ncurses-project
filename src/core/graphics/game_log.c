@@ -36,7 +36,7 @@ void GameLog_draw() {
     int screen_height = Rendering_get_screen_height();
     int screen_width = Rendering_get_screen_width();
     int menu_bottom_height = Rendering_get_menu_bottom_height();
-    int menu_bottom_width = Rendering_get_menu_bottom_width();
+    //int menu_bottom_width = Rendering_get_menu_bottom_width();
     
     int start_x = screen_width - LOG_WIDTH;
     int start_y = screen_height - menu_bottom_height;

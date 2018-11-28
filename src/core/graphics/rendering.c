@@ -61,7 +61,7 @@ boolean Rendering_init(size_t width, size_t height) {
     menu_bottom_width = screen_width;
     menu_bottom_height = MENU_BOTTOM_HEIGHT;
 
-    int i, j;
+    size_t i, j;
     for (i = 0; i < NUM_FRAME_BUFFERS; i++) {
         
         if ((frames[i] = calloc(1, sizeof(FrameBuffer))) == NULL) {
@@ -74,8 +74,10 @@ boolean Rendering_init(size_t width, size_t height) {
         frames[i]->width = width;
         frames[i]->height = height;
         frames[i]->max_index = width * height - 1;
+        /*
         fprintf(stderr, "frames[%d]->width: %d, ->height: %d\n", 
             i, frames[i]->width, frames[i]->height);
+        */
 
         for (j = 0; j < pixel_count; j++) {
             Pixel *current_pixel = &frames[i]->pixels[j];
@@ -110,8 +112,11 @@ int Rendering_get_menu_bottom_width() {
 void Rendering_convert_coordinates(Map *map, int half_screen_width, int half_screen_height, 
     int center_x, int center_y, RenderCoordinateBorders *borders) {
     
+    (void)map;
+    /*
     int map_max_x = map->m->get_max_x(map);
     int map_max_y = map->m->get_max_y(map);
+    */
 
     borders->left_x = center_x - half_screen_width;
     borders->right_x = center_x + half_screen_width;
@@ -181,8 +186,8 @@ static void paint_image(Image *image, int x, int y, Color_Pair color, FrameBuffe
     
     int i, j;
     attron(COLOR_PAIR(color));
-    for (i = 0; i < image_height && y - borders->top_y + i < current_height; i++) {
-        for (j = 0; j < image_width && x - borders->left_x + j < current_width; j++) {
+    for (i = 0; i < image_height && y - borders->top_y + i < (int)current_height; i++) {
+        for (j = 0; j < image_width && x - borders->left_x + j < (int)current_width; j++) {
             char current_pixel_value = pixels[i][j];
             int buffer_y_target = y - borders->top_y + i - half_image_height;
             int buffer_x_target = x - borders->left_x + j - half_image_width;
@@ -202,7 +207,7 @@ static void paint_image(Image *image, int x, int y, Color_Pair color, FrameBuffe
  */
 static void paint_terrain(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map) {
     int from_x, from_y; 
-    size_t to_x, to_y, j, k;
+    size_t to_x, to_y;
 
     size_t current_height = borders->bottom_y - borders->top_y + 1;
     size_t current_width = borders->right_x - borders->left_x + 1;
@@ -234,8 +239,6 @@ static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *bo
     GameObject *objects[], int num_elements) {
     
     (void)map;
-
-    size_t j, k;
 
     int i;
     for (i = 0; i < num_elements; i++) {
@@ -326,9 +329,8 @@ static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders
     Map *map, int start_x, int end_x, int start_y, int end_y) {
     
     (void)map;
+    (void)borders;
     assert(frame_buffer);
-
-    size_t to_x, to_y, left_x, top_y;
 
     size_t current_height = end_y - start_y;
     size_t current_width = end_x - start_x;
@@ -359,8 +361,9 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
 
     size_t menu_bottom_top_y = current_height - menu_bottom_height;
     size_t menu_bottom_bot_y = current_height;
+    
     fprintf(stderr, "curH: %d, curW: %d, topY: %d, botY: %d\n", 
-        current_height, current_width, menu_bottom_top_y, menu_bottom_bot_y);
+        (int)current_height, (int)current_width, (int)menu_bottom_top_y, (int)menu_bottom_bot_y);
 
     /* Don't draw under the bottom menu */
     current_height -= menu_bottom_height;
@@ -368,7 +371,7 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
 
     /* Used for the terrain part of the window */
     RenderCoordinateBorders borders = {0};
-    Rendering_convert_coordinates(map, current_width / 2, current_height / 2, center_x, center_y, 
+    Rendering_convert_coordinates(map, (int)current_width / 2, (int)current_height / 2, (int)center_x, (int)center_y, 
         &borders);
 
     fprintf(stderr, "(borders) bottom_y: %d, left_x: %d\t", borders.bottom_y, borders.left_x);

@@ -118,17 +118,7 @@ TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
 
 /* ----- | Functions | ----- */
 
-void TerrainType_init() {
-    TerrainType_Tag terrain_tags[] = {
-        TERRAIN_NONE, 
-        TERRAIN_GRASS, 
-        TERRAIN_WHEAT, 
-        TERRAIN_WATER, 
-        TERRAIN_STONE, 
-        TERRAIN_TREE, 
-        TERRAIN_ENUM_SIZE
-    };
-    
+void TerrainType_init() {    
     int tag;
     for (tag = TERRAIN_NONE; tag < TERRAIN_ENUM_SIZE; tag++) {
         Image_init_2D(&TERRAIN_IMAGES[tag], terrain_types[tag].width, 

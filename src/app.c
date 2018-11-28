@@ -59,9 +59,9 @@ int main(int argc, char *argv[]) {
     Player_init(&neutrals, COLOR_PAIR_YELLOW, FALSE);
 
     const int max_x_coord = 100;
-    const int min_x_coord = max_x_coord * -1;
+    //const int min_x_coord = max_x_coord * -1;
     const int max_y_coord = 50;
-    const int min_y_coord = max_y_coord * -1;
+    //const int min_y_coord = max_y_coord * -1;
 
     Map default_map;
     global_map = &default_map;
