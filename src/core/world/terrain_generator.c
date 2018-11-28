@@ -51,11 +51,13 @@ void TerrainGenerator_generate_default_map(Map *map) {
     }
 
     /* Add some grass patches. */
-    int patch_size_x = 6, patch_size_y = 4;
+    int patch_size_x = 3, patch_size_y = 2;
     int start_x = 15-71, start_y = 20-21;
+    start_x -= start_x % SQUARE_SIZE;
+    start_y -= start_y % SQUARE_SIZE;
     int j, k;
-    for (k = start_y; k < patch_size_y + start_y; k++) {
-        for (j = start_x; j < patch_size_x + start_x; j++) {
+    for (k = start_y; k < (patch_size_y * SQUARE_SIZE) + start_y; k += SQUARE_SIZE) {
+        for (j = start_x; j < (patch_size_x * SQUARE_SIZE) + start_x; j += SQUARE_SIZE) {
             //Square_init(map, j, k, TERRAIN_GRASS);
             Map_set_square(map, j, k, TERRAIN_GRASS);
         }

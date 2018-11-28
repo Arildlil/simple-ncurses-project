@@ -222,21 +222,7 @@ static void paint_terrain(FrameBuffer *frame_buffer, RenderCoordinateBorders *bo
 
             Color_Pair color = terrain->m->get_colors(terrain);
             Image *image = terrain->m->get_image(terrain);
-            char **pixels = image->get_pixels(image);
-
-            for (j = 0; j < (size_t)image->get_height(image) && to_y + j < current_height; j++) {
-                for (k = 0; k < (size_t)image->get_width(image) && to_x + k < current_width; k++) {
-                    char cur_pixel = pixels[j][k];
-                    int inner_index = (to_y + j) * current_width + to_x + k;
-                    assert(inner_index >= 0);
-                    if (inner_index >= frame_buffer->max_index) {
-                        break;
-                    }
-                    Pixel *current_pixel = &frame_buffer->pixels[inner_index];
-                    current_pixel->color = color;
-                    current_pixel->symbol = cur_pixel;
-                }
-            }
+            paint_image(image, from_x, from_y, color, frame_buffer, borders);
         }
     }
 }

@@ -34,7 +34,9 @@ const char *TERRAIN_STRINGS[TERRAIN_ENUM_SIZE][5] = {
         ""
     },
     {
-        "v"
+        " v^",
+        "^v ",
+        "v v",
     },
     {
         "v"
@@ -70,8 +72,8 @@ TerrainType terrain_types[TERRAIN_ENUM_SIZE] = {
         .name = "grass",
         .image = &TERRAIN_IMAGES[TERRAIN_GRASS],
         .colors = COLOR_PAIR_GRASS,
-        .width = 1,
-        .height = 1,
+        .width = 3,
+        .height = 3,
         .m = &terrain_methods,
     },
     {
