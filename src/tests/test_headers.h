@@ -4,6 +4,8 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
-#include <cmocka.h>
+#ifdef DEBUG
+  #include <cmocka.h>
+#endif
 
 #endif

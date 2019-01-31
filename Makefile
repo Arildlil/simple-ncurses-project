@@ -13,10 +13,12 @@ OBJS = src/core/player/*.c src/core/graphics/*.c \
 
 INCS = -I/usr/include/cmocka
 LIB_PATH = -L/usr/lib/
-LIBS = -lcmocka -lncurses
+LIBS = -lncurses
+LIBS_TEST = -lcmocka
 
 FLAGS = $(WARNINGS) $(DEBUG)
-LDLIBS = $(LIB_PATH) $(LIBS)
+LDLIBS = $(LIBPATH) $(LIBS)
+LDLIBS_TEST = $(LDLIBS) $(LIBS_TEST)
 
 .PHONY: all clean install debug run lrun test vtest
 
@@ -33,7 +35,7 @@ test: $(TESTS) $(OBJS)
 
 debug: $(APP) $(OBJS)
 	@echo "Building target" $@ "in DEBUG mode..." 
-	$(CC) $(FLAGS) -DDEBUG $(APP) $(OBJS) $(LDLIBS) -o app
+	$(CC) $(FLAGS) -DDEBUG $(APP) $(OBJS) $(LDLIBS_TEST) -o app
 
 app: $(APP) $(OBJS)
 	@echo "Building target" $@ "..." 
