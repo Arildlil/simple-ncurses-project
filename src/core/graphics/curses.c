@@ -15,6 +15,7 @@
 
 
 static void define_color_pairs();
+static void draw_surface(Surface *surface);
 
 
 
@@ -92,29 +93,40 @@ boolean Curses_exit(void) {
  * Redraws the screen.
  */
 void Curses_redraw(Surface *surfaces[], int num_elements) {
-    int i, j, k;
+    int i;
     getmaxyx(stdscr, max_y, max_x);
     clear();
+
     for (i = 0; i < num_elements; i++) {
-        Surface* cur = surfaces[i];
-        assert(cur != NULL);
-        if (cur->state == DEAD) {
+        Surface* current_surface = surfaces[i];
+        assert(current_surface != NULL);
+
+        if (current_surface->state == DEAD) {
             continue;
         }
         
-        char **pixels = cur->get_pixels(cur);
-        assert(pixels != NULL);
-        dprintf("Object <%d> (x,y)\n", i);
- 
-        for (j = 0; j < cur->get_height(cur); j++) {
-            for (k = 0; k < cur->get_width(cur); k++) {
-                char cur_pixel = pixels[j][k];
-                dprintf("\t(%d,", cur->x+k);
-                dprintf("%d) ", cur->y+j);
-                mvaddch(cur->y+j, cur->x+k,cur_pixel);
-            }
-            dnprintf("\n");
-        }
+        draw_surface(current_surface);
     }
+
     refresh();
+}
+
+static void draw_surface(Surface *surface) {
+    int j, k;
+
+    char **pixels = surface->get_pixels(surface);
+    assert(pixels != NULL);
+    dprintf("Object <%d> (x,y)\n", i);
+
+    for (j = 0; j < surface->get_height(surface); j++) {
+        for (k = 0; k < surface->get_width(surface); k++) {
+            char pixel = pixels[j][k];
+            mvaddch(surface->y+j, surface->x+k, pixel);
+            
+            dprintf("\t(%d,", surface->x+k);
+            dprintf("%d) ", surface->y+j);
+        }
+        
+        dnprintf("\n");
+    }
 }

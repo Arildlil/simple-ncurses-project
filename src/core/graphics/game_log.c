@@ -14,6 +14,9 @@
 
 /* ----- | Function Prototypes | ----- */
 
+static void render_borders(FrameBuffer *frame_buffer, int screen_width, int left_corner_x, int upper_corner_y,
+    int right_corner_x, int bottom_corner_y);
+static void render_text(FrameBuffer *frame_buffer, int screen_width, int text_start_x, int bottom_y);
 static void add_line(char *string);
 
 
@@ -38,30 +41,42 @@ void GameLog_draw() {
     int menu_bottom_height = Rendering_get_menu_bottom_height();
     //int menu_bottom_width = Rendering_get_menu_bottom_width();
     
-    int start_x = screen_width - LOG_WIDTH;
-    int start_y = screen_height - menu_bottom_height;
+    int log_window_start_x = screen_width - LOG_WIDTH;
+    int log_window_start_y = screen_height - menu_bottom_height;
     int end_x = screen_width - 1;
-    int bottom_y = start_y + menu_bottom_height - 1;
+    int bottom_y = log_window_start_y + menu_bottom_height - 1;
+
+    int log_text_start_x = log_window_start_x + 1;
 
     FrameBuffer *frame_buffer = get_frame_buffer();
 
+    render_borders(frame_buffer, screen_width, log_window_start_x, log_window_start_y, end_x, bottom_y);
+    render_text(frame_buffer, screen_width, log_text_start_x, bottom_y);
+}
+
+static void render_borders(FrameBuffer *frame_buffer, int screen_width, int left_corner_x, int upper_corner_y,
+    int right_corner_x, int bottom_corner_y) {
     /* Top border */
-    render_line_char(start_x, start_y, pixel_horizontal, LOG_WIDTH, border_color,
+    render_line_char(left_corner_x, upper_corner_y, pixel_horizontal, LOG_WIDTH, border_color,
         frame_buffer, screen_width);
     /* Bottom border */
-    render_line_char(start_x, bottom_y, pixel_horizontal, LOG_WIDTH, border_color,
+    render_line_char(left_corner_x, bottom_corner_y, pixel_horizontal, LOG_WIDTH, border_color,
         frame_buffer, screen_width);
     /* Vertical borders */
-    render_line_vert_char(end_x, start_y, pixel_vertical, LOG_HEIGHT, border_color,
+    render_line_vert_char(right_corner_x, upper_corner_y, pixel_vertical, LOG_HEIGHT, border_color,
         frame_buffer, screen_width);
-    render_line_vert_char(start_x, start_y, pixel_vertical, LOG_HEIGHT, border_color,
-        frame_buffer, screen_width);
+    render_line_vert_char(left_corner_x, upper_corner_y, pixel_vertical, LOG_HEIGHT, border_color,
+        frame_buffer, screen_width);    
+}
 
+static void render_text(FrameBuffer *frame_buffer, int screen_width, int text_start_x, int bottom_y) {
     /* Write strings */
     int i, count;
     for (count = 0, i = line_index; count < MAX_LINES; count++, i = (i + 1) % MAX_LINES) {
         if (lines[i][0] != '\0') {
-            render_line(start_x + 1, bottom_y - 1 - count, lines[i], strlen(lines[i]), 
+            int current_y = bottom_y - 1 - count;
+
+            render_line(text_start_x, current_y, lines[i], strlen(lines[i]), 
                 text_color, frame_buffer, screen_width);
         }
     }

@@ -24,6 +24,7 @@ static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *bo
     GameObject *objects[], int num_elements);
 static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, 
     Map *map, int start_x, int end_x, int start_y, int end_y);
+static void render_pixel(FrameBuffer *frame_buffer, int x, int y);
 
 
 
@@ -404,15 +405,23 @@ void Rendering_render_frame() {
     FrameBuffer *current_frame = frames[current_frame_index];
     size_t current_height = current_frame->height;
     size_t current_width = current_frame->width;
+
     for (y = 0; y < current_height; y++) {
         for (x = 0; x < current_width; x++) {
-            size_t index = y * current_width + x;
-            Pixel *current_pixel = &current_frame->pixels[index];
-            attron(COLOR_PAIR(current_pixel->color));
-            mvaddch(y, x, current_pixel->symbol);
-            attroff(COLOR_PAIR(current_pixel->color));
+            render_pixel(current_frame, x, y);
         }
     }
 
     current_frame_index = ++current_frame_index % NUM_FRAME_BUFFERS;
+}
+
+static inline void render_pixel(FrameBuffer *current_frame, int x, int y) {
+    size_t current_width = current_frame->width;
+    size_t index = y * current_width + x;
+    Pixel *current_pixel = &current_frame->pixels[index];
+    
+    attron(COLOR_PAIR(current_pixel->color));
+    mvaddch(y, x, current_pixel->symbol);
+    attroff(COLOR_PAIR(current_pixel->color));
+
 }
