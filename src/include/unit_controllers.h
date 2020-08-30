@@ -7,4 +7,10 @@
 
 GameObject_Controller *get_controller(const char *name);
 
+void default_on_tick(GameObject_Controller *controller, GameObject *object);
+boolean default_shoot(GameObject_Controller *controller, GameObject *object);
+boolean peasant_shoot(GameObject_Controller *controller, GameObject *object);
+
+boolean farm_square(GameObject *object);
+
 #endif

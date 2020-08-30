@@ -49,6 +49,12 @@ static void cleanup(int sig);
 
 static Player player, neutrals;
 
+static GameObject_Controller player_controller;
+static GameObject_Controller_Methods player_methods = {
+    .on_tick = NULL,
+    .shoot = peasant_shoot,
+};
+
 static int MIDDLE_X = 0;
 static GameObject *hero;
 
@@ -70,8 +76,8 @@ int main(int argc, char *argv[]) {
     const int max_y_coord = 50;        
 
     init_world(max_x_coord, max_y_coord);
-    initialize_players();
     generate_entities(5);
+    initialize_players();
 
     MIDDLE_X = max_x / 2;
 
@@ -113,11 +119,6 @@ static void initialize_players() {
     Player_init(&player, COLOR_PAIR_RED, TRUE);
     Player_init(&neutrals, COLOR_PAIR_YELLOW, FALSE);
 
-    GameObject_Controller player_controller;
-    GameObject_Controller_Methods player_methods = {
-        .on_tick = NULL,
-        .shoot = get_controller("peasant")->m->shoot,
-    };
     GameObject_Controller_init(&player_controller, &player_methods);
     
     hero = Unit_new(&player, &player_controller, "peasant", 0, 0);

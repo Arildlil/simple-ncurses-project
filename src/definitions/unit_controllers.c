@@ -9,11 +9,7 @@
 
 /* ----- | Prototypes | ------ */
 
-static void default_on_tick(GameObject_Controller *controller, GameObject *object);
-static boolean default_shoot(GameObject_Controller *controller, GameObject *object);
-static boolean peasant_shoot(GameObject_Controller *controller, GameObject *object);
 
-static boolean farm_square(GameObject *object);
 
 
 
@@ -94,7 +90,7 @@ GameObject_Controller *get_controller(const char *name) {
 
 
 
-static void default_on_tick(GameObject_Controller *controller, GameObject *object) {
+void default_on_tick(GameObject_Controller *controller, GameObject *object) {
     (void)controller;
 
     if (object->m->get_order_count(object) > 0) {
@@ -133,19 +129,19 @@ static void default_on_tick(GameObject_Controller *controller, GameObject *objec
     object->m->on_tick(object);
 }
 
-static boolean default_shoot(GameObject_Controller *controller, GameObject *object) {
+boolean default_shoot(GameObject_Controller *controller, GameObject *object) {
     (void)controller;
     (void)object;
     return TRUE;
 }
 
-static boolean peasant_shoot(GameObject_Controller *controller, GameObject *object) {
+boolean peasant_shoot(GameObject_Controller *controller, GameObject *object) {
     (void)controller;
     (void)object;
     return farm_square(object);
 }
 
-static boolean farm_square(GameObject *object) {
+boolean farm_square(GameObject *object) {
     size_t x = object->m->get_x(object); 
     size_t y = object->m->get_y(object);
     Square *current_square = global_map->m->get_square(global_map, x, y);
