@@ -7,7 +7,7 @@
 
 
 
-static void set_movement_x_y(int x, int y);
+static void set_movement_x_y(GameObject *hero, int x, int y);
 
 
 
@@ -30,6 +30,9 @@ enum {
 static int per_tick_movement_x = 0;
 static int per_tick_movement_y = 0;
 
+static int last_movement_x = 0;
+static int last_movement_y = 0;
+
 
 
 /* ----- | Functions | ----- */
@@ -48,51 +51,60 @@ boolean PlayerControls_handle_input_char(char input, GameObject *hero) {
 
     switch (input) {
         case MOVE_UP:
-            set_movement_x_y(0, -1);
+            set_movement_x_y(hero, 0, -1);
             break;
         case MOVE_DOWN:
-            set_movement_x_y(0, 1);
+            set_movement_x_y(hero, 0, 1);
             break;
         case MOVE_RIGHT: 
-            set_movement_x_y(1, 0);
+            set_movement_x_y(hero, 1, 0);
             break;
         case MOVE_LEFT:
-            set_movement_x_y(-1, 0);
+            set_movement_x_y(hero, -1, 0);
             break;
         case MOVE_UP_LEFT:
-            set_movement_x_y(-1, -1);
+            set_movement_x_y(hero, -1, -1);
             break;
         case MOVE_UP_RIGHT:
-            set_movement_x_y(1, -1);
+            set_movement_x_y(hero, 1, -1);
             break;
         case MOVE_DOWN_LEFT:
-            set_movement_x_y(-1, 1);
+            set_movement_x_y(hero, -1, 1);
             break;
         case MOVE_DOWN_RIGHT:
-            set_movement_x_y(1, 1);
+            set_movement_x_y(hero, 1, 1);
             break;
         case STOP:
-            set_movement_x_y(0, 0);
+            set_movement_x_y(hero, 0, 0);
             break;
         case ATTACK:
             hero->m->shoot(hero);
             break;
         case NO_KEYBOARD_INPUT:
+            hero->m->movement(hero, per_tick_movement_x, per_tick_movement_y);
             break;
         default:
             return FALSE;
     }
 
-    hero->m->movement(hero, per_tick_movement_x, per_tick_movement_y);
-
     return TRUE;
 }
 
-static void set_movement_x_y(int x, int y) {
+static void set_movement_x_y(GameObject *hero, int x, int y) {
     assert(x <= 1 && x >= -1);
     assert(y <= 1 && y >= -1);
-
-    per_tick_movement_x = x;
-    per_tick_movement_y = y;
+    
+    if (x == last_movement_x && y == last_movement_y) {
+        per_tick_movement_x = x;
+        per_tick_movement_y = y;
+        hero->m->movement(hero, per_tick_movement_x, per_tick_movement_y);
+    } else {
+        per_tick_movement_x = 0;
+        per_tick_movement_y = 0;
+        hero->m->movement(hero, x, y);        
+    }
+    
+    last_movement_x = x;
+    last_movement_y = y;
 }
 
