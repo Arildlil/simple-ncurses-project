@@ -22,6 +22,6 @@ void UnitDefs_init();
  * @arg y: The y-coordinate of the new unit.
  * @return: A new unit on success, NULL otherwise.
  */
-GameObject *Unit_new(Player *owner, const char *name, int x, int y);
+GameObject *Unit_new(Player *owner, GameObject_Controller *custom_controller, const char *name, int x, int y);
 
 #endif

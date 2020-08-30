@@ -28,6 +28,10 @@
 
 static int init();
 static void process_input();
+static void init_world(int max_x_coord, int max_y_coord);
+static void initialize_players();
+static int generate_entities(unsigned int count);
+
 static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_elements);
 static void render_objects(Map *map, GameObject *objects[], int num_objects);
 static void cleanup(int sig);
@@ -40,75 +44,39 @@ static void cleanup(int sig);
 #define US_PER_SEC 1000000
 #define UPDATE_RATE_US (US_PER_SEC / FPS)
 
+#define NUM_TROOPS 5
+#define NUM_OBJECTS (NUM_TROOPS + 1)
+
+static Player player, neutrals;
+
 static int MIDDLE_X = 0;
 static GameObject *hero;
+
+static Map default_map;
+static GameObject *all_objects[NUM_OBJECTS];
+
 
 
 
 /* ----- | Functions | ----- */
 
 int main(int argc, char *argv[]) {
-    dnprintf("Main!\n");
     init();
 
     (void)argc;
     (void)argv;
 
-    Player player, neutrals;
-    Player_init(&player, COLOR_PAIR_RED, TRUE);
-    Player_init(&neutrals, COLOR_PAIR_YELLOW, FALSE);
-
     const int max_x_coord = 100;
-    //const int min_x_coord = max_x_coord * -1;
-    const int max_y_coord = 50;
-    //const int min_y_coord = max_y_coord * -1;
+    const int max_y_coord = 50;        
 
-    Map default_map;
-    global_map = &default_map;
-    Map_init(&default_map, max_x_coord, max_y_coord);
-    TerrainGenerator_generate_default_map(&default_map);
-
-    char *units_to_spawn[] = {
-        "archer",
-        "archer",
-        "swordman",
-        "spearman",
-        "peasant",
-    };
-
-    PlayerControls_init();
-
-    GameObject_Controller player_controller;
-    GameObject_Controller_Methods player_methods = {
-        .on_tick = NULL,
-        .shoot = get_controller("peasant")->m->shoot,
-    };
-    GameObject_Controller_init(&player_controller, &player_methods);
+    init_world(max_x_coord, max_y_coord);
+    initialize_players();
+    generate_entities(5);
 
     MIDDLE_X = max_x / 2;
-    #define NUM_TROOPS 5
-    #define NUM_OBJECTS (NUM_TROOPS + 1)
-
-    GameObject *all_objects[NUM_OBJECTS];
-    
-    /*
-    int i;
-    for (i = 0; i < NUM_TROOPS; i++) {
-        all_objects[i] = new_Unit(&neutrals, MIDDLE_X, 10+5*i, units_to_spawn[i]);
-    }
-    */
-    int i;
-    for (i = 0; i < NUM_TROOPS; i++) {
-        all_objects[i] = Unit_new(&neutrals, units_to_spawn[i], MIDDLE_X, 10+5*i);
-    }
-
-    hero = Unit_new(&player, "peasant", 0, 0);
-    all_objects[NUM_OBJECTS-1] = hero;
-    hero->m->set_controller(hero, &player_controller);
 
     int counter = 0;
     while (1) {
-
         int i;
         for (i = 0; i < NUM_TROOPS; i++) {
             GameObject *cur_object = all_objects[i];
@@ -129,9 +97,51 @@ int main(int argc, char *argv[]) {
         #endif
         usleep(UPDATE_RATE_US);
     }
-    printf("max_x: %d, max_y: %d\n", max_x, max_y);
     
     cleanup(OK);
+}
+
+static void init_world(int max_x_coord, int max_y_coord) {
+    global_map = &default_map;
+    Map_init(&default_map, max_x_coord, max_y_coord);
+    TerrainGenerator_generate_default_map(&default_map);
+}
+
+static void initialize_players() {
+    PlayerControls_init();
+
+    Player_init(&player, COLOR_PAIR_RED, TRUE);
+    Player_init(&neutrals, COLOR_PAIR_YELLOW, FALSE);
+
+    GameObject_Controller player_controller;
+    GameObject_Controller_Methods player_methods = {
+        .on_tick = NULL,
+        .shoot = get_controller("peasant")->m->shoot,
+    };
+    GameObject_Controller_init(&player_controller, &player_methods);
+    
+    hero = Unit_new(&player, &player_controller, "peasant", 0, 0);
+    all_objects[NUM_OBJECTS-1] = hero;
+}
+
+static int generate_entities(unsigned int count) {
+    int entities_generated = 0;
+    
+    char *units_to_spawn[] = {
+        "archer",
+        "archer",
+        "swordman",
+        "spearman",
+        "peasant",
+    };
+    
+    int i;
+    for (i = 0; i < NUM_TROOPS; i++) {
+        all_objects[i] = Unit_new(&neutrals, NULL, units_to_spawn[i], MIDDLE_X, 10+5*i);
+    }
+
+    
+    return entities_generated;
 }
 
 static void process_input() {

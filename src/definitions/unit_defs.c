@@ -97,7 +97,7 @@ void UnitDefs_init() {
     }
 }
 
-GameObject *Unit_new(Player *owner, const char *name, int x, int y) {
+GameObject *Unit_new(Player *owner, GameObject_Controller *custom_controller, const char *name, int x, int y) {
     if (owner == NULL || name == NULL) {
         return NULL;
     }
@@ -117,7 +117,12 @@ GameObject *Unit_new(Player *owner, const char *name, int x, int y) {
     for (i = 0; i < NUM_UNIT_TYPES; i++) {
         if (StrRel(name, ==, defs[i].name)) {
             image_to_use = &images[i];
-            controller = get_controller(defs[i].controller);
+
+            if (custom_controller) {
+                controller = custom_controller;
+            } else {
+                controller = get_controller(defs[i].controller);
+            }
         }
     }
     if (image_to_use == NULL) {
