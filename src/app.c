@@ -137,29 +137,11 @@ int main(int argc, char *argv[]) {
 static void process_input() {
     char input = getch();
 
-    switch (input) {
-        case ERR: 
-            break;
-        case 'a':
-            /* Intentional fall-through */
-        case 'd':
-            /* Intentional fall-through */
-        case 'w':
-            /* Intentional fall-through */
-        case 's':
-            /* Intentional fall-through */
-        case 'q':
-            /* Intentional fall-through */
-        case 'e':
-            /* Intentional fall-through */
-        case '<':
-            /* Intentional fall-through */
-        case ' ':
-            /* Intentional fall-through */
-        case 'x':
-            PlayerControls_handle_input_char(input, hero);
-            break;
+    if (input == ERR) {
+        input = NO_KEYBOARD_INPUT;
     }
+
+    PlayerControls_handle_input_char(input, hero);
 }
 
 static void render_objects(Map *map, GameObject *objects[], int num_objects) {

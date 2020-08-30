@@ -3,6 +3,8 @@
 
 #include "gameobject.h"
 
+#define NO_KEYBOARD_INPUT -1
+
 
 
 /*
