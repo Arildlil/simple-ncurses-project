@@ -1,6 +1,7 @@
-#include "../../include/gameobject_container.h"
+#include "../include/gameobject_container.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 
 
@@ -24,13 +25,13 @@ static GameObjectContainer_methods methods = {
     .get_new_object = GameObjectContainer_get_new_object,
     .get_object = GameObjectContainer_get_object,
     .get_all_objects = GameObjectContainer_get_all_objects
-}
+};
 
 
 
 /* ----- | Functions | ----- */
 
-struct GameObjectContainer GameObjectContainer_init(struct GameObjectContainer *container,
+struct GameObjectContainer *GameObjectContainer_init(struct GameObjectContainer *container,
     unsigned int size) {
    
     if (container == NULL) {
@@ -61,12 +62,17 @@ static void GameObjectContainer_on_tick(struct GameObjectContainer *container) {
         return;
     }
     
-    int index;
+    unsigned int index;
     for (index = 0; index < container->size; index++) {
-        GameObject *current = GameObjectContainer_get_object(container, index);
+        GameObject *current = container->m->get_object(container, index);
         
-        if (current != NULL) {
-            current->m->on_tick(current);
+        if (current == NULL || !current->m->is_active(current)) {
+            continue;
+        }
+        
+        GameObject_Controller *cur_controller = current->m->get_controller(current);
+        if (cur_controller != NULL) {
+            cur_controller->m->on_tick(cur_controller, current);
         }
     }
 }
@@ -84,12 +90,12 @@ static GameObject *GameObjectContainer_get_new_object(struct GameObjectContainer
         return NULL;
     }
     
-    int current_index;
+    unsigned int current_index;
     for (current_index = 0; current_index < container->size; current_index++) {
-        GameObject *current = container[current_index];
-        if (!current->m->is_active(current)) {
+        GameObject *current = container->m->get_object(container, current_index);
+        if (!current->active) {
             *index = current_index;
-            return GameObjectContainer_get_object(container, current_index);
+            return container->m->get_object(container, current_index);
         }
     }
     
@@ -102,16 +108,16 @@ static GameObject *GameObjectContainer_get_object(struct GameObjectContainer *co
     }
     
     // May choose to return an object in the future, by using the NullObjectPattern instead of NULL.
-    if (index >= size) {
+    if (index >= container->m->get_size(container)) {
         return NULL;
     }
     
-    return container[index];
+    return &container->gameobjects[index];
 }
 
 static GameObject *GameObjectContainer_get_all_objects(struct GameObjectContainer *container, unsigned int *size) {
     if (container == NULL) {
-        return;
+        return NULL;
     }
     
     *size = container->size;

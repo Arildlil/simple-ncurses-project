@@ -90,6 +90,10 @@ GameObject_Controller *get_controller(const char *name) {
 
 
 
+void no_action(GameObject_Controller *controller, GameObject *object) {
+    return;
+}
+
 void default_on_tick(GameObject_Controller *controller, GameObject *object) {
     (void)controller;
 

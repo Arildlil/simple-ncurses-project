@@ -97,7 +97,7 @@ void UnitDefs_init() {
     }
 }
 
-GameObject *Unit_new(Player *owner, GameObject_Controller *custom_controller, const char *name, int x, int y) {
+GameObject *Unit_new(Player *owner, GameObject *gameobject, GameObject_Controller *custom_controller, const char *name, int x, int y) {
     if (owner == NULL || name == NULL) {
         return NULL;
     }
@@ -105,8 +105,12 @@ GameObject *Unit_new(Player *owner, GameObject_Controller *custom_controller, co
         UnitDefs_init();
     }
 
-    GameObject *object = malloc(sizeof(GameObject));
-    if (object == NULL) {
+
+    if (gameobject == NULL) {
+        gameobject = malloc(sizeof(GameObject));
+    }
+    
+    if (gameobject == NULL) {
         fprintf(stderr, "(ERROR) Unit_new: Couldn't alloc memory for new unit!\n");
         return NULL;
     }
@@ -128,7 +132,7 @@ GameObject *Unit_new(Player *owner, GameObject_Controller *custom_controller, co
     if (image_to_use == NULL) {
         fprintf(stderr, "(ERROR) Unit_new: Couldn't find definition for name \'%s\'!\n", 
             name);
-        free(object);
+        free(gameobject);
         return NULL;
     } 
     if (controller == NULL) {
@@ -136,8 +140,8 @@ GameObject *Unit_new(Player *owner, GameObject_Controller *custom_controller, co
             name);
         controller = get_controller("default");
     }
-    GameObject_init(object, owner, x, y, image_to_use, NULL);
-    object->m->set_controller(object, controller);
+    GameObject_init(gameobject, owner, x, y, image_to_use, NULL);
+    gameobject->m->set_controller(gameobject, controller);
 
-    return object;
+    return gameobject;
 }

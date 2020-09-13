@@ -21,7 +21,7 @@ static void paint_image(Image *image, int x, int y, Color_Pair color, FrameBuffe
     RenderCoordinateBorders *borders);
 static void paint_terrain(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map);
 static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map, 
-    GameObject *objects[], int num_elements);
+    GameObject objects[], int num_elements);
 static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, 
     Map *map, int start_x, int end_x, int start_y, int end_y);
 static void render_pixel(FrameBuffer *frame_buffer, int x, int y);
@@ -166,6 +166,10 @@ static inline int inner_i(int fb_x, int fb_y, int width) {
 static void paint_object(GameObject *object, int x, int y, FrameBuffer *frame_buffer,
     RenderCoordinateBorders *borders) {
 
+    if (!object->m->is_active(object)) {
+        return;
+    }
+
     Player *owner = object->m->get_owner(object);
     Color_Pair colors = owner->m->get_colors(owner);
     Image *image = object->m->get_image(object);
@@ -237,13 +241,13 @@ static void paint_terrain(FrameBuffer *frame_buffer, RenderCoordinateBorders *bo
  * Paint the visible GameObjects into the frame buffer.
  */
 static void paint_objects(FrameBuffer *frame_buffer, RenderCoordinateBorders *borders, Map *map, 
-    GameObject *objects[], int num_elements) {
+    GameObject objects[], int num_elements) {
     
     (void)map;
 
     int i;
     for (i = 0; i < num_elements; i++) {
-        GameObject *object = objects[i];
+        GameObject *object = &objects[i];
         int object_x = object->m->get_x(object);
         int object_y = object->m->get_y(object);
         if (object_x < borders->left_x || object_x > borders->right_x || 
@@ -353,7 +357,7 @@ static void paint_bottom_menu(FrameBuffer *frame_buffer, RenderCoordinateBorders
         menu_vert_border_color, frame_buffer, current_width);
 }
 
-void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject *objects[], int num_elements) {
+void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject objects[], int num_elements) {
     assert(map);
 
     FrameBuffer *current_frame = frames[current_frame_index];
@@ -363,8 +367,10 @@ void Rendering_fill_framebuffer(Map *map, int center_x, int center_y, GameObject
     size_t menu_bottom_top_y = current_height - menu_bottom_height;
     size_t menu_bottom_bot_y = current_height;
     
+    /*
     fprintf(stderr, "curH: %d, curW: %d, topY: %d, botY: %d\n", 
         (int)current_height, (int)current_width, (int)menu_bottom_top_y, (int)menu_bottom_bot_y);
+    */
 
     /* Don't draw under the bottom menu */
     current_height -= menu_bottom_height;

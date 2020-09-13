@@ -9,7 +9,7 @@ DEBUG = -g
 TESTS = src/tests/tests.c
 APP = src/app.c
 OBJS = src/core/player/*.c src/core/graphics/*.c \
-	src/core/gameobject/*.c src/core/world/*.c src/definitions/*.c src/utils.c
+	src/core/gameobject/*.c src/core/world/*.c src/definitions/*.c src/utils.c src/core/*.c
 
 INCS = -I/usr/include/cmocka
 LIB_PATH = -L/usr/lib/

@@ -8,6 +8,7 @@
 #include "include/rendering.h"
 #include "include/unit_controllers.h"
 #include "include/terrain_generator.h"
+#include "include/gameobject_container.h"
 
 #include "include/unit_defs.h"
 
@@ -32,13 +33,15 @@ static void init_world(int max_x_coord, int max_y_coord);
 static void initialize_players();
 static int generate_entities(unsigned int count);
 
-static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_elements);
-static void render_objects(Map *map, GameObject *objects[], int num_objects);
+static void Curses_redraw_objects(Map *map, GameObjectContainer *objects);
+static void render_objects(Map *map, GameObjectContainer *objects);
 static void cleanup(int sig);
 
 
 
 /* ----- | Static Variables | ------ */
+
+#define NO_GRAPHIC_MODE 0
 
 #define FPS 10
 #define US_PER_SEC 1000000
@@ -51,7 +54,7 @@ static Player player, neutrals;
 
 static GameObject_Controller player_controller;
 static GameObject_Controller_Methods player_methods = {
-    .on_tick = NULL,
+    .on_tick = no_action,
     .shoot = peasant_shoot,
 };
 
@@ -59,7 +62,9 @@ static int MIDDLE_X = 0;
 static GameObject *hero;
 
 static Map default_map;
-static GameObject *all_objects[NUM_OBJECTS];
+//static GameObject *all_objects[NUM_OBJECTS];
+
+static GameObjectContainer entities;
 
 
 
@@ -73,7 +78,11 @@ int main(int argc, char *argv[]) {
     (void)argv;
 
     const int max_x_coord = 100;
-    const int max_y_coord = 50;        
+    const int max_y_coord = 50;  
+    
+    GameObjectContainer_init(&entities, NUM_OBJECTS);
+    
+    assert(entities.m->get_size(&entities) > 0);
 
     init_world(max_x_coord, max_y_coord);
     generate_entities(5);
@@ -83,6 +92,7 @@ int main(int argc, char *argv[]) {
 
     int counter = 0;
     while (1) {
+        /*
         int i;
         for (i = 0; i < NUM_TROOPS; i++) {
             GameObject *cur_object = all_objects[i];
@@ -91,8 +101,10 @@ int main(int argc, char *argv[]) {
                 cur_controller->m->on_tick(cur_controller, cur_object);
             }
         }
+        */
+        entities.m->on_tick(&entities);
 
-        render_objects(&default_map, all_objects, NUM_OBJECTS);
+        render_objects(&default_map, &entities);
 
         process_input();
 
@@ -121,12 +133,14 @@ static void initialize_players() {
 
     GameObject_Controller_init(&player_controller, &player_methods);
     
-    hero = Unit_new(&player, &player_controller, "peasant", 0, 0);
-    all_objects[NUM_OBJECTS-1] = hero;
+    unsigned int inserted_index = 0;
+    hero = entities.m->get_new_object(&entities, &inserted_index);
+    Unit_new(&player, hero, &player_controller, "peasant", 0, 0);
 }
 
 static int generate_entities(unsigned int count) {
     assert(count <= NUM_TROOPS);
+    
     int entities_generated = 0;
     
     char *units_to_spawn[] = {
@@ -135,9 +149,12 @@ static int generate_entities(unsigned int count) {
         "spearman",
     };
     
-    unsigned int i;
+    unsigned int inserted_index, i;
     for (i = 0; i < count; i++) {
-        all_objects[i] = Unit_new(&neutrals, NULL, units_to_spawn[0], MIDDLE_X, 10+5*i);
+        GameObject *empty_gameobject = entities.m->get_new_object(&entities, &inserted_index);
+        assert(empty_gameobject);
+        
+        Unit_new(&neutrals, empty_gameobject, NULL, units_to_spawn[0], MIDDLE_X, 10+5*i);
     }
     
     return entities_generated;
@@ -153,22 +170,29 @@ static void process_input() {
     PlayerControls_handle_input_char(input, hero);
 }
 
-static void render_objects(Map *map, GameObject *objects[], int num_objects) {
+static void render_objects(Map *map, GameObjectContainer *objects) {
     assert(objects != NULL);
-    assert(num_objects >= 0);
 
-    Curses_redraw_objects(map, objects, num_objects);
+    if (NO_GRAPHIC_MODE) {
+        return;
+    }
+    
+    Curses_redraw_objects(map, objects);
 }
 
 /*
  * Redraws the GameObjects.
  */
-static void Curses_redraw_objects(Map *map, GameObject *objects[], int num_elements) {
+static void Curses_redraw_objects(Map *map, GameObjectContainer *objects) {
     getmaxyx(stdscr, max_y, max_x);
     clear();
 
     /* Draw the background Map. */
-    Rendering_fill_framebuffer(map, hero->m->get_x(hero), hero->m->get_y(hero), objects, num_elements);
+    unsigned int number_objects = 0;
+    GameObject *all_objects = objects->m->get_all_objects(objects, &number_objects);
+    
+    Rendering_fill_framebuffer(map, hero->m->get_x(hero), hero->m->get_y(hero), 
+        all_objects, number_objects);
 
     Rendering_render_frame();
 
@@ -185,7 +209,13 @@ static int init() {
     signal(SIGINT, cleanup);
     signal(SIGTERM, cleanup);
     signal(SIGKILL, cleanup);
+    
+    if (NO_GRAPHIC_MODE) {
+        return OK;
+    }
+    
     Curses_init();
+    
     if (Rendering_init(max_x, max_y) == FALSE) {
         cleanup(0);
     }
