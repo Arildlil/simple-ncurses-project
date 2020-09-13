@@ -32,6 +32,7 @@ struct Map_Methods {
     int (*get_width)(struct Map *map);
     int (*get_height)(struct Map *map);
     Square *(*get_square)(struct Map *map, int x, int y);
+    Square ***(*get_surrounding_squares)(struct Map *map, Square *square);
     void (*free)(struct Map *map);
 };
 

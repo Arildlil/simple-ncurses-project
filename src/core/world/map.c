@@ -15,6 +15,7 @@ static int Map_get_min_y(struct Map *map);
 static int Map_get_width(struct Map *map);
 static int Map_get_height(struct Map *map);
 static Square *Map_get_square(struct Map *map, int x, int y);
+static Square ***Map_get_surrounding_squares(struct Map *map, Square *square);
 static void Map_free(struct Map *map);
 
 
@@ -30,6 +31,7 @@ static Map_Methods map_methods = {
     .get_width = Map_get_width,
     .get_height = Map_get_height,
     .get_square = Map_get_square,
+    .get_surrounding_squares = Map_get_surrounding_squares,
     .free = Map_free
 };
 
@@ -132,6 +134,23 @@ static Square *Map_get_square(struct Map *map, int x, int y) {
     /*fprintf(stderr, "Map_get_square: (x = %d, y = %d), (i = %d, j = %d)\n", x, y, i, j);*/
     Square *row = map->squares[j];
     return &row[i];
+}
+
+static Square ***Map_get_surrounding_squares(struct Map *map, Square *square) {
+    static Square *surrounding_squares[3][3] = { NULL };
+
+    int square_x = square->m->get_x(square);
+    int square_y = square->m->get_y(square);
+
+    int x, y;
+    for (y = -1; y <= 1; y++) {
+        for (x = -1; x <= 1; x++) {
+            Square *current = Map_get_square(map, square_x + x, square_y + y);
+            surrounding_squares[y + 1][x + 1] = current;
+        }
+    }
+
+    return surrounding_squares;
 }
 
 static void Map_free(struct Map *map) {
