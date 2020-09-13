@@ -126,21 +126,19 @@ static void initialize_players() {
 }
 
 static int generate_entities(unsigned int count) {
+    assert(count <= NUM_TROOPS);
     int entities_generated = 0;
     
     char *units_to_spawn[] = {
         "archer",
-        "archer",
         "swordman",
         "spearman",
-        "peasant",
     };
     
-    int i;
-    for (i = 0; i < NUM_TROOPS; i++) {
-        all_objects[i] = Unit_new(&neutrals, NULL, units_to_spawn[i], MIDDLE_X, 10+5*i);
+    unsigned int i;
+    for (i = 0; i < count; i++) {
+        all_objects[i] = Unit_new(&neutrals, NULL, units_to_spawn[0], MIDDLE_X, 10+5*i);
     }
-
     
     return entities_generated;
 }

@@ -29,6 +29,8 @@ typedef struct Coordinates {
     int y;
 } Coordinates;
 
+int random_in_range(int from, int to);
+
 #define MOVEMENT_PER_UPDATE 3
 
 #endif
